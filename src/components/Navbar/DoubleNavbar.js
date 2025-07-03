@@ -529,7 +529,7 @@
 // }
 
 
-
+import { Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {
   IconCalendarStats,
@@ -543,13 +543,20 @@ import {
 } from '@tabler/icons-react';
 import { UnstyledButton, Tooltip } from '@mantine/core';
 import classes from './DoubleNavbar.module.css';
+import { useNavigate } from 'react-router-dom';
+import AdmissionEnquiry from '../FrontOffice/Admission_Enquiry/admissionEnquiry';
+import Dashboard from '../DashBoard/dashboard';
+
+
+
+
 
 const mainLinksMockdata = [
   {
     icon: IconHome2,
     label: 'Front Office',
     subLinks: [
-      { label: 'Admission Enquiry' },
+      { label: 'Admission Enquiry',route:'/admission-enquiry' },   // step-1 
       { label: 'Visitor Book' },
       { label: 'Phone Call Log' },
       { label: 'Postal Dispatch' },
@@ -633,15 +640,23 @@ export function DoubleNavbar() {
   const [activeMain, setActiveMain] = useState('Front Office');
   const [activeSub, setActiveSub] = useState('');
   const [currentDate, setCurrentDate] = useState('');
-  const [openSubmenus, setOpenSubmenus] = useState({});
+  // const [openSubmenus, setOpenSubmenus] = useState({});
 
-  const toggleSubmenu = (label) => {
-    setOpenSubmenus((prev) => ({ ...prev, [label]: !prev[label] }));
-  };
+  const [openMenuLabel, setOpenMenuLabel] = useState('');
+
+  const navigate = useNavigate();
+
+const toggleSubmenu = (label) => {
+  setOpenMenuLabel((prev) => (prev === label ? '' : label));
+};
+
+function handleClick(route) {
+  if(route) navigate(route)
+}
 
   const mainLinks = mainLinksMockdata.map((link) => {
     const hasSubLinks = link.subLinks && link.subLinks.length > 0;
-    const isOpen = openSubmenus[link.label];
+   const isOpen = openMenuLabel === link.label;
 
     return (
       <div key={link.label}>
@@ -654,6 +669,7 @@ export function DoubleNavbar() {
             } else {
               setActiveMain(link.label);
               setActiveSub('');
+              setOpenMenuLabel('');
             }
           }}
           className={`${classes.mainLink} ${activeMain === link.label ? classes.active : ''}`}
@@ -689,6 +705,7 @@ export function DoubleNavbar() {
                 onClick={() => {
                   setActiveSub(sub.label);
                   setActiveMain(link.label);
+                  handleClick(sub.route)
                 }}
               >
                 {sub.label}
@@ -752,7 +769,7 @@ export function DoubleNavbar() {
           className={classes.consumerparent}
           style={{ height: '100%' }}
         >
-          <h1
+          {/* <h1
             style={{
               textAlign: 'center',
               display: 'flex',
@@ -762,7 +779,14 @@ export function DoubleNavbar() {
             }}
           >
             Details
-          </h1>
+          </h1> */}
+        <Routes>
+          <Route path="/" element={<Dashboard/>} />
+          <Route path="/admission-enquiry" element={<AdmissionEnquiry/>} />
+         
+
+
+        </Routes>
         </div>
       </div>
     </div>

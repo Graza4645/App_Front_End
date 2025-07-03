@@ -136,7 +136,7 @@
 }
 
 .expanded {
-  width: 320px;
+  width: 287px;
 }
 
 .topSection {
@@ -210,7 +210,7 @@
 }
 
 .subLinkGroup {
-  padding-left: 48px;
+  padding-left: 24px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -219,17 +219,22 @@
 }
 
 .subLink {
-  font-size: 11px;
+ font-size: 11px;
   color: var(--mantine-color-gray-7);
   cursor: pointer;
   padding: 3px 6px;
   border-radius: 5px;
+
+  margin-left: 10px; /* ✅ Indent subLink */
+  padding-left: 10px; /* ✅ Create space for border */
+  border-left: 3px solid transparent; /* Line placeholder */
+  transition: border-left 0.3s ease;
   /* color: #88919c; */
   
 }
 
 .subLink:hover {
-  background-color: #edf2fa;
+  background-color: #e4edfa;
   color: black;
 }
 
