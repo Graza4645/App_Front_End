@@ -546,18 +546,28 @@ import classes from './DoubleNavbar.module.css';
 import { useNavigate } from 'react-router-dom';
 import AdmissionEnquiry from '../FrontOffice/Admission_Enquiry/admissionEnquiry';
 import Dashboard from '../DashBoard/dashboard';
+import VisitorBook from '../FrontOffice/VisitorBook/visitorbook.js';
+
 
 
 
 
 
 const mainLinksMockdata = [
+   {
+    icon: IconHome2,
+    label: 'DashBoard', route : '/dashboard',
+    subLinks: [
+      //{ label: 'Student In Progress..' },
+    
+    ],
+  },
   {
     icon: IconHome2,
     label: 'Front Office',
     subLinks: [
       { label: 'Admission Enquiry',route:'/admission-enquiry' },   // step-1 
-      { label: 'Visitor Book' },
+      { label: 'Visitor Book' , route: '/visitorbook' },
       { label: 'Phone Call Log' },
       { label: 'Postal Dispatch' },
       { label: 'Postal Receive' },
@@ -569,68 +579,43 @@ const mainLinksMockdata = [
     icon: IconGauge,
     label: 'Student Information',
     subLinks: [
-      { label: 'Admission Form' },
-      { label: 'Student List' },
+      { label: 'Student In Progress..' },
+    
     ],
   },
   {
     icon: IconDeviceDesktopAnalytics,
     label: 'Fee Collection',
     subLinks: [
-      { label: 'Admission Enquiry' },
-      { label: 'Visitor Book' },
-      { label: 'Phone Call Log' },
-      { label: 'Postal Dispatch' },
-      { label: 'Postal Receive' },
-      { label: 'Complain' },
-      { label: 'Setup Front Office' },
+      { label: 'Fee In Progress..' },
     ],
   },
   {
     icon: IconCalendarStats,
     label: 'Income',
     subLinks: [
-      { label: 'Income Summary' },
-      { label: 'Monthly Report' },
+      { label: 'Income In Progress..' },
     ],
   },
   {
     icon: IconUser,
     label: 'Expenses',
     subLinks: [
-      { label: 'Admission Enquiry' },
-      { label: 'Visitor Book' },
-      { label: 'Phone Call Log' },
-      { label: 'Postal Dispatch' },
-      { label: 'Postal Receive' },
-      { label: 'Complain' },
-      { label: 'Setup Front Office' },
+      { label: 'Expenses In Progress..' },
     ],
   },
   {
     icon: IconFingerprint,
     label: 'Examinations',
     subLinks: [
-      { label: 'Admission Enquiry' },
-      { label: 'Visitor Book' },
-      { label: 'Phone Call Log' },
-      { label: 'Postal Dispatch' },
-      { label: 'Postal Receive' },
-      { label: 'Complain' },
-      { label: 'Setup Front Office' },
+      { label: 'Examinations In Progress..' },
     ],
   },
   {
     icon: IconSettings,
     label: 'Attendance',
     subLinks: [
-      { label: 'Admission Enquiry' },
-      { label: 'Visitor Book' },
-      { label: 'Phone Call Log' },
-      { label: 'Postal Dispatch' },
-      { label: 'Postal Receive' },
-      { label: 'Complain' },
-      { label: 'Setup Front Office' },
+      { label: 'Attendance In Progress..' },
     ],
   },
 ];
@@ -661,17 +646,18 @@ function handleClick(route) {
     return (
       <div key={link.label}>
         <UnstyledButton
-          onClick={() => {
-            if (hasSubLinks) {
-              toggleSubmenu(link.label);
-              setActiveMain(link.label);
-              setActiveSub('');
-            } else {
-              setActiveMain(link.label);
-              setActiveSub('');
-              setOpenMenuLabel('');
-            }
-          }}
+         onClick={() => {
+  if (hasSubLinks) {
+    toggleSubmenu(link.label);
+    setActiveMain(link.label);
+    setActiveSub('');
+  } else {
+    setActiveMain(link.label);
+    setActiveSub('');
+    setOpenMenuLabel('');
+    handleClick(link.route); 
+  }
+}}
           className={`${classes.mainLink} ${activeMain === link.label ? classes.active : ''}`}
         >
           <span className={classes.iconWrapper}>
@@ -782,10 +768,11 @@ function handleClick(route) {
           </h1> */}
         <Routes>
           <Route path="/" element={<Dashboard/>} />
+          <Route path="/dashboard" element={<Dashboard/>} />
           <Route path="/admission-enquiry" element={<AdmissionEnquiry/>} />
-         
+          <Route path="/visitorbook" element={<VisitorBook/>} />
 
-
+          
         </Routes>
         </div>
       </div>
