@@ -3,17 +3,26 @@ import './createvisitor.css';
 
 const formElements = [
   {
-    id: 'department',
-    label: 'Department',
+    id: 'Purpose',
+    label: 'Purpose',
     type: 'dropdown',
-    options: ['HR', 'Finance', 'Engineering', 'Marketing'],
+    options: ['Marketing', 'Parent Teacher Meeting', 'Student Meeting', 'Staff Meeting','Principal'],
     position: 'left',
+    require: true
   },
   {
-    id: 'cameraAccess',
-    label: 'Camera Access',
-    type: 'checkbox',
+    id: 'VisitorName',
+    label: 'Visitor Name',
+    type: 'text',
     position: 'left',
+    require: false
+  },
+  {
+    id: 'Phone',
+    label: 'Phone Number',
+    type: 'text',
+    position: 'left',
+    require: true
   },
   {
     id: 'visitorType',
@@ -21,68 +30,185 @@ const formElements = [
     type: 'dropdown',
     options: ['Client', 'Vendor', 'Interviewee'],
     position: 'left',
+    require: true
   },
+
+  
+     {
+    id: 'time',
+    label: 'In Time',
+    type: 'time',
+    position: 'left',
+    require: true
+  },
+      {
+    id: 'date',
+    label: 'Date',
+    type: 'date',
+    position: 'left',
+    require: true
+  },
+
+
   {
-    id: 'purpose',
-    label: 'Visit Purpose',
+    id: 'MeetingWith',
+    label: 'Meeting With',
     type: 'dropdown',
     options: ['Meeting', 'Delivery', 'Interview'],
     position: 'right',
+    require: true
   },
   {
-    id: 'wifiAccess',
-    label: 'WiFi Access',
-    type: 'checkbox',
-    position: 'right',
-  },
-  {
-    id: 'building',
-    label: 'Building',
+    id: 'Staff',
+    label: 'Staff',
     type: 'dropdown',
-    options: ['Block A', 'Block B', 'Block C'],
+    options: ['Meeting', 'Delivery', 'Interview'],
     position: 'right',
+    require: true
   },
+  {
+    id: 'idcard',
+    label: 'ID Card',
+    type: 'text',
+    position: 'right',
+    require: true
+  },
+   {
+    id: 'Numberpeson',
+    label: 'Number Of Person',
+    type: 'text',
+    position: 'right',
+    require: true
+  },
+       {
+    id: 'time',
+    label: 'Out Time',
+    type: 'time',
+    position: 'right',
+    require: true
+  },
+
+  {
+    id: 'fileUpload',
+    label: 'Upload Documents',
+    type: 'file',
+    position: 'right',
+    require: true
+  },
+   
+
+  
+    
 ];
 
 export default function CreateVisitorBook() {
   const leftItems = formElements.filter((item) => item.position === 'left');
   const rightItems = formElements.filter((item) => item.position === 'right');
 
-const renderItem = (item) => (
-  item.type === 'dropdown' ? (
-    <div key={item.id} className="form-group">
-      <label htmlFor={item.id}>{item.label}</label>
-      <select id={item.id} name={item.id} className="dropdown">
-        <option value="">--Select--</option>
-        {item.options.map((opt, index) => (
-          <option key={index} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-    </div>
-  ) : item.type === 'checkbox' ? (
-    <div key={item.id} className="form-group">
-      <label htmlFor={item.id}>{item.label}</label>
-      <div className="checkbox-wrapper">
-        <input type="checkbox" id={item.id} name={item.id} />
-        <span>{item.label}</span>
-      </div>
-    </div>
-  ) : null
-);
+  const renderItem = (item) => {
+    if (item.type === 'dropdown') {
+      return (
+        <div key={item.id} className="form-group">
+          <label htmlFor={item.id}>
+            {item.label}
+            {item.require && <span className="required">*</span>}
+          </label>
+          <select id={item.id} name={item.id} className="dropdown">
+            <option value="">--Select--</option>
+            {item.options.map((opt, index) => (
+              <option key={index} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    } if(item.type === 'text') {
+      return (
+        <div key={item.id} className="form-group">
+          <label htmlFor={item.id}>
+            {item.label}
+            {item.require && <span className="required">*</span>}
+          </label>
+          <input
+            type="text"
+            id={item.id}
+            name={item.id}
+            className="text-input"
+          />
+        </div>
+      );
+    }
+    if(item.type === 'date') {
+      return (
+        <div key={item.id} className="form-group">
+          <label htmlFor={item.id}>
+            {item.label}
+            {item.require && <span className="required">*</span>}
+          </label>
+          <input
+            type="date"
+            id={item.id}
+            name={item.id}
+            className="text-input"
+          />
+        </div>
+      );
+    }
+
+     if(item.type === 'time') {
+      return (
+        <div key={item.id} className="form-group">
+          <label htmlFor={item.id}>
+            {item.label}
+            {item.require && <span className="required">*</span>}
+          </label>
+          <input
+            type="time"
+            id={item.id}
+            name={item.id}
+            className="text-input"
+          />
+        </div>
+      );
+    }
+
+     if(item.type === 'file') {
+      return (
+        <div key={item.id} className="form-group">
+          <label htmlFor={item.id}>
+            {item.label}
+            {item.require && <span className="required">*</span>}
+          </label>
+          <input
+            type="file"
+            id={item.id}
+            name={item.id}
+            className="file"
+          />
+        </div>
+      );
+    }
+
+
+  };
 
   return (
+
+    <> <div className="header">Front Office → Visitor Book → Create New Visitor</div>
     <div className="container">
       <div className="left">
-        <h3>Left Side</h3>
         {leftItems.map(renderItem)}
       </div>
 
       <div className="right">
-        <h3>Right Side</h3>
         {rightItems.map(renderItem)}
+        <div>
+          <button className='submit'>Submit</button>
+        </div>
       </div>
     </div>
+    </>
   );
+
 }
