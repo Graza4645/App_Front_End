@@ -1,9 +1,17 @@
 // VisitorTable.jsx
 import './visitorbook.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function VisitorBook() {
+  const navigate = useNavigate();
   return (
+    <>
+      <div className='createbutton'>
+           <span >Front Office → Visitor Book</span>
+           <button type='button' onClick={() => navigate('/createvisitor')}>Create New +</button>
+      </div>
     <main>
+      
       <div className="table-container">
         <table>
           <thead>
@@ -37,5 +45,6 @@ export default function VisitorBook() {
         </table>
       </div>
     </main>
+    </>
   );
 }

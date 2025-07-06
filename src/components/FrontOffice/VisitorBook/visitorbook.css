@@ -87,3 +87,21 @@ th:first-child {
 th:last-child {
   border-top-right-radius: 8px;
 }
+
+.createbutton{
+    margin: 6px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    
+}
+
+button{
+  border: 0px;
+  background-color: #7258df;
+  border-radius: 4px;
+  padding: 2px 7px 3px 3px;
+  color: white;
+  cursor: grab;
+  
+}

@@ -547,6 +547,8 @@ import { useNavigate } from 'react-router-dom';
 import AdmissionEnquiry from '../FrontOffice/Admission_Enquiry/admissionEnquiry';
 import Dashboard from '../DashBoard/dashboard';
 import VisitorBook from '../FrontOffice/VisitorBook/visitorbook.js';
+import CreateVisitorBook from '../FrontOffice/VisitorBook/createvisitor.js';
+
 
 
 
@@ -771,8 +773,7 @@ function handleClick(route) {
           <Route path="/dashboard" element={<Dashboard/>} />
           <Route path="/admission-enquiry" element={<AdmissionEnquiry/>} />
           <Route path="/visitorbook" element={<VisitorBook/>} />
-
-          
+          <Route path="/createvisitor" element={<CreateVisitorBook/>}/>
         </Routes>
         </div>
       </div>
