@@ -75,7 +75,7 @@ const formElements = [
     require: true
   },
    {
-    id: 'Numberpeson',
+    id: 'Numberperson',
     label: 'Number Of Person',
     type: 'text',
     position: 'right',
@@ -105,7 +105,7 @@ const formElements = [
 export default function CreateVisitorBook() {
   const leftItems = formElements.filter((item) => item.position === 'left');
   const rightItems = formElements.filter((item) => item.position === 'right');
-
+  const [meetingWith, setMeetingWith] = useState("");
 
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState(''); 
@@ -120,6 +120,53 @@ export default function CreateVisitorBook() {
   }
 
   const renderItem = (item) => {
+
+   if (item.id === 'Numberperson' && meetingWith === 'Staff') {
+  return null;
+}
+if (item.label === 'Out Time' && meetingWith === 'Staff') {
+  return null;
+}
+
+
+
+if (item.label === 'In Time' && meetingWith === 'Staff') {
+  return null;
+}
+ if (item.type === 'dropdown') {
+      
+       if(item.id === 'MeetingWith'){
+      return (
+        <div key={item.id} className="form-group">
+          <label htmlFor={item.id}>
+            {item.label}
+            {item.require && <span className="required">*</span>}
+          </label>
+          <select 
+              id={item.id} 
+              name={item.id} 
+              className="dropdown" 
+              value={meetingWith}
+              onChange={(e)=> setMeetingWith(e.target.value)}
+              >
+            <option value="">--Select--</option>
+            {item.options.map((opt, index) => (
+              <option key={index} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    }
+
+    }
+    
+    
+   
+
+    
+
     if (item.type === 'dropdown') {
       return (
         <div key={item.id} className="form-group">
@@ -139,7 +186,12 @@ export default function CreateVisitorBook() {
       );
 
 
-    } if(item.type === 'text') {
+    } 
+    
+    
+    
+    
+    if(item.type === 'text') {
        if (item.id === 'Phone') {
         return (
           <div key={item.id} className="form-group">
