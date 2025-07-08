@@ -6,7 +6,7 @@
     height: 100%;
     /* border: 1px solid green; */
     margin: 12px;
-    background-color: #fdfdfd;
+    background-color: #dfdfdf;
     border-radius: 12px;
      flex-wrap: wrap; /* Allows wrapping if screen is small */
   
@@ -74,7 +74,7 @@
 }
 
 .header{
-    border: 1px solid #008000;
+    /* border: 1px solid #008000; */
     color: #495057;
     font-size: 12px;
 }
@@ -86,19 +86,8 @@
 }
 
 
-/* .submit-button {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
+.error{
+  font-size: 12px;
+  color : red;
+  margin: 0px;
 }
-
-.submit-button:hover {
-  background-color: #45a049;
-} */
