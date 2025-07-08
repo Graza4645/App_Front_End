@@ -7,51 +7,12 @@ const formElements = [
     id: 'Purpose',
     label: 'Purpose',
     type: 'dropdown',
-    options: ['Marketing', 'Parent Teacher Meeting', 'Student Meeting', 'Staff Meeting','Principal'],
-    position: 'left',
-    require: true
-  },
-  {
-    id: 'VisitorName',
-    label: 'Visitor Name',
-    type: 'text',
-    position: 'left',
-    require: false
-  },
-  {
-    id: 'Phone',
-    label: 'Phone Number',
-    type: 'text',
-    position: 'left',
-    require: true
-  },
-  {
-    id: 'visitorType',
-    label: 'Visitor Type',
-    type: 'dropdown',
-    options: ['Client', 'Vendor', 'Interviewee'],
+    options: ['Marketing', 'Parent Teacher Meeting', 'Student Meeting', 'Staff Meeting','Principal Meeting'],
     position: 'left',
     require: true
   },
 
-  
-     {
-    id: 'time',
-    label: 'In Time',
-    type: 'time',
-    position: 'left',
-    require: true
-  },
-      {
-    id: 'date',
-    label: 'Date',
-    type: 'date',
-    position: 'left',
-    require: true
-  },
-
-
-  {
+   {
     id: 'MeetingWith',
     label: 'Meeting With',
     type: 'dropdown',
@@ -59,21 +20,69 @@ const formElements = [
     position: 'right',
     require: true
   },
-  {
+
+    {
     id: 'Staff',
     label: 'Staff',
     type: 'dropdown',
-    options: ['Meeting', 'Delivery', 'Interview'],
+    options: ['MD FIROZ', 'SEKH', 'NAYYAR'],
+    position: 'left',
+    require: true
+  },
+// ----------------------------------------------------
+      {
+    id: 'class',
+    label: 'Class',
+    type: 'dropdown',
+    options: ['10th', '9th', '8th'],
+    position: 'left',
+    require: true
+  },
+
+
+      {
+    id: 'section',
+    label: 'Section',
+    type: 'dropdown',
+    options: ['A', 'B', 'C'],
     position: 'right',
     require: true
   },
+
+      {
+    id: 'student',
+    label: 'Student',
+    type: 'dropdown',
+    options: ['Kallua', 'Pandra', 'Motka','Chunnu','kaliya'],
+    position: 'right',
+    require: true
+  },
+
+
+   
+   {
+    id: 'VisitorName',
+    label: 'Visitor Name',
+    type: 'text',
+    position: 'left',
+    require: false
+  },
+
   {
-    id: 'idcard',
-    label: 'ID Card',
+    id: 'Phone',
+    label: 'Phone Number',
     type: 'text',
     position: 'right',
     require: true
   },
+    {
+    id: 'idcard',
+    label: 'ID Card',
+    type: 'text',
+    position: 'left',
+    require: true
+  },
+
    {
     id: 'Numberperson',
     label: 'Number Of Person',
@@ -81,11 +90,26 @@ const formElements = [
     position: 'right',
     require: true
   },
+   {
+    id: 'date',
+    label: 'Date',
+    type: 'date',
+    position: 'left',
+    require: true
+  },
+     {
+    id: 'time',
+    label: 'In Time',
+    type: 'time',
+    position: 'right',
+    require: true
+  },
+  
        {
     id: 'time',
     label: 'Out Time',
     type: 'time',
-    position: 'right',
+    position: 'left',
     require: true
   },
 
@@ -96,7 +120,7 @@ const formElements = [
     position: 'right',
     require: true
   },
-   
+
 
   
     
@@ -121,18 +145,27 @@ export default function CreateVisitorBook() {
 
   const renderItem = (item) => {
 
-   if (item.id === 'Numberperson' && meetingWith === 'Staff') {
-  return null;
-}
-if (item.label === 'Out Time' && meetingWith === 'Staff') {
-  return null;
-}
+//    if (item.id === 'Numberperson' && meetingWith === 'Staff') {
+//   return null;
+// }
+// if (item.label === 'Out Time' && meetingWith === 'Staff') {
+//   return null;
+// }
+
+// if (item.label === 'In Time' && meetingWith === 'Staff') {
+//   return null;
+// }
+
+  const showStudentFields = ['class', 'section', 'student', 'VisitorName'];
+  if (showStudentFields.includes(item.id) && meetingWith !== 'Student') {
+    return null;
+  }
+
+if (item.id === 'Staff' && meetingWith !== 'Staff') {
+    return null;
+  }
 
 
-
-if (item.label === 'In Time' && meetingWith === 'Staff') {
-  return null;
-}
  if (item.type === 'dropdown') {
       
        if(item.id === 'MeetingWith'){
