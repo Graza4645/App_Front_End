@@ -8,6 +8,29 @@ export default function VisitorBook() {
     <>
       <div className='createbutton'>
            <span >Front Office → Visitor Book</span>
+                    <div className="icon-toolbar">
+  <span className="icon-container">
+    <i className="fas fa-copy"></i>
+    <span className="tooltip">Copy</span>
+  </span>
+  <span className="icon-container">
+    <i className="fas fa-file-excel"></i>
+    <span className="tooltip">Excel</span>
+  </span>
+  <span className="icon-container">
+    <i className="fas fa-file-csv"></i>
+    <span className="tooltip">CSV</span>
+  </span>
+  <span className="icon-container">
+    <i className="fas fa-file-pdf"></i>
+    <span className="tooltip">PDF</span>
+  </span>
+  <span className="icon-container">
+    <i className="fas fa-print"></i>
+    <span className="tooltip">Print</span>
+  </span>
+</div>
+
            <button type='button' onClick={() => navigate('/createvisitor')}>Create New +</button>
       </div>
     <main>

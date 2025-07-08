@@ -89,10 +89,12 @@ th:last-child {
 }
 
 .createbutton{
-    margin: 6px;
-    font-size: 13px;
+       margin: 6px;
+    font-size: 11px;
     display: flex;
     justify-content: space-between;
+    height: 26px;
+
     
 }
 
@@ -105,3 +107,52 @@ button{
   cursor: grab;
   
 }
+
+
+.icon-toolbar {
+     display: flex;
+    gap: 7px;
+    justify-content: flex-start;
+    align-items: center;
+   
+    margin-left: 713px;
+}
+
+
+.icon-container {
+  position: relative;
+  font-size: 22px;
+  cursor: pointer;
+  color: #333;
+  transition: transform 0.1s ease; /* Smooth icon zoom on hover */
+}
+
+.icon-container:hover {
+  transform: scale(1.2); /* Grows the icon by 30% */
+}
+
+.tooltip {
+    position: absolute;
+    bottom: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgb(92 92 92);
+    color: #f9f9f9;
+    font-size: 9px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    /* transition: opacity 0.5s ease, visibility 0.5s ease;
+  visibility: hidden;
+
+  /* ⏱ Increase duration to 0.5s (500ms) */
+  /* transition: opacity 0.5s ease, visibility 0.5s ease; */
+}
+
+.icon-container:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+

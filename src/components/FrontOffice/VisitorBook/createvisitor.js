@@ -330,12 +330,15 @@ if (item.id === 'Staff' && meetingWith !== 'Staff') {
     <> <div className="header">Front Office → Visitor Book → Create New Visitor</div>
     <div className="container">
       <div className="left">
+        <span className='headline'>Create New VisitorBook</span>
         {leftItems.map(renderItem)}
       </div>
 
       <div className="right">
+        <span className='headlines'>Create New VisitorBook</span>
         {rightItems.map(renderItem)}
         <div>
+           
           <button className='submit' disabled={!!phoneError}>Submit</button>
         </div>
       </div>
