@@ -1,5 +1,5 @@
 import React from 'react';
-import dashboardImage from './details.png'; // ✅ correct relative path
+import dashboardImage from './hd.jpg'; // ✅ correct relative path
 
 export default function Dashboard() {
   return (

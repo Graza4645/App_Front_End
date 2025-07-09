@@ -89,11 +89,11 @@ th:last-child {
 }
 
 .createbutton{
-       margin: 6px;
-    font-size: 11px;
+     font-size: 11px;
     display: flex;
     justify-content: space-between;
-    height: 26px;
+    height: 36px;
+    align-items: center;
 
     
 }
@@ -114,8 +114,6 @@ button{
     gap: 7px;
     justify-content: flex-start;
     align-items: center;
-   
-    margin-left: 713px;
 }
 
 
@@ -156,3 +154,19 @@ button{
   visibility: visible;
 }
 
+
+
+
+.create{
+  /* border: 1px solid red; */
+  height: 26px;
+}
+
+.leftvistor{
+margin-left: 6px;
+}
+
+
+.rightvisitor{
+margin-right: 6px;
+}
