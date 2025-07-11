@@ -9,6 +9,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var createStaff = require('./routes/createStaff')
 var getStaffDetails = require('./routes/getStaffdetails')
+var visitorstaff    = require('./routes/VisitoBook/VisitorStaff')
+var visitorstudent = require('./routes/VisitoBook/VisitorStudent')
 
 var app = express();
 app.use(cors());
@@ -27,6 +29,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/createstaff', createStaff)
 app.use('/getStaffDetails', getStaffDetails)
+app.use('/visitorstaff', visitorstaff);
+app.use('/visitorstudent', visitorstudent)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
