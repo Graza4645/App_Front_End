@@ -12,7 +12,7 @@ var getStaffDetails = require('./routes/getStaffdetails')
 var visitorstaff    = require('./routes/VisitoBook/VisitorStaff')
 var visitorstudent = require('./routes/VisitoBook/VisitorStudent')
 var getvisitorStudent = require('./routes/VisitoBook/getvisitorStudent')
-var getvisitorStudent = require('./routes/VisitoBook/getvisitorStaff')
+var getvisitorStaff = require('./routes/VisitoBook/getvisitorStaff')
 
 var app = express();
 app.use(cors());
@@ -34,7 +34,7 @@ app.use('/getStaffDetails', getStaffDetails)
 app.use('/visitorstaff', visitorstaff);
 app.use('/visitorstudent', visitorstudent)
 app.use('/getvisitorStudent', getvisitorStudent)
-app.use('/getvisitorStaff', getvisitorStudent)
+app.use('/getvisitorStaff', getvisitorStaff)
 
 app.use(function(req, res, next) {
   next(createError(404));
