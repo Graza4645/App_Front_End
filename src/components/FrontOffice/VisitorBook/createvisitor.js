@@ -192,24 +192,46 @@ export default function CreateVisitorBook() {
 
  const handleSubmit = async () => {
   try {
-    const payload = {
+    const commonPayload = {
       purpose: formData.Purpose,
       meeting_with: formData.MeetingWith,
-      staff: formData.Staff,
-      visitor_name: formData.VisitorName,
       id_card: formData.idcard,
-      phone_number: formData.Phone,
       date: formData.date,
+      visitor_name: formData.VisitorName,
+      out_time: formData.outTime,
+      phone_number: formData.Phone,
+      comments: formData.comments,
       number_of_person: formData.Numberperson,
       in_time: formData.inTime,
-      out_time: formData.outTime,
-      comments: formData.comments,
       upload_documents: formData.fileUpload || "",
     };
 
+    let payload = {};
+    let apiUrl = "";
+
+    if (formData.MeetingWith === "Staff") {
+      payload = {
+        ...commonPayload,
+        staff: formData.Staff,
+      };
+      apiUrl = "http://localhost:3000/visitorstaff";
+    } else if (formData.MeetingWith === "Student") {
+      payload = {
+        ...commonPayload,
+        class: formData.class,
+        section: formData.section,
+        student: formData.student,
+      };
+      apiUrl = "http://localhost:3000/visitorstudent";
+    } else {
+      alert("Unsupported Meeting With type.");
+      return;
+    }
+
+    console.log("Submitting to:", apiUrl);
     console.log("Payload:", payload);
 
-    const res = await fetch("http://localhost:3000/visitorstaff", {
+    const res = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
