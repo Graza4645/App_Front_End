@@ -166,6 +166,69 @@ export default function VisitorBook() {
     fetchVisitors();
   }, []);
 
+
+
+const handleDelete = async (visitor) => {
+  const confirmDelete = window.confirm(`Are you sure you want to delete ${visitor.visitor_name || visitor.staff || visitor.student}?`);
+
+  if (!confirmDelete) return;
+
+  try {
+    const response = await fetch(`http://localhost:3000/deleteVisitor/${visitor.id}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete visitor');
+    }
+
+    // Remove from local state
+    setVisitors((prev) => prev.filter((v) => v.id !== visitor.id));
+
+    alert('Visitor deleted successfully');
+  } catch (error) {
+    console.error('Delete error:', error);
+    alert('Error deleting visitor');
+  }
+};
+
+
+const handleEdit = async (visitor) => {
+  // Optional: prompt or pre-fill form (use modal in real apps)
+  const updatedName = prompt("Edit visitor name:", visitor.visitor_name || visitor.staff || visitor.student);
+
+  if (!updatedName || updatedName.trim() === "") return;
+
+  try {
+    const updatedVisitor = {
+      ...visitor,
+      visitor_name: updatedName, // Modify only the field you're updating
+    };
+
+    const response = await fetch(`http://localhost:3000/updateVisitor/${visitor.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedVisitor),
+    });
+
+    if (!response.ok) throw new Error('Failed to update visitor');
+
+    // Update local state
+    setVisitors((prev) =>
+      prev.map((v) => (v.id === visitor.id ? updatedVisitor : v))
+    );
+
+    alert("Visitor updated successfully!");
+  } catch (err) {
+    console.error("Error updating visitor:", err);
+    alert("Update failed!");
+  }
+};
+
+
+
   const normalizeData = (data) => {
     return data.map((visitor) => ({
       Purpose: visitor.purpose || 'N/A',
@@ -253,7 +316,7 @@ export default function VisitorBook() {
       </div>
 
       <main>
-        <div className='table-container'>
+        <div id="printArea"  className='table-container'>
           <table>
             <thead>
               <tr>
@@ -281,7 +344,15 @@ export default function VisitorBook() {
                   <td>{visitor.date || 'N/A'}</td>
                   <td>{visitor.in_time || visitor.intime || 'N/A'}</td>
                   <td>{visitor.out_time || visitor.outtime || 'N/A'}</td>
-                  <td>Edit | Delete</td>
+                  <td>
+                      <div className="action-menu">
+                        <i className="fas fa-ellipsis-v"></i>
+                        <div className="dropdown-content">
+                          <div onClick={() => handleEdit(visitor)}>Edit</div>
+                          <div onClick={() => handleDelete(visitor)}>Delete</div>
+                        </div>
+                      </div>
+                    </td>
                 </tr>
               ))}
               {visitors.length === 0 && (
