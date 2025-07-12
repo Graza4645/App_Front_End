@@ -13,6 +13,8 @@ var visitorstaff    = require('./routes/VisitoBook/VisitorStaff')
 var visitorstudent = require('./routes/VisitoBook/VisitorStudent')
 var getvisitorStudent = require('./routes/VisitoBook/getvisitorStudent')
 var getvisitorStaff = require('./routes/VisitoBook/getvisitorStaff')
+var deletevistorStaff = require('./routes/VisitoBook/deletevistorStaff')
+var deletevistorStudent = require('./routes/VisitoBook/deletevisitorStudent')
 
 var app = express();
 app.use(cors());
@@ -35,6 +37,8 @@ app.use('/visitorstaff', visitorstaff);
 app.use('/visitorstudent', visitorstudent)
 app.use('/getvisitorStudent', getvisitorStudent)
 app.use('/getvisitorStaff', getvisitorStaff)
+app.use('/deletevistorStaff', deletevistorStaff)
+app.use('/deletevistorStudent', deletevistorStudent);
 
 app.use(function(req, res, next) {
   next(createError(404));

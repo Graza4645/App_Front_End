@@ -395,31 +395,36 @@ export default function VisitorBook() {
     fetchVisitors();
   }, []);
 
-  const handleDelete = async (visitor) => {
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete ${
-        visitor.visitor_name || visitor.staff || visitor.student
-      }?`
-    );
-    if (!confirmDelete) return;
+ const handleDelete = async (visitor) => {
+  const name = visitor.visitor_name || visitor.staff || visitor.student;
+  const confirmDelete = window.confirm(`Are you sure you want to delete ${name}?`);
+  if (!confirmDelete) return;
 
-    try {
-      const response = await fetch(
-        `http://localhost:3000/deleteVisitor/${visitor.id}`,
-        {
-          method: "DELETE",
-        }
-      );
+  const encodedName = encodeURIComponent(name);
 
-      if (!response.ok) throw new Error("Failed to delete visitor");
+  try {
+    let response = await fetch(`http://localhost:3000/deletevistorStaff?visitor_name=${encodedName}`, {
+      method: "DELETE",
+    });
 
-      setVisitors((prev) => prev.filter((v) => v.id !== visitor.id));
-      alert("Visitor deleted successfully");
-    } catch (error) {
-      console.error("Delete error:", error);
-      alert("Error deleting visitor");
+    if (!response.ok) {
+      response = await fetch(`http://localhost:3000/deletevistorStudent?visitor_name=${encodedName}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete visitor from both APIs");
     }
-  };
+    setVisitors((prev) =>
+      prev.filter((v) => (v.visitor_name || v.staff || v.student) !== name)
+    );
+
+    alert("Visitor deleted successfully");
+  } catch (error) {
+    console.error("Delete error:", error);
+    alert("Error deleting visitor");
+  }
+};
+
 
   const handleEdit = async (visitor) => {
     const updatedName = prompt(
