@@ -3,25 +3,120 @@ import "./createvisitor.css";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 
-
 // here i will implement  you code
 
 const formElements = [
-  { id: "Purpose", label: "Purpose", type: "dropdown", options: ["Marketing", "Parent Teacher Meeting", "Student Meeting", "Staff Meeting", "Principal Meeting"], position: "left", require: true },
-  { id: "MeetingWith", label: "Meeting With", type: "dropdown", options: ["Staff", "Student", "Parent"], position: "right", require: true },
-  { id: "Staff", label: "Staff", type: "dropdown", options: [], position: "left", require: true },
-  { id: "class", label: "Class", type: "dropdown", options: ["10th", "9th", "8th"], position: "left", require: true },
-  { id: "section", label: "Section", type: "dropdown", options: ["A", "B", "C"], position: "right", require: true },
-  { id: "student", label: "Student", type: "dropdown", options: ["Kallua", "Pandra", "Motka", "Chunnu", "kaliya"], position: "right", require: true },
-  { id: "VisitorName", label: "Visitor Name", type: "text", position: "right", require: true },
-  { id: "Phone", label: "Phone Number", type: "text", position: "right", require: true },
-  { id: "idcard", label: "ID Card", type: "text", position: "left", require: true },
-  { id: "Numberperson", label: "Number Of Person", type: "text", position: "right", require: true },
+  {
+    id: "Purpose",
+    label: "Purpose",
+    type: "dropdown",
+    options: [
+      "Marketing",
+      "Parent Teacher Meeting",
+      "Student Meeting",
+      "Staff Meeting",
+      "Principal Meeting",
+    ],
+    position: "left",
+    require: true,
+  },
+  {
+    id: "MeetingWith",
+    label: "Meeting With",
+    type: "dropdown",
+    options: ["Staff", "Student", "Parent"],
+    position: "right",
+    require: true,
+  },
+  {
+    id: "Staff",
+    label: "Staff",
+    type: "dropdown",
+    options: [],
+    position: "left",
+    require: true,
+  },
+  {
+    id: "class",
+    label: "Class",
+    type: "dropdown",
+    options: ["10th", "9th", "8th"],
+    position: "left",
+    require: true,
+  },
+  {
+    id: "section",
+    label: "Section",
+    type: "dropdown",
+    options: ["A", "B", "C"],
+    position: "right",
+    require: true,
+  },
+  {
+    id: "student",
+    label: "Student",
+    type: "dropdown",
+    options: ["Kallua", "Pandra", "Motka", "Chunnu", "kaliya"],
+    position: "right",
+    require: true,
+  },
+  {
+    id: "VisitorName",
+    label: "Visitor Name",
+    type: "text",
+    position: "right",
+    require: true,
+  },
+  {
+    id: "Phone",
+    label: "Phone Number",
+    type: "text",
+    position: "right",
+    require: true,
+  },
+  {
+    id: "idcard",
+    label: "ID Card",
+    type: "text",
+    position: "left",
+    require: true,
+  },
+  {
+    id: "Numberperson",
+    label: "Number Of Person",
+    type: "text",
+    position: "right",
+    require: true,
+  },
   { id: "date", label: "Date", type: "date", position: "left", require: true },
-  { id: "inTime", label: "In Time", type: "time", position: "left", require: true },
-  { id: "outTime", label: "Out Time", type: "time", position: "right", require: true },
-  { id: "fileUpload", label: "Upload Documents", type: "file", position: "right", require: true },
-  { id: "comments", label: "Write comments", type: "text", position: "left", require: true },
+  {
+    id: "inTime",
+    label: "In Time",
+    type: "time",
+    position: "left",
+    require: true,
+  },
+  {
+    id: "outTime",
+    label: "Out Time",
+    type: "time",
+    position: "right",
+    require: true,
+  },
+  {
+    id: "fileUpload",
+    label: "Upload Documents",
+    type: "file",
+    position: "right",
+    require: true,
+  },
+  {
+    id: "comments",
+    label: "Write comments",
+    type: "text",
+    position: "left",
+    require: true,
+  },
 ];
 
 export default function CreateVisitorBook() {
@@ -41,8 +136,7 @@ export default function CreateVisitorBook() {
   const [NmberpersonErro, setNumberpersonError] = useState("");
 
   const [inTimeError, setInTimeError] = useState("");
-const [outTimeError, setOutTimeError] = useState("");
-
+  const [outTimeError, setOutTimeError] = useState("");
 
   useEffect(() => {
     if (meetingWith === "Staff") {
@@ -120,7 +214,19 @@ const [outTimeError, setOutTimeError] = useState("");
 
   const handleSubmit = async () => {
     try {
-      const commonPayload = { purpose: formData.Purpose, meeting_with: formData.MeetingWith, id_card: formData.idcard, date: formData.date, visitor_name: formData.VisitorName, out_time: formData.outTime, phone_number: formData.Phone, comments: formData.comments, number_of_person: formData.Numberperson, in_time: formData.inTime, upload_documents: formData.fileUpload || "" };
+      const commonPayload = {
+        purpose: formData.Purpose,
+        meeting_with: formData.MeetingWith,
+        id_card: formData.idcard,
+        date: formData.date,
+        visitor_name: formData.VisitorName,
+        out_time: formData.outTime,
+        phone_number: formData.Phone,
+        comments: formData.comments,
+        number_of_person: formData.Numberperson,
+        in_time: formData.inTime,
+        upload_documents: formData.fileUpload || "",
+      };
 
       let payload = {};
       let apiUrl = "";
@@ -314,13 +420,21 @@ const [outTimeError, setOutTimeError] = useState("");
       );
     }
 
-if (item.type === "date") {
+    if (item.type === "date") {
   const today = new Date();
   const oneYearBack = new Date(today);
   oneYearBack.setFullYear(today.getFullYear() - 1);
 
   const oneYearAhead = new Date(today);
   oneYearAhead.setFullYear(today.getFullYear() + 1);
+
+  // 📌 Formatter to 15-Aug-2025
+  const formatDate = (date) => {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = date.toLocaleString("en-US", { month: "short" });
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
 
   return (
     <div key={item.id} className="form-group">
@@ -331,100 +445,102 @@ if (item.type === "date") {
       <DatePicker
         id={item.id}
         selected={formData[item.id] ? new Date(formData[item.id]) : null}
-        onChange={(date) => handleChange(item.id, date)}
+        onChange={(date) => {
+          const formatted = formatDate(date);
+          handleChange(item.id, formatted);
+        }}
         minDate={oneYearBack}
         maxDate={oneYearAhead}
         placeholderText="Pick a date"
-        dateFormat="dd-MMM-YYYY"
+        dateFormat="dd-MMM-yyyy"
         className="text-input"
       />
     </div>
   );
 }
 
+    if (item.type === "time") {
+      const value = formData[item.id] || "";
 
-if (item.type === "time") {
-  const value = formData[item.id] || "";
+      // Generate dropdown options from 09:00 to 18:00 in 30-min steps
+      const generateTimeOptions = () => {
+        const options = [];
+        for (let h = 9; h <= 18; h++) {
+          for (let m = 0; m < 60; m += 30) {
+            const hour = h.toString().padStart(2, "0");
+            const minute = m.toString().padStart(2, "0");
+            const value24 = `${hour}:${minute}`;
+            const h12 = (h % 12 || 12).toString();
+            const ampm = h < 12 ? "AM" : "PM";
+            const label = `${h12}:${minute} ${ampm}`;
+            options.push({ value: value24, label });
+          }
+        }
+        return options;
+      };
 
-  // Generate dropdown options from 09:00 to 18:00 in 30-min steps
-  const generateTimeOptions = () => {
-    const options = [];
-    for (let h = 9; h <= 18; h++) {
-      for (let m = 0; m < 60; m += 30) {
-        const hour = h.toString().padStart(2, "0");
-        const minute = m.toString().padStart(2, "0");
-        const value24 = `${hour}:${minute}`;
-        const h12 = ((h % 12) || 12).toString();
-        const ampm = h < 12 ? "AM" : "PM";
-        const label = `${h12}:${minute} ${ampm}`;
-        options.push({ value: value24, label });
-      }
+      const timeOptions = generateTimeOptions();
+
+      const handleTimeChange = (id, selectedValue) => {
+        const inTime = formData["inTime"];
+        const outTime = formData["outTime"];
+
+        // Clear previous errors
+        setInTimeError("");
+        setOutTimeError("");
+
+        if (id === "inTime" && outTime) {
+          const inT = new Date(`2000-01-01T${selectedValue}`);
+          const outT = new Date(`2000-01-01T${outTime}`);
+          if (inT >= outT) {
+            setInTimeError("In Time must be earlier than Out Time.");
+            return;
+          }
+        }
+
+        if (id === "outTime" && inTime) {
+          const inT = new Date(`2000-01-01T${inTime}`);
+          const outT = new Date(`2000-01-01T${selectedValue}`);
+          if (outT <= inT) {
+            setOutTimeError("Out Time must be later than In Time.");
+            return;
+          }
+        }
+
+        handleChange(id, selectedValue);
+      };
+
+      return (
+        <div key={item.id} className="form-group">
+          <label htmlFor={item.id}>
+            {item.label}
+            {item.require && <span className="required">*</span>}
+          </label>
+          <select
+            id={item.id}
+            name={item.id}
+            className="dropdown"
+            value={value}
+            onChange={(e) => handleTimeChange(item.id, e.target.value)}
+          >
+            <option value="">-- Select Time --</option>
+            {timeOptions.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+
+          {/* ✅ Show error messages below each field if applicable */}
+          {item.id === "inTime" && inTimeError && (
+            <p className="error">{inTimeError}</p>
+          )}
+          {item.id === "outTime" && outTimeError && (
+            <p className="error">{outTimeError}</p>
+          )}
+        </div>
+      );
     }
-    return options;
-  };
-
-  const timeOptions = generateTimeOptions();
-
-  const handleTimeChange = (id, selectedValue) => {
-    const inTime = formData["inTime"];
-    const outTime = formData["outTime"];
-
-    // Clear previous errors
-    setInTimeError("");
-    setOutTimeError("");
-
-    if (id === "inTime" && outTime) {
-      const inT = new Date(`2000-01-01T${selectedValue}`);
-      const outT = new Date(`2000-01-01T${outTime}`);
-      if (inT >= outT) {
-        setInTimeError("In Time must be earlier than Out Time.");
-        return;
-      }
-    }
-
-    if (id === "outTime" && inTime) {
-      const inT = new Date(`2000-01-01T${inTime}`);
-      const outT = new Date(`2000-01-01T${selectedValue}`);
-      if (outT <= inT) {
-        setOutTimeError("Out Time must be later than In Time.");
-        return;
-      }
-    }
-
-    handleChange(id, selectedValue);
-  };
-
-  return (
-    <div key={item.id} className="form-group">
-      <label htmlFor={item.id}>
-        {item.label}
-        {item.require && <span className="required">*</span>}
-      </label>
-      <select
-        id={item.id}
-        name={item.id}
-        className="dropdown"
-        value={value}
-        onChange={(e) => handleTimeChange(item.id, e.target.value)}
-      >
-        <option value="">-- Select Time --</option>
-        {timeOptions.map((t) => (
-          <option key={t.value} value={t.value}>
-            {t.label}
-          </option>
-        ))}
-      </select>
-
-      {/* ✅ Show error messages below each field if applicable */}
-      {item.id === "inTime" && inTimeError && (
-        <p className="error">{inTimeError}</p>
-      )}
-      {item.id === "outTime" && outTimeError && (
-        <p className="error">{outTimeError}</p>
-      )}
-    </div>
-  );
-}
 
     if (item.type === "file") {
       return (
