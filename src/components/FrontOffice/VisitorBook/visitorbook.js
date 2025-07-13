@@ -1,4 +1,3 @@
-
 import "./visitorbook.css";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -10,7 +9,8 @@ export default function VisitorBook() {
   const navigate = useNavigate();
   const [visitors, setVisitors] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const visitorsPerPage = 10;
+
+  const visitorsPerPage = 20;
 
   useEffect(() => {
     const fetchVisitors = async () => {
@@ -31,36 +31,44 @@ export default function VisitorBook() {
     fetchVisitors();
   }, []);
 
- const handleDelete = async (visitor) => {
-  const name = visitor.visitor_name || visitor.staff || visitor.student;
-  const confirmDelete = window.confirm(`Are you sure you want to delete ${name}?`);
-  if (!confirmDelete) return;
-
-  const encodedName = encodeURIComponent(name);
-
-  try {
-    let response = await fetch(`http://localhost:3000/deletevistorStaff?visitor_name=${encodedName}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) {
-      response = await fetch(`http://localhost:3000/deletevistorStudent?visitor_name=${encodedName}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) throw new Error("Failed to delete visitor from both APIs");
-    }
-    setVisitors((prev) =>
-      prev.filter((v) => (v.visitor_name || v.staff || v.student) !== name)
+  const handleDelete = async (visitor) => {
+    const name = visitor.visitor_name || visitor.staff || visitor.student;
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete ${name}?`
     );
+    if (!confirmDelete) return;
 
-    alert("Visitor deleted successfully");
-  } catch (error) {
-    console.error("Delete error:", error);
-    alert("Error deleting visitor");
-  }
-};
+    const encodedName = encodeURIComponent(name);
 
+    try {
+      let response = await fetch(
+        `http://localhost:3000/deletevistorStaff?visitor_name=${encodedName}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        response = await fetch(
+          `http://localhost:3000/deletevistorStudent?visitor_name=${encodedName}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        if (!response.ok)
+          throw new Error("Failed to delete visitor from both APIs");
+      }
+      setVisitors((prev) =>
+        prev.filter((v) => (v.visitor_name || v.staff || v.student) !== name)
+      );
+
+      alert("Visitor deleted successfully");
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Error deleting visitor");
+    }
+  };
 
   const handleEdit = async (visitor) => {
     const updatedName = prompt(
@@ -209,16 +217,16 @@ export default function VisitorBook() {
           <table>
             <thead>
               <tr>
-                <th>Purpose</th>
-                <th>Meeting With</th>
-                <th>Visitor Name</th>
-                <th>Phone</th>
-                <th>ID Card</th>
-                <th>Number Of Person</th>
-                <th>Date</th>
-                <th>In Time</th>
-                <th>Out Time</th>
-                <th>Action</th>
+                <th>PURPOSE</th>
+                <th>MEETING WITH</th>
+                <th>VISITOR NAME</th>
+                <th>PHONE</th>
+                <th>ID CARD</th>
+                <th>NUMBER OF PERSON</th>
+                <th>DATE</th>
+                <th>IN TIME</th>
+                <th>OUT TIME</th>
+                <th>ACTION</th>
               </tr>
             </thead>
             <tbody>
@@ -250,8 +258,18 @@ export default function VisitorBook() {
                     <div className="action-menu">
                       <i className="fas fa-ellipsis-v"></i>
                       <div className="dropdown-content">
-                        <div className="edit" onClick={() => handleEdit(visitor)}>Edit</div>
-                        <div className="Delete"  onClick={() => handleDelete(visitor)}>Delete</div>
+                        <div
+                          className="edit"
+                          onClick={() => handleEdit(visitor)}
+                        >
+                          Edit
+                        </div>
+                        <div
+                          className="Delete"
+                          onClick={() => handleDelete(visitor)}
+                        >
+                          Delete
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -259,7 +277,7 @@ export default function VisitorBook() {
               ))}
               {visitors.length === 0 && (
                 <tr>
-                  <td colSpan="10">No visitor data available.</td>
+                  <td colSpan="20">No visitor data available.</td>
                 </tr>
               )}
             </tbody>
@@ -270,22 +288,28 @@ export default function VisitorBook() {
       {/* <div className='count'></div> */}
 
       {/* Pagination Controls */}
-     <div className="pagination">
-  <span className='count'> Page: {currentPage} of {totalPages}</span>
+      <div className="pagination">
+        <span className="count">
+          {" "}
+          Page: {currentPage} of {totalPages}
+        </span>
 
-  <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
-    Prev
-  </button>
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(currentPage - 1)}
+        >
+          Prev
+        </button>
 
-  <button className="active">
-    {currentPage}
-  </button>
+        <button className="active">{currentPage}</button>
 
-  <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
-    Next
-  </button>
-</div>
-
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(currentPage + 1)}
+        >
+          Next
+        </button>
+      </div>
 
       {/* </div> */}
     </>
