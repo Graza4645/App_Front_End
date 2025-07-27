@@ -463,21 +463,47 @@ export default function CreateVisitorBook() {
       const value = formData[item.id] || "";
 
       // Generate dropdown options from 09:00 to 18:00 in 30-min steps
+      // const generateTimeOptions = () => {
+      //   const options = [];
+      //   for (let h = 9; h <= 18; h++) {
+      //     for (let m = 0; m < 60; m += 30) {
+      //       const hour = h.toString().padStart(2, "0");
+      //       const minute = m.toString().padStart(2, "0");
+      //       const value24 = `${hour}:${minute}`;
+      //       const h12 = (h % 12 || 12).toString();
+      //       const ampm = h < 12 ? "AM" : "PM";
+      //       const label = `${h12}:${minute} ${ampm}`;
+      //       options.push({ value: value24, label });
+      //     }
+      //   }
+      //   return options;
+      // };
+
+
       const generateTimeOptions = () => {
-        const options = [];
-        for (let h = 9; h <= 18; h++) {
-          for (let m = 0; m < 60; m += 30) {
-            const hour = h.toString().padStart(2, "0");
-            const minute = m.toString().padStart(2, "0");
-            const value24 = `${hour}:${minute}`;
-            const h12 = (h % 12 || 12).toString();
-            const ampm = h < 12 ? "AM" : "PM";
-            const label = `${h12}:${minute} ${ampm}`;
-            options.push({ value: value24, label });
-          }
-        }
-        return options;
-      };
+  const options = [];
+  const start = new Date();
+  start.setHours(9, 0, 0, 0); // 09:00
+  const end = new Date();
+  end.setHours(18, 0, 0, 0); // 18:00
+
+  while (start <= end) {
+    const hour = start.getHours().toString().padStart(2, "0");
+    const minute = start.getMinutes().toString().padStart(2, "0");
+    const value24 = `${hour}:${minute}`;
+
+    const hour12 = (start.getHours() % 12 || 12).toString();
+    const ampm = start.getHours() < 12 ? "AM" : "PM";
+    const label = `${hour12}:${minute} ${ampm}`;
+
+    options.push({ value: value24, label });
+
+    start.setMinutes(start.getMinutes() + 1); // step 1 minute
+  }
+
+  return options;
+};
+
 
       const timeOptions = generateTimeOptions();
 

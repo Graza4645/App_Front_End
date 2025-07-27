@@ -23,6 +23,7 @@ export default function VisitorBook() {
         const staffData = await staffRes.json();
         const allVisitors = [...(studentData || []), ...(staffData || [])];
         setVisitors(allVisitors);
+        
       } catch (error) {
         console.error("Error fetching visitor data:", error);
       }
@@ -69,6 +70,31 @@ export default function VisitorBook() {
       alert("Error deleting visitor");
     }
   };
+
+
+  const handleCopy = () => {
+  const exportData = normalizeData(visitors); // Already defined and used for Excel/CSV
+
+  if (!exportData.length) {
+    alert("No data to copy");
+    return;
+  }
+
+  // Create a tab-separated string (or you can use commas for CSV)
+  const headers = Object.keys(exportData[0]).join("\t");
+  const rows = exportData.map(row => Object.values(row).join("\t"));
+  const tsvContent = [headers, ...rows].join("\n");
+
+  // Use Clipboard API to copy
+  navigator.clipboard.writeText(tsvContent)
+    .then(() => {
+      alert("Visitor data copied to clipboard!");
+    })
+    .catch(err => {
+      console.error("Failed to copy:", err);
+      alert("Failed to copy visitor data.");
+    });
+};
 
   const handleEdit = async (visitor) => {
     const updatedName = prompt(
@@ -172,10 +198,10 @@ export default function VisitorBook() {
         <div className="leftvistor">Front Office → Visitor Book</div>
         <div className="rightvisitor">
           <div className="icon-toolbar">
-            <span className="icon-container" title="Copy (Coming Soon)">
-              <i className="fas fa-copy"></i>
-              <span className="tooltip">Copy</span>
-            </span>
+           <span className="icon-container" onClick={handleCopy} title="Copy to Clipboard">
+  <i className="fas fa-copy"></i>
+  <span className="tooltip">Copy</span>
+</span>
             <span
               className="icon-container"
               onClick={() => handleExport("excel")}

@@ -65,6 +65,7 @@ th:last-child {
 
     .table-container {
       max-height: 490px; /* Adjust based on need */
+      height: 490px;
       overflow-y: auto;
       border: 1px solid #ccc;
     }
@@ -85,10 +86,17 @@ th:last-child {
       z-index: 10;
     }
 
-    thead:hover th {
-     font-size: 14px;
-}
+    /* thead:hover th {
+      font-size: 14px; 
+} */
 
+
+td[colspan="20"] {
+  text-align: center;
+  padding: 40px 0; /* vertically center with space */
+  font-style: italic;
+  color: #888; /* optional */
+}
     tbody td {
       padding: 7px;
       font-size: 11px;
@@ -311,4 +319,10 @@ margin-right: 6px;
 
 .Delete :hover{
     background-color: rgb(248, 48, 48) !important;
+}
+
+
+
+body{
+  font-style: italic;
 }
