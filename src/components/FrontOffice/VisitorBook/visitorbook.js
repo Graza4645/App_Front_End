@@ -10,6 +10,10 @@ export default function VisitorBook() {
   const [visitors, setVisitors] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [selectedVisitor, setSelectedVisitor] = useState(null);
+const [showModal, setShowModal] = useState(false);
+
+
   const visitorsPerPage = 20;
 
   useEffect(() => {
@@ -31,6 +35,16 @@ export default function VisitorBook() {
 
     fetchVisitors();
   }, []);
+
+
+
+  const handleView = (visitor) => {
+  setSelectedVisitor(visitor);
+  setShowModal(true);
+};
+
+
+
 
   const handleDelete = async (visitor) => {
     const name = visitor.visitor_name || visitor.staff || visitor.student;
@@ -284,19 +298,11 @@ export default function VisitorBook() {
                     <div className="action-menu">
                       <i className="fas fa-ellipsis-v"></i>
                       <div className="dropdown-content">
-                        <div
-                          className="edit"
-                          onClick={() => handleEdit(visitor)}
-                        >
-                          Edit
-                        </div>
-                        <div
-                          className="Delete"
-                          onClick={() => handleDelete(visitor)}
-                        >
-                          Delete
-                        </div>
-                      </div>
+  <div className="view" onClick={() => handleView(visitor)}>View</div>
+  <div className="edit" onClick={() => handleEdit(visitor)}>Edit</div>
+  <div className="Delete" onClick={() => handleDelete(visitor)}>Delete</div>
+</div>
+
                     </div>
                   </td>
                 </tr>
@@ -309,6 +315,26 @@ export default function VisitorBook() {
             </tbody>
           </table>
         </div>
+
+
+{showModal && selectedVisitor && (
+  <div className="modal-overlay">
+    <div className="modal">
+      <div className="modal-header">
+        <h3>Visitor Details</h3>
+        <span className="close-button" onClick={() => setShowModal(false)}>&times;</span>
+      </div>
+      <div className="modal-body">
+        {Object.entries(normalizeData([selectedVisitor])[0]).map(([key, value]) => (
+          <p key={key}><strong>{key}:</strong> {value}</p>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
+
+
       </main>
       {/* <div className='lower'> */}
       {/* <div className='count'></div> */}
