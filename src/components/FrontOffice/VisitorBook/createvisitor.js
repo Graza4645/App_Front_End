@@ -88,7 +88,7 @@ const formElements = [
     position: "right",
     require: true,
   },
-  { id: "date", label: "Date", type: "date", position: "left", require: true },
+  { id: "createdate", label: "Date", type: "date", position: "left", require: true },
   {
     id: "inTime",
     label: "In Time",
@@ -428,7 +428,7 @@ export default function CreateVisitorBook() {
   const oneYearAhead = new Date(today);
   oneYearAhead.setFullYear(today.getFullYear() + 1);
 
-  // 📌 Formatter to 15-Aug-2025
+  // 📌 Format date as: 15-Aug-2025
   const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, "0");
     const month = date.toLocaleString("en-US", { month: "short" });
@@ -442,43 +442,27 @@ export default function CreateVisitorBook() {
         {item.label}
         {item.require && <span className="required">*</span>}
       </label>
-      <DatePicker
-        id={item.id}
-        selected={formData[item.id] ? new Date(formData[item.id]) : null}
-        onChange={(date) => {
-          const formatted = formatDate(date);
-          handleChange(item.id, formatted);
-        }}
-        minDate={oneYearBack}
-        maxDate={oneYearAhead}
-        placeholderText="Pick a date"
-        dateFormat="dd-MMM-yyyy"
-        className="text-input"
-      />
+      <div className="datepicker-wrapper-create">
+        <DatePicker
+          id={item.id}
+          selected={formData[item.id] ? new Date(formData[item.id]) : null}
+          onChange={(date) => {
+            const formatted = formatDate(date);
+            handleChange(item.id, formatted);
+          }}
+          minDate={oneYearBack}
+          maxDate={oneYearAhead}
+          placeholderText="Select Date"
+          dateFormat="dd-MMM-yyyy"
+        />
+      </div>
     </div>
   );
 }
 
+
     if (item.type === "time") {
       const value = formData[item.id] || "";
-
-      // Generate dropdown options from 09:00 to 18:00 in 30-min steps
-      // const generateTimeOptions = () => {
-      //   const options = [];
-      //   for (let h = 9; h <= 18; h++) {
-      //     for (let m = 0; m < 60; m += 30) {
-      //       const hour = h.toString().padStart(2, "0");
-      //       const minute = m.toString().padStart(2, "0");
-      //       const value24 = `${hour}:${minute}`;
-      //       const h12 = (h % 12 || 12).toString();
-      //       const ampm = h < 12 ? "AM" : "PM";
-      //       const label = `${h12}:${minute} ${ampm}`;
-      //       options.push({ value: value24, label });
-      //     }
-      //   }
-      //   return options;
-      // };
-
 
       const generateTimeOptions = () => {
   const options = [];

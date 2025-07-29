@@ -1,25 +1,20 @@
 .container {
-    position: relative; /* Needed for absolute positioning inside */
-      display: flex;
-    gap: 2rem;
-    /* padding: 12px; */
-    height: 92%;
-    /* border: 1px solid green; */
-    margin: 12px;
-    background-color: #ffffff;
-    border-radius: 12px;
-     flex-wrap: wrap; /* Allows wrapping if screen is small */
-     border-style: double;
-  
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  height: 92%;
+  margin: 12px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border-style: double;
 }
 
 .left,
 .right {
   flex: 1;
   padding: 16px;
-  /* border: 1px solid #ddd; */
   border-radius: 8px;
-  /* background-color: #f9f9f9; */
 }
 
 .left h3,
@@ -30,12 +25,11 @@
 }
 
 .form-group {
- margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .form-group label {
   display: block;
-  /* font-weight: 500; */
   margin-bottom: 1px;
   color: #333;
   font-size: small;
@@ -46,9 +40,9 @@
   margin-left: 4px;
 }
 
-/* Input styles */
+
 .text-input,
-.dropdown {
+.dropdown{
   width: 93%;
   height: 30px;
   padding: 0px 12px;
@@ -59,13 +53,11 @@
   background-color: white;
 }
 
-
-.react-datepicker-wrapper,
-.react-datepicker__input-container {
+.datepicker-wrapper-create .react-datepicker-wrapper {
   width: 93%;
 }
 
-.react-datepicker__input-container input {
+.datepicker-wrapper-create .react-datepicker__input-container input {
   width: 100%;
   height: 30px;
   padding: 0px 12px;
@@ -77,85 +69,7 @@
 }
 
 
-.container {
-    position: relative; /* Needed for absolute positioning inside */
-      display: flex;
-    gap: 2rem;
-    /* padding: 12px; */
-    height: 92%;
-    /* border: 1px solid green; */
-    margin: 12px;
-    background-color: #ffffff;
-    border-radius: 12px;
-     flex-wrap: wrap; /* Allows wrapping if screen is small */
-     border-style: double;
-  
-}
-
-.left,
-.right {
-  flex: 1;
-  padding: 16px;
-  /* border: 1px solid #ddd; */
-  border-radius: 8px;
-  /* background-color: #f9f9f9; */
-}
-
-.left h3,
-.right h3 {
-  margin-bottom: 16px;
-  font-size: 18px;
-  color: #333;
-}
-
-.form-group {
- margin-bottom: 10px;
-}
-
-.form-group label {
-  display: block;
-  /* font-weight: 500; */
-  margin-bottom: 1px;
-  color: #333;
-  font-size: small;
-}
-
-.required {
-  color: red;
-  margin-left: 4px;
-}
-
-/* Input styles */
-.text-input,
-.dropdown {
-  width: 93%;
-  height: 30px;
-  padding: 0px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  background-color: white;
-}
-
-
-.react-datepicker-wrapper,
-.react-datepicker__input-container {
-  width: 93%;
-}
-
-.react-datepicker__input-container input {
-  width: 100%;
-  height: 30px;
-  padding: 0px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  background-color: white;
-}
-
-/* Dropdown specific styles */
+/* Dropdown arrow styling */
 .dropdown {
   appearance: none;
   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20fill='black'%20height='24'%20viewBox='0%200%2024%2024'%20width='24'%20xmlns='http://www.w3.org/2000/svg'%3E%3Cpath%20d='M7%2010l5%205%205-5z'/%3E%3C/svg%3E");
@@ -165,19 +79,13 @@
   cursor: pointer;
 }
 
-
-
-
-.header{
-    /* border: 1px solid #008000; */
-    color: #495057;
-    font-size: 12px;
-    margin-left: 12px;
+.header {
+  color: #495057;
+  font-size: 12px;
+  margin-left: 12px;
 }
 
-
-      
-.comments{
+.comments {
   width: 93%;
   height: 100px;
   font-size: 14px;
@@ -187,18 +95,16 @@
   background-color: white;
 }
 
-.comments-group label{
- 
-   margin-bottom: 1px;
+.comments-group label {
+  margin-bottom: 1px;
   color: #333;
   font-size: small;
-  
 }
 
 .submit {
-  padding: 2px 17px 2px 17px;
+  padding: 2px 17px;
   font-size: 16px;
-  background-color: #1976d2; /* Blue */
+  background-color: #1976d2;
   color: white;
   border: none;
   border-radius: 4px;
@@ -214,110 +120,21 @@
 }
 
 .submit:not(:disabled):hover {
-  background-color: #1565c0; /* Darker blue on hover */
+  background-color: #1565c0;
   transform: scale(1.03);
 }
 
-
-.error{
+.error {
   font-size: 12px;
-  color : red;
+  color: red;
   margin: 0px;
 }
 
-
-
-.headline{
-     font-weight: bold;
+.headline {
+  font-weight: bold;
 }
 
-.headlines{
+.headlines {
   font-weight: bold;
   color: white;
 }
-
-
-
-
-/* Dropdown specific styles */
-.dropdown {
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20fill='black'%20height='24'%20viewBox='0%200%2024%2024'%20width='24'%20xmlns='http://www.w3.org/2000/svg'%3E%3Cpath%20d='M7%2010l5%205%205-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px 16px;
-  cursor: pointer;
-}
-
-
-
-
-.header{
-    /* border: 1px solid #008000; */
-    color: #495057;
-    font-size: 12px;
-    margin-left: 12px;
-}
-
-
-      
-.comments{
-  width: 93%;
-  height: 100px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  background-color: white;
-}
-
-.comments-group label{
- 
-   margin-bottom: 1px;
-  color: #333;
-  font-size: small;
-  
-}
-
-.submit {
-  padding: 2px 17px 2px 17px;
-  font-size: 16px;
-  background-color: #1976d2; /* Blue */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.submit:disabled {
-  background-color: #ccc;
-  color: #666;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.submit:not(:disabled):hover {
-  background-color: #1565c0; /* Darker blue on hover */
-  transform: scale(1.03);
-}
-
-
-.error{
-  font-size: 12px;
-  color : red;
-  margin: 0px;
-}
-
-
-
-.headline{
-     font-weight: bold;
-}
-
-.headlines{
-  font-weight: bold;
-  color: white;
-}
-
-
