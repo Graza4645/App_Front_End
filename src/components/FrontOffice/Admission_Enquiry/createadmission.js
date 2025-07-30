@@ -1,9 +1,111 @@
 import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useNavigate } from "react-router-dom";
 import "./createadmission.css";
 
-
 const AdmissionEnquiryForm = () => {
-  
+  const formElements = [
+    {
+      id: "admissionname",
+      label: "Name",
+      type: "text",
+      position: "right",
+      require: true,
+    },
+    {
+      id: "admissionphone",
+      label: "Phone",
+      type: "text",
+      position: "right",
+      require: true,
+    },
+
+    ,
+    {
+      id: "admissionEmail",
+      label: "Email",
+      type: "text",
+      position: "right",
+      require: true,
+    },
+
+    {
+      id: "Addressadmission",
+      label: "Address",
+      type: "textarea",
+      position: "left",
+      require: true,
+    },
+
+    {
+      id: "Descriptionadmission",
+      label: "Description",
+      type: "textarea",
+      position: "left",
+      require: true,
+    },
+
+    {
+      id: "Noteadmission",
+      label: "Note",
+      type: "textarea",
+      position: "left",
+      require: true,
+    },
+
+    {
+      id: "admissiondate",
+      label: "Date",
+      type: "date",
+      position: "left",
+      require: true,
+    },
+    {
+      id: "admissiondatefollowUp",
+      label: "Next Follow Up Date",
+      type: "date",
+      position: "left",
+      require: true,
+    },
+
+    {
+      id: "assigned",
+      label: "Assigned",
+      type: "dropdown",
+      options: ["Nursery", "LKG"],
+      require: true,
+    },
+    {
+      id: "reference",
+      label: "Reference",
+      type: "dropdown",
+      options: ["Nursery", "LKG"],
+      require: true,
+    },
+    {
+      id: "source",
+      label: "Source",
+      type: "dropdown",
+      options: ["Nursery", "LKG"],
+      require: true,
+    },
+    {
+      id: "classadmissioncreate",
+      label: "Class",
+      type: "dropdown",
+      options: ["Nursery", "LKG"],
+      require: true,
+    },
+    {
+      id: "numberofchild",
+      label: "Number Of Child",
+      type: "text",
+      position: "right",
+      require: true,
+    },
+  ];
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -38,76 +140,131 @@ const AdmissionEnquiryForm = () => {
     <div className="admission-enquiry-container">
       <h2>Admission Enquiry</h2>
       <form className="form-grid" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Name <span className="required">*</span></label>
-          <input name="name" value={formData.name} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label>Phone <span className="required">*</span></label>
-          <input name="phone" value={formData.phone} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label>Email</label>
-          <input name="email" value={formData.email} onChange={handleChange} />
-        </div>
+        {formElements.map((item) => {
+          if (item.type === "text") {
+            return (
+              <div key={item.id} className="addmisson-group-create">
+                <label htmlFor={item.id}>
+                  {item.label}
+                  {item.require && <span className="required">*</span>}
+                </label>
+                <input
+                  type="text"
+                  id={item.id}
+                  name={item.id}
+                  className="addmisson-group-create-input"
+                  value={formData[item.id]}
+                  maxLength={item.id === "phone" ? 10 : undefined}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    if (item.id === "phone") {
+                      val = val.replace(/\D/g, "");
+                    }
+                    setFormData((prev) => ({
+                      ...prev,
+                      [item.id]: val,
+                    }));
+                  }}
+                />
+              </div>
+            );
+          }
 
-        <div className="form-group">
-          <label>Address</label>
-          <input name="address" value={formData.address} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label>Description</label>
-          <input name="description" value={formData.description} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label>Note</label>
-          <input name="note" value={formData.note} onChange={handleChange} />
-        </div>
+          if (item.type === "textarea") {
+            return (
+              <div key={item.id} className="addmisson-group-create">
+                <label htmlFor={item.id}>
+                  {item.label}
+                  {item.require && <span className="required">*</span>}
+                </label>
+                <textarea
+                  id={item.id}
+                  name={item.id}
+                  className="addmisson-group-create-textarea"
+                  value={formData[item.id] || ""}
+                  onChange={handleChange}
+                />
+              </div>
+            );
+          }
 
-        <div className="form-group">
-          <label>Date <span className="required">*</span></label>
-          <input type="date" name="date" value={formData.date} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label>Next Follow Up Date <span className="required">*</span></label>
-          <input type="date" name="followUpDate" value={formData.followUpDate} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label>Assigned</label>
-          <select name="assigned" value={formData.assigned} onChange={handleChange}>
-            <option value="">Select</option>
-          </select>
-        </div>
+          if (item.type === "date") {
+            const today = new Date();
+            const oneYearBack = new Date(today);
+            oneYearBack.setFullYear(today.getFullYear() - 1);
 
-        <div className="form-group">
-          <label>Reference</label>
-          <select name="reference" value={formData.reference} onChange={handleChange}>
-            <option value="">Select</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label>Source <span className="required">*</span></label>
-          <select name="source" value={formData.source} onChange={handleChange}>
-            <option value="">Select</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label>Class</label>
-          <select name="class" value={formData.class} onChange={handleChange}>
-            <option value="Class 1">Class 1</option>
-            <option value="Class 2">Class 2</option>
-            <option value="Class 3">Class 3</option>
-          </select>
-        </div>
+            const oneYearAhead = new Date(today);
+            oneYearAhead.setFullYear(today.getFullYear() + 1);
 
-        <div className="form-group">
-          <label>Number Of Child</label>
-          <input type="number" name="numberOfChild" value={formData.numberOfChild} onChange={handleChange} />
-        </div>
+            // 📌 Format date as: 15-Aug-2025
+            const formatDate = (date) => {
+              const day = String(date.getDate()).padStart(2, "0");
+              const month = date.toLocaleString("en-US", { month: "short" });
+              const year = date.getFullYear();
+              return `${day}-${month}-${year}`;
+            };
+
+            return (
+              <div key={item.id} className="addmisson-group-create">
+                <label htmlFor={item.id}>
+                  {item.label}
+                  {item.require && <span className="required">*</span>}
+                </label>
+                <div className="addmisson-group-create-date">
+                  <DatePicker
+                    id={item.id}
+                    selected={
+                      formData[item.id] ? new Date(formData[item.id]) : null
+                    }
+                    onChange={(date) => {
+                      const formatted = formatDate(date);
+                      setFormData((prev) => ({
+                        ...prev,
+                        [item.id]: formatted,
+                      }));
+                    }}
+                    minDate={oneYearBack}
+                    maxDate={oneYearAhead}
+                    placeholderText="Select Date"
+                    dateFormat="dd-MMM-yyyy"
+                  />
+                </div>
+              </div>
+            );
+          }
+
+          if ((item.type = "dropdown")) {
+            return (
+              <div key={item.id} className="addmisson-group-create">
+                <label htmlFor={item.id}>
+                  {item.label}
+                  {item.require && <span className="required">*</span>}
+                </label>
+                <select
+                  id={item.id}
+                  name={item.id}
+                  // value={value}
+                  className="dropdown-admission"
+                  onChange={handleChange}
+                >
+                  <option value="">Select {item.label}</option>
+                  {item.options.map((option, idx) => (
+                    <option key={idx} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            );
+          }
+          return null;
+        })}
       </form>
 
       <div className="form-actions">
-        <button type="submit" onClick={handleSubmit}>Save</button>
+        <button type="submit" onClick={handleSubmit}>
+          Save
+        </button>
       </div>
     </div>
   );
