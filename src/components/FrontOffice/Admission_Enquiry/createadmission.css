@@ -37,12 +37,30 @@ select {
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
+}   */
 
 .form-actions {
-  text-align: right;
-  margin-top: 20px;
-}*/
+ text-align: center;
+    margin: 20px 0px 20px 0px;
+} 
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.disabled-button {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 
 
