@@ -56,7 +56,7 @@ const AdmissionEnquiryForm = () => {
 
     {
       id: "admissiondate",
-      label: "Date",
+      label: "Last Follow Up Date",
       type: "date",
       position: "left",
       require: true,
@@ -119,6 +119,8 @@ const AdmissionEnquiryForm = () => {
   };
   /** ------------------------->  End Mobile Validation    <--------------------------------------  */
 
+
+
   /**  -------------------------> start Name Validation   <------------------------------------- */
   const [nameError, setNameError] = useState("");
   const validateName = (value) => {
@@ -167,6 +169,8 @@ const validateNumberOfChild = (value) => {
 };
 
   /**  -------------------------> End Number of prson Validation   <------------------------------------- */
+
+
 
 
 
@@ -220,11 +224,65 @@ const validateNumberOfChild = (value) => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form Data:", formData);
-    // Here you can send data to API
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    name: formData.admissionname,
+    phone: formData.admissionphone,
+    email: formData.admissionEmail,
+    address: formData.Addressadmission,
+    description: formData.Descriptionadmission,
+    note: formData.Noteadmission,
+    date: formData.admissiondate,
+    next_follow_up_date: formData.admissiondatefollowUp,
+    assigned: formData.assigned,
+    reference: formData.reference,
+    source: formData.source,
+    class: formData.classadmissioncreate,
+    number_of_child: parseInt(formData.numberofchild, 10),
   };
+
+  try {
+    const response = await fetch('http://localhost:3000/admissioncraete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Enquiry submitted successfully!");
+      console.log("API Response:", data);
+      // Reset form if needed
+      setFormData({
+        admissionname: "",
+        admissionphone: "",
+        admissionEmail: "",
+        Addressadmission: "",
+        Descriptionadmission: "",
+        Noteadmission: "",
+        admissiondate: "",
+        admissiondatefollowUp: "",
+        assigned: "",
+        reference: "",
+        source: "",
+        classadmissioncreate: "",
+        numberofchild: "",
+      });
+    } else {
+      console.error("Submission failed:", data.error);
+      alert("Failed to submit enquiry. Try again.");
+    }
+  } catch (error) {
+    console.error("API Error:", error);
+    alert("Server error occurred. Check console.");
+  }
+};
+
 
   return (
     <div className="admission-enquiry-container">

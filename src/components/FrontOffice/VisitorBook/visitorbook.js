@@ -8,7 +8,8 @@ import autoTable from "jspdf-autotable";
 export default function VisitorBook() {
   const navigate = useNavigate();
   const [visitors, setVisitors] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1); ///
+  
 
   const [selectedVisitor, setSelectedVisitor] = useState(null);
 const [showModal, setShowModal] = useState(false);

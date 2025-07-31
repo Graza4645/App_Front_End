@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect } from "react";
 import "./AdmissionEnquiry.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -14,6 +14,26 @@ const AdmissionEnquiry = () => {
   status: "",
 });
 
+
+
+
+
+
+
+
+
+
+const [enquiries, setEnquiries] = useState([]);
+useEffect(() => {
+  fetch("http://localhost:3000/getadmission")
+    .then((res) => res.json())
+    .then((data) => {
+      setEnquiries(data);
+    })
+    .catch((err) => {
+      console.error("Failed to fetch enquiries:", err);
+    });
+}, []);
 /**  Starting */
    const formElements = 
    [
@@ -29,8 +49,66 @@ const AdmissionEnquiry = () => {
 
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-   const totalPages = Math.ceil(12 / 12);
+ const [currentPage, setCurrentPage] = useState(1);
+ const [selectedEnquiry, setSelectedEnquiry] = useState(null);
+const [showModal, setShowModal] = useState(false);
+
+const handleView = (item) => {
+  setSelectedEnquiry(item);
+  setShowModal(true);
+};
+
+const handleEdit = async (item) => {
+  const updatedName = prompt("Edit Name", item.name);
+  if (!updatedName || updatedName.trim() === "") return;
+
+  try {
+    const response = await fetch(`http://localhost:3000/updateadmission/${item.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...item, name: updatedName }),
+    });
+
+    if (!response.ok) throw new Error("Failed to update admission");
+
+    setEnquiries((prev) =>
+      prev.map((e) => (e.id === item.id ? { ...item, name: updatedName } : e))
+    );
+
+    alert("Updated successfully!");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to update");
+  }
+};
+
+const handleDelete = async (item) => {
+  const confirmDelete = window.confirm(`Delete ${item.name}?`);
+  if (!confirmDelete) return;
+
+  try {
+    const response = await fetch(`http://localhost:3000/deleteadmission/${item.id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) throw new Error("Failed to delete");
+
+    setEnquiries((prev) => prev.filter((e) => e.id !== item.id));
+    alert("Deleted successfully!");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete");
+  }
+};
+
+
+const recordsPerPage = 6;
+
+const indexOfLast = currentPage * recordsPerPage;
+const indexOfFirst = indexOfLast - recordsPerPage;
+const currentRecords = enquiries.slice(indexOfFirst, indexOfLast);
+const totalPages = Math.ceil(enquiries.length / recordsPerPage);
+
 
   const handleChange = (name, value) => {
   setFormData(prev => ({ ...prev, [name]: value }));
@@ -170,39 +248,87 @@ return null;
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td colSpan="8" className="no-data">
-                <div className="no-data-img" />
-                <div>No data available in table</div>
-                <p>↩ Add new record or search with different criteria.</p>
-              </td>
-            </tr>
-          </tbody>
+  {currentRecords.length === 0 ? (
+    <tr>
+      <td colSpan="8" className="no-data">
+        <div className="no-data-img" />
+        <div>No data available in table</div>
+        <p>↩ Add new record or search with different criteria.</p>
+      </td>
+    </tr>
+  ) : (
+    currentRecords.map((item, index) => (
+      <tr key={item.id || index}>
+        <td>{item.name}</td>
+        <td>{item.phone}</td>
+        <td>{item.source}</td>
+        <td>{item.date}</td>
+        <td>{item.date || "-"}</td>
+        <td>{item.next_follow_up_date}</td>
+        <td>{item.status || "Active"}</td>
+       <td>
+  <div className="action-menu">
+    <i className="fas fa-ellipsis-v"></i>
+    <div className="dropdown-content">
+      <div className="view" onClick={() => handleView(item)}>View</div>
+      <div className="edit" onClick={() => handleEdit(item)}>Edit</div>
+      <div className="delete" onClick={() => handleDelete(item)}>Delete</div>
+    </div>
+  </div>
+</td>
+
+      </tr>
+    ))
+  )}
+</tbody>
+
         </table>
       </div>
     </div>
-     <div className="pagination">
-        <span className="count">
-          {" "}
-          Page: {currentPage} of {totalPages}
-        </span>
 
-        <button
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage(currentPage - 1)}
-        >
-          Prev
-        </button>
 
-        <button className="active">{currentPage}</button>
+  
 
-        <button
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage(currentPage + 1)}
-        >
-          Next
-        </button>
+    {showModal && selectedEnquiry && (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <h3>Enquiry Details</h3>
+          <p><strong>Name:</strong> {selectedEnquiry.name}</p>
+          <p><strong>Phone:</strong> {selectedEnquiry.phone}</p>
+          <p><strong>Source:</strong> {selectedEnquiry.source}</p>
+          <p><strong>Enquiry Date:</strong> {selectedEnquiry.date}</p>
+          <p><strong>Next Follow Up:</strong> {selectedEnquiry.next_follow_up_date || "-"}</p>
+          <p><strong>Status:</strong> {selectedEnquiry.status}</p>
+          <button onClick={() => setShowModal(false)}>Close</button>
+        </div>
       </div>
+    )}
+
+
+
+
+    <div className="pagination">
+  <span className="count">
+    Page: {currentPage} of {totalPages}
+  </span>
+
+  <button
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage((prev) => prev - 1)}
+  >
+    Prev
+  </button>
+
+  <button className="active">{currentPage}</button>
+
+  <button
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((prev) => prev + 1)}
+  >
+    Next
+  </button>
+</div>
+
       </>
 
   );

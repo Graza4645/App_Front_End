@@ -15,9 +15,12 @@ var getvisitorStudent = require('./routes/VisitoBook/getvisitorStudent')
 var getvisitorStaff = require('./routes/VisitoBook/getvisitorStaff')
 var deletevistorStaff = require('./routes/VisitoBook/deletevistorStaff')
 var deletevistorStudent = require('./routes/VisitoBook/deletevisitorStudent')
+var admissioncreate = require('./routes/admission/createadmission')
+var admissionget = require('./routes/admission/admissionget')
 
 var app = express();
 app.use(cors());
+app.use(express.json());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -39,6 +42,8 @@ app.use('/getvisitorStudent', getvisitorStudent)
 app.use('/getvisitorStaff', getvisitorStaff)
 app.use('/deletevistorStaff', deletevistorStaff)
 app.use('/deletevistorStudent', deletevistorStudent);
+app.use('/admissioncraete', admissioncreate )
+app.use('/getadmission', admissionget);
 
 app.use(function(req, res, next) {
   next(createError(404));
