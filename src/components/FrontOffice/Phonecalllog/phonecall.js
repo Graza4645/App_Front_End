@@ -5,30 +5,74 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const PhoneCallLog = () => {
   
- 
-
-
-const [logs, setLogs] = useState([]);
-
-useEffect(() => {
-  fetch("http://localhost:3000") // <-- replace with your real API URL
-    .then((res) => res.json())
-    .then((data) => setLogs(data))
-    .catch((err) => console.error("Error fetching call logs:", err));
-}, []);
-
-
-  const recordsPerPage = 5;
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = logs.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(logs.length / recordsPerPage);
-
+ const [selectedEnquiry, setSelectedEnquiry] = useState(null);
 
 
   
 
+const [logs, setLogs] = useState([]);
+const handleView = (item) => {
+  setSelectedEnquiry(item);
+  setShowModal(true);
+};
+  const [currentPage, setCurrentPage] = useState(1);
+  const [formData, setFormData] = useState({});
+const [showModal, setShowModal] = useState(false);
 
+useEffect(() => {
+  fetchLogs();
+}, []);
+
+const fetchLogs = () => {
+  fetch("http://localhost:3000/getcallogs")
+    .then((res) => res.json())
+    .then((data) => setLogs(data.data))
+    .catch((err) => console.error("Error fetching call logs:", err));
+};
+
+
+const handleEdit = async (item) => {
+  const updatedName = prompt("Edit Name", item.name);
+  if (!updatedName || updatedName.trim() === "") return;
+
+  try {
+    const response = await fetch(`http://localhost:3000/updateadmission/${item.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...item, name: updatedName }),
+    });
+
+    if (!response.ok) throw new Error("Failed to update admission");
+
+  setLogs((prev) =>
+  prev.map((e) => (e.id === item.id ? { ...item, name: updatedName } : e))
+);
+
+    alert("Updated successfully!");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to update");
+  }
+};
+
+
+  // Pagination logic
+  const recordsPerPage = 5;
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = logs.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(logs.length / recordsPerPage);  
+
+    const formElement =[
+      {
+  
+      id: "callSearch",
+      label: "Search",
+      type: "text",
+      require: true,
+  
+      }
+    ]
 
 
   const formElements = [
@@ -46,7 +90,7 @@ useEffect(() => {
     },
     {
       id: "phonedate",
-      label: "Next Follow Up Date",
+      label: "Date",
       type: "date",
       position: "left",
       require: true,
@@ -55,6 +99,13 @@ useEffect(() => {
       id: "callDescription",
       label: "Description",
       type: "textarea",
+      require: true,
+    },
+       {
+      id: "phonedatefollow",
+      label: "Next Follow Up Date",
+      type: "date",
+      position: "left",
       require: true,
     },
     {
@@ -71,12 +122,7 @@ useEffect(() => {
       require: true,
     },
 
-    {
-      id: "callSearch",
-      label: "Search",
-      type: "text",
-      require: true,
-    },
+  
 
     // {
     //   id: "MeetingWith",
@@ -139,6 +185,83 @@ useEffect(() => {
   };
 
   /**  -------------------------> End Duration Validation   <------------------------------------- */
+
+
+const isFormValid = () => {
+  const requiredFields = formElements
+    .filter((el) => el.require)
+    .map((el) => el.id)
+    .concat(["callType"]);
+
+  const allFieldsFilled = requiredFields.every(
+    (id) => formData[id] && formData[id].toString().trim() !== ""
+  );
+
+  const noErrors =
+    nameError === "" &&
+    phoneError === "" &&
+    NmberpersonErro === "" &&
+    Object.values(remarksError).every((err) => err === "");
+
+  return allFieldsFilled && noErrors;
+};
+
+
+const handleDelete = async (item) => {
+  if (!window.confirm("Are you sure you want to delete this record?")) return;
+
+  try {
+    const response = await fetch(`http://localhost:3000/deletecalllog/${item.id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) throw new Error("Failed to delete call log");
+
+    // Refresh the logs
+    fetchLogs();
+    alert("Deleted successfully!");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete");
+  }
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:3000/createcalllogs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+     body: JSON.stringify({
+  name: formData.phoneName,
+  number: formData.phoneNumber,
+  date: formData.phonedate,
+  description: formData.callDescription,
+  nextFollowUpDate: formData.phonedatefollow,
+  duration: formData.phoneDuration,
+  note: formData.callNote,
+  callType: formData.callType,
+}),
+    });
+
+    if (response.ok) {
+  setFormData({});
+  setNameError("");
+  setPhoneError("");
+  setNumberpersonError("");
+  setRemarksError({});
+  fetchLogs(); // ⬅ Refresh
+}
+
+    const data = await response.json();
+    // console.log("Call log saved:", data);
+  } catch (error) {
+    console.error("Error saving call log:", error);
+  }
+};
 
   return (
     <div style={{ display: "flex" }}>
@@ -351,16 +474,23 @@ useEffect(() => {
               marginTop: "12px",
             }}
           >
-            <button
-              style={{
-                fontSize: "14px",
-                width: "93%",
-                height: "25px",
-                padding: "0px",
-              }}
-            >
-              Save
-            </button>
+           <button
+  onClick={handleSubmit}
+  style={{
+    fontSize: "14px",
+    width: "44%",
+    height: "25px",
+    padding: "0px",
+    backgroundColor: isFormValid() ? "#007bff" : "#ccc",
+    color: "white",
+    border: "none",
+    cursor: isFormValid() ? "pointer" : "not-allowed",
+  }}
+  disabled={!isFormValid()}
+>
+  Save
+</button>
+
           </div>
         </form>
 
@@ -437,7 +567,7 @@ useEffect(() => {
           style={{ marginBottom: "10px", width: "20%" }}
         /> */}
 
-        {formElements.map((item) => {
+        {formElement.map((item) => {
           if (item.id === "callSearch") {
             return (
               <div key={item.id} className="call-group-create">
@@ -483,15 +613,22 @@ useEffect(() => {
          {currentRecords.map((log, index) => (
               <tr key={index}>
                 <td>{log.name}</td>
-                <td>{log.phone}</td>
+                <td>{log.number}</td>
                 <td>{log.date}</td>
-                <td>{log.nextFollowUpDate || "-"}</td>
+                <td>{log.next_follow_up_date || "-"}</td>
                 <td>
-                  <strong>{log.callType}</strong>
+                  <strong>{log.call_type}</strong>
                 </td>
                 <td>
-                  <button>Edit</button>
-                  <button style={{ marginLeft: "5px" }}>Delete</button>
+                   <div className="action-menu">
+    <i className="fas fa-ellipsis-v"></i>
+    <div className="dropdown-content">
+     <div className="view" onClick={() => handleView(log)}>View</div>
+<div className="edit" onClick={() => handleEdit(log)}>Edit</div>
+<div className="delete" onClick={() => handleDelete(log)}>Delete</div>
+
+    </div>
+  </div>
                 </td>
               </tr>
             ))}
@@ -505,27 +642,24 @@ useEffect(() => {
           </tbody>
         </table>
         </div>
-         <div className="pagination">
-  <span className="count">
-    Page: {currentPage} of {totalPages}
-  </span>
-
-  <button
-    disabled={currentPage === 1}
-    onClick={() => setCurrentPage((prev) => prev - 1)}
-  >
-    Prev
-  </button>
-
-  <button className="active">{currentPage}</button>
-
-  <button
-    disabled={currentPage === totalPages}
-    onClick={() => setCurrentPage((prev) => prev + 1)}
-  >
-    Next
-  </button>
-</div>
+         
+   {/* Pagination */}
+        <div className="pagination" style={{ marginTop: "10px" }}>
+          <span>Page: {currentPage} of {totalPages}</span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </button>
+          <button className="active">{currentPage}</button>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

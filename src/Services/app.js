@@ -17,6 +17,8 @@ var deletevistorStaff = require('./routes/VisitoBook/deletevistorStaff')
 var deletevistorStudent = require('./routes/VisitoBook/deletevisitorStudent')
 var admissioncreate = require('./routes/admission/createadmission')
 var admissionget = require('./routes/admission/admissionget')
+var createcalllog = require('./routes/calllogs/createlogs')
+var getcallogs = require('./routes/calllogs/getcalllogs')
 
 var app = express();
 app.use(cors());
@@ -44,6 +46,8 @@ app.use('/deletevistorStaff', deletevistorStaff)
 app.use('/deletevistorStudent', deletevistorStudent);
 app.use('/admissioncraete', admissioncreate )
 app.use('/getadmission', admissionget);
+app.use('/createcalllogs', createcalllog)
+app.use('/getcallogs', getcallogs)
 
 app.use(function(req, res, next) {
   next(createError(404));
