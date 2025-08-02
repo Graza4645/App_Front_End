@@ -549,6 +549,7 @@ import Dashboard from '../DashBoard/dashboard';
 import VisitorBook from '../FrontOffice/VisitorBook/visitorbook.js';
 import CreateVisitorBook from '../FrontOffice/VisitorBook/createvisitor.js';
 import AdmissionEnquiryForm from '../FrontOffice/Admission_Enquiry/createadmission.js';
+import PhoneCallLog from '../FrontOffice/Phonecalllog/phonecall.js';
 
 
 
@@ -571,7 +572,7 @@ const mainLinksMockdata = [
     subLinks: [
       { label: 'Admission Enquiry',route:'/admission-enquiry' },   // step-1 
       { label: 'Visitor Book' , route: '/visitorbook' },
-      { label: 'Phone Call Log' },
+      { label: 'Phone Call Log', route : '/phoneCallLog' },
       { label: 'Postal Dispatch' },
       { label: 'Postal Receive' },
       { label: 'Complain' },
@@ -776,6 +777,10 @@ function handleClick(route) {
           <Route path="/visitorbook" element={<VisitorBook/>} />
           <Route path="/createvisitor" element={<CreateVisitorBook/>}/>
           <Route path="/admissionform" element={<AdmissionEnquiryForm/>}/>
+           <Route path="/phoneCallLog" element={<PhoneCallLog/>}/>
+
+
+          
 
 
           
