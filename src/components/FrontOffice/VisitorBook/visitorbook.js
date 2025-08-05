@@ -88,14 +88,15 @@ const [showModal, setShowModal] = useState(false);
 
 
   const handleCopy = () => {
-  const exportData = normalizeData(visitors); // Already defined and used for Excel/CSV
+  const exportData = normalizeData(visitors); 
+
 
   if (!exportData.length) {
     alert("No data to copy");
     return;
   }
 
-  // Create a tab-separated string (or you can use commas for CSV)
+  
   const headers = Object.keys(exportData[0]).join("\t");
   const rows = exportData.map(row => Object.values(row).join("\t"));
   const tsvContent = [headers, ...rows].join("\n");

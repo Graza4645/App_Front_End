@@ -1,129 +1,166 @@
-import React, { useState ,useEffect} from "react";
-import "./phonecall.css"; // Optional: Create this for styling
+import React, { useState, useEffect } from "react";
+import "./complain.css"; // Optional: Create this for styling
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const PhoneCallLog = () => {
-  
- const [selectedEnquiry, setSelectedEnquiry] = useState(null);
+const Complain = () => {
+  let num =1;
+  const [selectedEnquiry, setSelectedEnquiry] = useState(null);
 
-
-  
-
-const [logs, setLogs] = useState([]);
-const handleView = (item) => {
-  setSelectedEnquiry(item);
-  setShowModal(true);
-};
+  const [logs, setLogs] = useState([]);
+  const handleView = (item) => {
+    setSelectedEnquiry(item);
+    setShowModal(true);
+  };
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({});
-const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
-useEffect(() => {
-  fetchLogs();
-}, []);
-
+  useEffect(() => {
+    fetchLogs();
+  }, []);
 const fetchLogs = () => {
-  fetch("http://localhost:3000/getcallogs")
+  fetch("http://localhost:3000/getcomlain")
     .then((res) => res.json())
-    .then((data) => setLogs(data.data))
+    .then((data) => {
+      console.log("Fetched data from /getreceive:", data);
+
+      // Assuming your API returns { data: [...] }
+      if (Array.isArray(data.data)) {
+        console.log(data)
+        setLogs(data.data);
+      } else {
+        console.error("Expected array, got:", data);
+        setLogs([]); // Prevent slice error
+      }
+    })
     .catch((err) => console.error("Error fetching call logs:", err));
 };
 
 
-const handleEdit = async (item) => {
-  const updatedName = prompt("Edit Name", item.name);
-  if (!updatedName || updatedName.trim() === "") return;
 
-  try {
-    const response = await fetch(`http://localhost:3000/updateadmission/${item.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...item, name: updatedName }),
-    });
+  const handleEdit = async (item) => {
+    const updatedName = prompt("Edit Name", item.name);
+    if (!updatedName || updatedName.trim() === "") return;
 
-    if (!response.ok) throw new Error("Failed to update admission");
+    try {
+      const response = await fetch(
+        `http://localhost:3000/updateadmission/${item.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...item, name: updatedName }),
+        }
+      );
 
-  setLogs((prev) =>
-  prev.map((e) => (e.id === item.id ? { ...item, name: updatedName } : e))
-);
+      if (!response.ok) throw new Error("Failed to update admission");
 
-    alert("Updated successfully!");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to update");
-  }
+      setLogs((prev) =>
+        prev.map((e) => (e.id === item.id ? { ...item, name: updatedName } : e))
+      );
+
+      alert("Updated successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update");
+    }
+  };
+
+
+  const handleChange = (e) => {
+  const { id, value } = e.target;
+  setFormData((prev) => ({
+    ...prev,
+    [id]: value,
+  }));
 };
-
-
   // Pagination logic
   const recordsPerPage = 10;
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const currentRecords = logs.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(logs.length / recordsPerPage);  
+  const totalPages = Math.ceil(logs.length / recordsPerPage);
 
-  let num = 1;
-    const formElement =[
-      {
-  
+  const formElement = [
+    {
       id: "callSearch",
       label: "Search",
       type: "text",
       require: true,
-  
-      }
-    ]
-
+    },
+  ];
 
   const formElements = [
+     {
+      id: "complainttype",
+      label: "Complaint Type",
+      type: "dropdown",
+      options: ["Nursery", "LKG"],
+      require: true,
+    },
+    
+        {
+      id: "complainsource",
+      label: "Source",
+      type: "dropdown",
+      options: ["Nursery", "LKG"],
+      require: true,
+    },
+
     {
-      id: "phoneName",
-      label: "Name",
+      id: "complainby",
+      label: "Complain By",
       type: "text",
       require: true,
     },
-    {
-      id: "phoneNumber",
-      label: "Number",
+     {
+      id: "complainPhone",
+      label: "Phone",
       type: "text",
       require: true,
     },
-    {
-      id: "phonedate",
+
+     {
+      id: "complaindate",
       label: "Date",
       type: "date",
       position: "left",
       require: true,
-    },
+    }, 
+    
+   
     {
-      id: "callDescription",
+      id: "complaindescription",
       label: "Description",
       type: "textarea",
       require: true,
     },
-       {
-      id: "phonedatefollow",
-      label: "Next Follow Up Date",
-      type: "date",
-      position: "left",
+      {
+      id: "complainactiontaken",
+      label: "Action Taken",
+      type: "textarea",
       require: true,
     },
-    {
-      id: "phoneDuration",
-      label: "Duration",
+      {
+      id: "complainassigned",
+      label: "Assigned",
       type: "text",
       require: true,
     },
-
-    {
-      id: "callNote",
+   {
+      id: "complainnote",
       label: "Note",
       type: "textarea",
       require: true,
     },
 
-  
+      {
+    id: "fileUpload",
+    label: "Upload Documents",
+    type: "file",
+    position: "right",
+    require: true,
+  },
 
     // {
     //   id: "MeetingWith",
@@ -159,6 +196,8 @@ const handleEdit = async (item) => {
   };
   /** ------------------------->  End Mobile Validation    <--------------------------------------  */
 
+
+
   /**  -------------------------> start TextArea Validation   <------------------------------------- */
   const [remarksError, setRemarksError] = useState({});
   const validateTextarea = (id, value) => {
@@ -172,6 +211,8 @@ const handleEdit = async (item) => {
     }
   };
   /**  -------------------------> End TextArea Validation   <------------------------------------- */
+
+
 
   /**  -------------------------> start Duration Validation   <------------------------------------- */
   const [NmberpersonErro, setNumberpersonError] = useState("");
@@ -187,80 +228,83 @@ const handleEdit = async (item) => {
 
   /**  -------------------------> End Duration Validation   <------------------------------------- */
 
+  const isFormValid = () => {
+    const requiredFields = formElements
+      .filter((el) => el.require)
+      .map((el) => el.id)
+      .concat(["callType"]);
 
-const isFormValid = () => {
-  const requiredFields = formElements
-    .filter((el) => el.require)
-    .map((el) => el.id)
-    .concat(["callType"]);
+    const allFieldsFilled = requiredFields.every(
+      (id) => formData[id] && formData[id].toString().trim() !== ""
+    );
 
-  const allFieldsFilled = requiredFields.every(
-    (id) => formData[id] && formData[id].toString().trim() !== ""
-  );
+    const noErrors =
+      nameError === "" &&
+      phoneError === "" &&
+      NmberpersonErro === "" &&
+      Object.values(remarksError).every((err) => err === "");
 
-  const noErrors =
-    nameError === "" &&
-    phoneError === "" &&
-    NmberpersonErro === "" &&
-    Object.values(remarksError).every((err) => err === "");
+    return allFieldsFilled && noErrors;
+  };
 
-  return allFieldsFilled && noErrors;
-};
+  const handleDelete = async (item) => {
+    if (!window.confirm("Are you sure you want to delete this record?")) return;
 
+    try {
+      const response = await fetch(
+        `http://localhost:3000/deletecalllog/${item.id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
-const handleDelete = async (item) => {
-  if (!window.confirm("Are you sure you want to delete this record?")) return;
+      if (!response.ok) throw new Error("Failed to delete call log");
 
-  try {
-    const response = await fetch(`http://localhost:3000/deletecalllog/${item.id}`, {
-      method: "DELETE",
-    });
+      // Refresh the logs
+      fetchLogs();
+      alert("Deleted successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete");
+    }
+  };
 
-    if (!response.ok) throw new Error("Failed to delete call log");
-
-    // Refresh the logs
-    fetchLogs();
-    alert("Deleted successfully!");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to delete");
-  }
-};
-
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const response = await fetch("http://localhost:3000/createcalllogs", {
+    const response = await fetch("http://localhost:3000/createcomplain", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-     body: JSON.stringify({
-  name: formData.phoneName,
-  number: formData.phoneNumber,
-  date: formData.phonedate,
-  description: formData.callDescription,
-  nextFollowUpDate: formData.phonedatefollow,
-  duration: formData.phoneDuration,
-  note: formData.callNote,
-  callType: formData.callType,
-}),
+      body: JSON.stringify({
+        complaint_type: formData["complainttype"],
+        source: formData["complainsource"],
+        complain_by: formData["complainby"],
+        phone: formData["complainPhone"],
+        date: formData["complaindate"],
+        description: formData["complaindescription"],
+        action_taken: formData["complainactiontaken"],
+        assigned: formData["complainassigned"],
+        note: formData["complainnote"],
+        upload_documents: formData["fileUpload"], // Optional
+      }),
     });
 
-    if (response.ok) {
-  setFormData({});
-  setNameError("");
-  setPhoneError("");
-  setNumberpersonError("");
-  setRemarksError({});
-  fetchLogs(); // ⬅ Refresh
-}
-
     const data = await response.json();
-    // console.log("Call log saved:", data);
+
+    if (response.ok) {
+      alert("Complain created successfully!");
+      setFormData({});
+      fetchLogs(); // ⬅ Refresh data in table
+    } else {
+      console.error("Server error:", data);
+      alert("Failed to create complain");
+    }
   } catch (error) {
-    console.error("Error saving call log:", error);
+    console.error("Error saving complain:", error);
+    alert("Error occurred while saving complain");
   }
 };
 
@@ -276,10 +320,36 @@ const handleSubmit = async (e) => {
         }}
       >
         <h4 style={{ padding: "0px", margin: "0px 0px 13px" }}>
-          Add Phone Call Log
+          Add Postal Dispatch
         </h4>
         <form>
           {formElements.map((item) => {
+
+
+ if ((item.type === "dropdown")) {
+            return (
+              <div key={item.id} className="addmisson-group-create">
+                <label htmlFor={item.id}>
+                  {item.label}
+                  {item.require && <span className="required">*</span>}
+                </label>
+                <select
+                  id={item.id}
+                  name={item.id}
+                  // value={value}
+                  className="dropdown-admission"
+                  onChange={handleChange}
+                >
+                  <option value="">Select {item.label}</option>
+                  {item.options.map((option, idx) => (
+                    <option key={idx} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            );
+          }
             if (item.type === "textarea") {
               return (
                 <div key={item.id} className="call-group-create">
@@ -318,6 +388,31 @@ const handleSubmit = async (e) => {
                 </div>
               );
             }
+
+
+             if (item.type === "file") {
+      return (
+        <div key={item.id} className="call-group-create">
+          <label htmlFor={item.id}>
+            {item.label}
+            {item.require && <span className="required">*</span>}
+          </label>
+          <input
+            type="file"
+            id={item.id}
+            name={item.id}
+            className="call-group-create-input"
+          
+            onChange={(e) => {
+              const file = e.target.files[0];
+               
+             // handleChange(item.id, file?.name || "");
+            }}
+          />
+        </div>
+      );
+    }
+
 
             if (item.type === "date") {
               const today = new Date();
@@ -433,41 +528,6 @@ const handleSubmit = async (e) => {
             <input type="radio" name="callType" value="Outgoing" /> Outgoing
           </label> */}
 
-          <label style={{ fontSize: "14px", marginRight: "15px" }}>
-  Call Type
-</label>
-<label style={{ fontSize: "14px", marginRight: "6px" }}>
-  <input
-    type="radio"
-    name="callType"
-    value="Incoming"
-    checked={formData.callType === "Incoming"}
-    onChange={(e) =>
-      setFormData((prev) => ({
-        ...prev,
-        callType: e.target.value,
-      }))
-    }
-  />{" "}
-  Incoming
-</label>
-<label style={{ fontSize: "14px" }}>
-  <input
-    type="radio"
-    name="callType"
-    value="Outgoing"
-    checked={formData.callType === "Outgoing"}
-    onChange={(e) =>
-      setFormData((prev) => ({
-        ...prev,
-        callType: e.target.value,
-      }))
-    }
-  />{" "}
-  Outgoing
-</label>
-
-
           <div
             style={{
               display: "flex",
@@ -475,26 +535,27 @@ const handleSubmit = async (e) => {
               marginTop: "12px",
             }}
           >
-           <button
-  onClick={handleSubmit}
-  style={{
-    fontSize: "14px",
-    width: "44%",
-    height: "25px",
-    padding: "0px",
-    backgroundColor: isFormValid() ? "#007bff" : "#ccc",
-    color: "white",
-    border: "none",
-    cursor: isFormValid() ? "pointer" : "not-allowed",
-  }}
-  disabled={!isFormValid()}
->
-  Save
-</button>
-
+            <button
+              onClick={handleSubmit}
+              style={{
+                fontSize: "14px",
+                width: "44%",
+                height: "25px",
+                padding: "0px",
+               // backgroundColor: isFormValid() ? "#007bff" : "#ccc",
+               backgroundColor : "#007bff",
+                color: "white",
+                border: "none",
+               // cursor: isFormValid() ? "pointer" : "not-allowed",
+              }}
+             // disabled={!isFormValid()}
+            >
+              Save
+            </button>
           </div>
         </form>
 
+      
       </div>
 
       {/* Right Section - Table */}
@@ -507,7 +568,7 @@ const handleSubmit = async (e) => {
         }}
       >
         <h4 style={{ padding: "0px", margin: "0px 0px 13px" }}>
-          Phone Call Log List
+          Postal Dispatch List
         </h4>
         {/* <input
           type="text"
@@ -545,57 +606,73 @@ const handleSubmit = async (e) => {
           return null;
           // ...handle textarea and date types below
         })}
-       <div style={{ maxHeight: "450px", overflowY: "auto" }}>
-        <table border="0" cellPadding="10" cellSpacing="0" width="100%" className="enquiry-table">
-          <thead>
-            <tr>
-              <th>Sl No</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Date</th>
-              <th>Next Follow Up Date</th>
-              <th>Call Type</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody style={{ border: "1px solid red" }}>
-         {currentRecords.map((log, index) => (
-              <tr key={index}>
-                <td>{num++}</td>
-                <td>{log.name}</td>
-                <td>{log.number}</td>
-                <td>{log.date}</td>
-                <td>{log.next_follow_up_date || "-"}</td>
-                <td>
-                  <strong>{log.call_type}</strong>
-                </td>
-                <td>
-                   <div className="action-menu">
-    <i className="fas fa-ellipsis-v"></i>
-    <div className="dropdown-content">
-     <div className="view" onClick={() => handleView(log)}>View</div>
-<div className="edit" onClick={() => handleEdit(log)}>Edit</div>
-<div className="delete" onClick={() => handleDelete(log)}>Delete</div>
-
-    </div>
-  </div>
-                </td>
-              </tr>
-            ))}
-            {logs.length === 0 && (
+        <div style={{ maxHeight: "450px", overflowY: "auto" }}>
+          <table
+            border="0"
+            cellPadding="10"
+            cellSpacing="0"
+            width="100%"
+            className="enquiry-table"
+          >
+            
+            <thead>
               <tr>
-                <td colSpan="6" style={{ textAlign: "center" }}>
-                  No records found
-                </td>
+                <th>Sl No</th>
+                <th>Complain</th>
+                <th>Complaint Type</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Date</th>
+                <th>Action</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody style={{ border: "1px solid red" }}>
+              
+              {currentRecords.map((log, index) => (
+                  <tr key={index}>
+                  <td>{num++}</td>
+                  <td>{log.assigned}</td>
+                  <td>{log.complaint_type}</td>
+                  <td>{log.complain_by}</td>
+                   <td>{log.phone || "-"}</td>
+                  <td>{log.date || "-"}</td>
+                  <td>
+                    <div className="action-menu">
+                      <i className="fas fa-ellipsis-v"></i>
+                      <div className="dropdown-content">
+                        <div className="view" onClick={() => handleView(log)}>
+                          View
+                        </div>
+                        <div className="edit" onClick={() => handleEdit(log)}>
+                          Edit
+                        </div>
+                        <div
+                          className="delete"
+                          onClick={() => handleDelete(log)}
+                        >
+                          Delete
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {logs.length === 0 && (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: "center" }}>
+                    No records found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-         
-   {/* Pagination */}
+
+        {/* Pagination */}
         <div className="pagination" style={{ marginTop: "10px" }}>
-          <span>Page: {currentPage} of {totalPages}</span>
+          <span>
+            Page: {currentPage} of {totalPages}
+          </span>
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
@@ -604,8 +681,10 @@ const handleSubmit = async (e) => {
           </button>
           <button className="active">{currentPage}</button>
           <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+           // disabled={currentPage === totalPages}
           >
             Next
           </button>
@@ -615,4 +694,4 @@ const handleSubmit = async (e) => {
   );
 };
 
-export default PhoneCallLog;
+export default Complain;

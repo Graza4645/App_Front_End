@@ -550,6 +550,10 @@ import VisitorBook from '../FrontOffice/VisitorBook/visitorbook.js';
 import CreateVisitorBook from '../FrontOffice/VisitorBook/createvisitor.js';
 import AdmissionEnquiryForm from '../FrontOffice/Admission_Enquiry/createadmission.js';
 import PhoneCallLog from '../FrontOffice/Phonecalllog/phonecall.js';
+import PostalDispatch from '../FrontOffice/Postal Dispatch/postaldispatch.js';
+import PostalReceive from '../FrontOffice/Postal Receive/postalreceive.js';
+import Complain from '../FrontOffice/Complain/complain.js';
+
 
 
 
@@ -573,9 +577,9 @@ const mainLinksMockdata = [
       { label: 'Admission Enquiry',route:'/admission-enquiry' },   // step-1 
       { label: 'Visitor Book' , route: '/visitorbook' },
       { label: 'Phone Call Log', route : '/phoneCallLog' },
-      { label: 'Postal Dispatch' },
-      { label: 'Postal Receive' },
-      { label: 'Complain' },
+      { label: 'Postal Dispatch', route : '/postaldispatch' },
+      { label: 'Postal Receive', route : '/postalreceive' },
+      { label: 'Complain' , route : '/complain'},
       { label: 'Setup Front Office' },
     ],
   },
@@ -778,6 +782,16 @@ function handleClick(route) {
           <Route path="/createvisitor" element={<CreateVisitorBook/>}/>
           <Route path="/admissionform" element={<AdmissionEnquiryForm/>}/>
            <Route path="/phoneCallLog" element={<PhoneCallLog/>}/>
+            <Route path="/postaldispatch" element={<PostalDispatch/>}/>
+           <Route path="/postalreceive" element={<PostalReceive/>}/>
+            <Route path="/complain" element={<Complain/>}/>
+
+
+           
+
+             
+
+
 
 
           
