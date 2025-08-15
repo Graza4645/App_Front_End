@@ -44,6 +44,10 @@ select {
     margin: 20px 0px 20px 0px;
 } 
 
+#savecreateadmission{
+  width: 116px;
+}
+
 .error {
   color: red;
   font-size: 12px;
@@ -117,9 +121,9 @@ select {
 
 
 .addmisson-group-create-input,
-.dropdown{
+.dropdown-admission-create{
   width: 93%;
-  height: 30px;
+  height: 25px;
   padding: 0px 12px;
   font-size: 14px;
   border-radius: 4px;
@@ -134,7 +138,7 @@ select {
 
 .addmisson-group-create-date .react-datepicker__input-container input {
   width: 100%;
-  height: 30px;
+  height: 25px;
   padding: 0px 12px;
   font-size: 14px;
   border-radius: 4px;

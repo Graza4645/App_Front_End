@@ -74,12 +74,19 @@ const fetchLogs = () => {
     [id]: value,
   }));
 };
-  // Pagination logic
-  const recordsPerPage = 10;
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = logs.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(logs.length / recordsPerPage);
+ // ✅ Filter based on search input (Reference No)
+const searchTerm = (formData.callSearch || "").toLowerCase();
+
+const filteredLogs = logs.filter((log) =>
+  log.complain_by?.toLowerCase().includes(searchTerm)
+);
+
+// ✅ Pagination logic after filtering
+const recordsPerPage = 10;
+const indexOfLastRecord = currentPage * recordsPerPage;
+const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+const currentRecords = filteredLogs.slice(indexOfFirstRecord, indexOfLastRecord);
+const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
 
   const formElement = [
     {
@@ -497,6 +504,11 @@ const fetchLogs = () => {
                         ...prev,
                         [item.id]: val,
                       }));
+
+                                      if (item.id === "callSearch") {
+            setCurrentPage(1);
+          }
+
                     }}
                   />
 

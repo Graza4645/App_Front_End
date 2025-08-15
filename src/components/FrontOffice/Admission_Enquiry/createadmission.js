@@ -21,7 +21,6 @@ const AdmissionEnquiryForm = () => {
       require: true,
     },
 
-    
     {
       id: "admissionEmail",
       label: "Email",
@@ -56,7 +55,7 @@ const AdmissionEnquiryForm = () => {
 
     {
       id: "admissiondate",
-      label: "Last Follow Up Date",
+      label: "Date",    // label: "Last Follow Up Date",
       type: "date",
       position: "left",
       require: true,
@@ -119,8 +118,6 @@ const AdmissionEnquiryForm = () => {
   };
   /** ------------------------->  End Mobile Validation    <--------------------------------------  */
 
-
-
   /**  -------------------------> start Name Validation   <------------------------------------- */
   const [nameError, setNameError] = useState("");
   const validateName = (value) => {
@@ -144,35 +141,34 @@ const AdmissionEnquiryForm = () => {
 
   /**  -------------------------> End Email Validation   <------------------------------------- */
 
-   /**  -------------------------> start TextArea Validation   <------------------------------------- */
-const [remarksError, setRemarksError] = useState({});
-const validateTextarea = (id, value) => {
-  if (value.length > 299) {
-    setRemarksError((prev) => ({ ...prev, [id]: "Maximum 300 characters allowed." }));
-  } else {
-    setRemarksError((prev) => ({ ...prev, [id]: "" }));
-  }
-};
+  /**  -------------------------> start TextArea Validation   <------------------------------------- */
+  const [remarksError, setRemarksError] = useState({});
+  const validateTextarea = (id, value) => {
+    if (value.length > 299) {
+      setRemarksError((prev) => ({
+        ...prev,
+        [id]: "Maximum 300 characters allowed.",
+      }));
+    } else {
+      setRemarksError((prev) => ({ ...prev, [id]: "" }));
+    }
+  };
   /**  -------------------------> End TextArea Validation   <------------------------------------- */
 
- /**  -------------------------> start Number of person Validation   <------------------------------------- */
-const [childError, setChildError] = useState("");
-const validateNumberOfChild = (value) => {
-  const num = parseInt(value, 10);
-  if (!/^\d+$/.test(value)) {
-    setChildError("Only numeric values are allowed.");
-  } else if (num < 1 || num > 5) {
-    setChildError("Number of children should be between 1 and 5.");
-  } else {
-    setChildError("");
-  }
-};
+  /**  -------------------------> start Number of person Validation   <------------------------------------- */
+  const [childError, setChildError] = useState("");
+  const validateNumberOfChild = (value) => {
+    const num = parseInt(value, 10);
+    if (!/^\d+$/.test(value)) {
+      setChildError("Only numeric values are allowed.");
+    } else if (num < 1 || num > 5) {
+      setChildError("Number of children should be between 1 and 5.");
+    } else {
+      setChildError("");
+    }
+  };
 
   /**  -------------------------> End Number of prson Validation   <------------------------------------- */
-
-
-
-
 
   const [formData, setFormData] = useState({
     admissionname: "",
@@ -191,30 +187,30 @@ const validateNumberOfChild = (value) => {
   });
 
   const isFormValid = () => {
-  return (
-    formData.admissionname.trim() !== "" &&
-    formData.admissionphone.trim().length === 10 &&
-    /^[6-9]/.test(formData.admissionphone) &&
-    formData.admissionEmail.includes("@") &&
-    formData.Addressadmission.trim() !== "" &&
-    formData.Descriptionadmission.trim() !== "" &&
-    formData.Noteadmission.trim() !== "" &&
-    formData.admissiondate !== "" &&
-    formData.admissiondatefollowUp !== "" &&
-    formData.assigned !== "" &&
-    formData.reference !== "" &&
-    formData.source !== "" &&
-    formData.classadmissioncreate !== "" &&
-    /^\d+$/.test(formData.numberofchild) &&
-    parseInt(formData.numberofchild, 10) >= 1 &&
-    parseInt(formData.numberofchild, 10) <= 5 &&
-    !phoneError &&
-    !nameError &&
-    !emailError &&
-    !childError &&
-    Object.values(remarksError).every((err) => err === "")
-  );
-};
+    return (
+      formData.admissionname.trim() !== "" &&
+      formData.admissionphone.trim().length === 10 &&
+      /^[6-9]/.test(formData.admissionphone) &&
+      formData.admissionEmail.includes("@") &&
+      formData.Addressadmission.trim() !== "" &&
+      formData.Descriptionadmission.trim() !== "" &&
+      formData.Noteadmission.trim() !== "" &&
+      formData.admissiondate !== "" &&
+      formData.admissiondatefollowUp !== "" &&
+      formData.assigned !== "" &&
+      formData.reference !== "" &&
+      formData.source !== "" &&
+      formData.classadmissioncreate !== "" &&
+      /^\d+$/.test(formData.numberofchild) &&
+      parseInt(formData.numberofchild, 10) >= 1 &&
+      parseInt(formData.numberofchild, 10) <= 5 &&
+      !phoneError &&
+      !nameError &&
+      !emailError &&
+      !childError &&
+      Object.values(remarksError).every((err) => err === "")
+    );
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -224,69 +220,68 @@ const validateNumberOfChild = (value) => {
     }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const payload = {
-    name: formData.admissionname,
-    phone: formData.admissionphone,
-    email: formData.admissionEmail,
-    address: formData.Addressadmission,
-    description: formData.Descriptionadmission,
-    note: formData.Noteadmission,
-    date: formData.admissiondate,
-    next_follow_up_date: formData.admissiondatefollowUp,
-    assigned: formData.assigned,
-    reference: formData.reference,
-    source: formData.source,
-    class: formData.classadmissioncreate,
-    number_of_child: parseInt(formData.numberofchild, 10),
-  };
+    const payload = {
+      name: formData.admissionname,
+      phone: formData.admissionphone,
+      email: formData.admissionEmail,
+      address: formData.Addressadmission,
+      description: formData.Descriptionadmission,
+      note: formData.Noteadmission,
+      date: formData.admissiondate,
+      next_follow_up_date: formData.admissiondatefollowUp,
+      assigned: formData.assigned,
+      reference: formData.reference,
+      source: formData.source,
+      class: formData.classadmissioncreate,
+      number_of_child: parseInt(formData.numberofchild, 10),
+    };
 
-  try {
-    const response = await fetch('http://localhost:3000/admissioncraete', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert("Enquiry submitted successfully!");
-      console.log("API Response:", data);
-      // Reset form if needed
-      setFormData({
-        admissionname: "",
-        admissionphone: "",
-        admissionEmail: "",
-        Addressadmission: "",
-        Descriptionadmission: "",
-        Noteadmission: "",
-        admissiondate: "",
-        admissiondatefollowUp: "",
-        assigned: "",
-        reference: "",
-        source: "",
-        classadmissioncreate: "",
-        numberofchild: "",
+    try {
+      const response = await fetch("http://localhost:3000/admissioncraete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
-    } else {
-      console.error("Submission failed:", data.error);
-      alert("Failed to submit enquiry. Try again.");
-    }
-  } catch (error) {
-    console.error("API Error:", error);
-    alert("Server error occurred. Check console.");
-  }
-};
 
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Enquiry submitted successfully!");
+        console.log("API Response:", data);
+        // Reset form if needed
+        setFormData({
+          admissionname: "",
+          admissionphone: "",
+          admissionEmail: "",
+          Addressadmission: "",
+          Descriptionadmission: "",
+          Noteadmission: "",
+          admissiondate: "",
+          admissiondatefollowUp: "",
+          assigned: "",
+          reference: "",
+          source: "",
+          classadmissioncreate: "",
+          numberofchild: "",
+        });
+      } else {
+        console.error("Submission failed:", data.error);
+        alert("Failed to submit enquiry. Try again.");
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      alert("Server error occurred. Check console.");
+    }
+  };
 
   return (
     <div className="admission-enquiry-container">
-      <h2>Admission Enquiry</h2>
+      <h4 style={{marginLeft : "13px"}}>Admission Enquiry</h4>
       <form className="form-grid" onSubmit={handleSubmit}>
         {formElements.map((item) => {
           if (item.type === "text") {
@@ -320,9 +315,8 @@ const handleSubmit = async (e) => {
                     }
 
                     if (item.id === "numberofchild") {
-                          validateNumberOfChild(val);
-                        }
-
+                      validateNumberOfChild(val);
+                    }
 
                     setFormData((prev) => ({
                       ...prev,
@@ -348,7 +342,6 @@ const handleSubmit = async (e) => {
                 {item.id === "numberofchild" && childError && (
                   <div className="error-message">{childError}</div>
                 )}
-
               </div>
             );
           }
@@ -361,29 +354,31 @@ const handleSubmit = async (e) => {
                   {item.require && <span className="required">*</span>}
                 </label>
                 <textarea
-  id={item.id}
-  name={item.id}
-  className="addmisson-group-create-textarea"
-  value={formData[item.id] || ""}
-  maxLength={300}
-  onChange={(e) => {
-    const val = e.target.value;
-    validateTextarea(item.id, val);
-    setFormData((prev) => ({
-      ...prev,
-      [item.id]: val,
-    }));
-  }}
-/>
-{remarksError[item.id] && (
-  <div className="error-message">{remarksError[item.id]}</div>
-)}
-<div className="char-count" style={{ color: formData[item.id].length > 300 ? 'red' : 'gray' }}>
-  {formData[item.id]?.length || 0}/300
-</div>
-
-
-
+                  id={item.id}
+                  name={item.id}
+                  className="addmisson-group-create-textarea"
+                  value={formData[item.id] || ""}
+                  maxLength={300}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    validateTextarea(item.id, val);
+                    setFormData((prev) => ({
+                      ...prev,
+                      [item.id]: val,
+                    }));
+                  }}
+                />
+                {remarksError[item.id] && (
+                  <div className="error-message">{remarksError[item.id]}</div>
+                )}
+                <div
+                  className="char-count"
+                  style={{ fontSize : "10px",
+                    color: formData[item.id].length > 300 ? "red" : "gray",
+                  }}
+                >
+                  {formData[item.id]?.length || 0}/300
+                </div>
               </div>
             );
           }
@@ -433,7 +428,7 @@ const handleSubmit = async (e) => {
             );
           }
 
-          if ((item.type === "dropdown")) {
+          if (item.type === "dropdown") {
             return (
               <div key={item.id} className="addmisson-group-create">
                 <label htmlFor={item.id}>
@@ -444,7 +439,7 @@ const handleSubmit = async (e) => {
                   id={item.id}
                   name={item.id}
                   // value={value}
-                  className="dropdown-admission"
+                  className="dropdown-admission-create"
                   onChange={handleChange}
                 >
                   <option value="">Select {item.label}</option>
@@ -462,15 +457,14 @@ const handleSubmit = async (e) => {
       </form>
 
       <div className="form-actions">
-        <button
-  type="submit"
-  onClick={handleSubmit}
-  disabled={!isFormValid()}
-  className={!isFormValid() ? "disabled-button" : ""}
->
-  Save
-</button>
-
+        <button id="savecreateadmission"
+          type="submit"
+          onClick={handleSubmit}
+          disabled={!isFormValid()}
+          className={!isFormValid() ? "disabled-button" : ""}
+        >
+          Save
+        </button>
       </div>
     </div>
   );

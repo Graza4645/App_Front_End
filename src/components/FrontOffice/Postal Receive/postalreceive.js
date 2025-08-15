@@ -66,12 +66,19 @@ const fetchLogs = () => {
     }
   };
 
-  // Pagination logic
-  const recordsPerPage = 10;
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = logs.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(logs.length / recordsPerPage);
+// ✅ Filter based on search input (Reference No)
+const searchTerm = (formData.callSearch || "").toLowerCase();
+
+const filteredLogs = logs.filter((log) =>
+  log.reference_no?.toLowerCase().includes(searchTerm)
+);
+
+// ✅ Pagination logic after filtering
+const recordsPerPage = 10;
+const indexOfLastRecord = currentPage * recordsPerPage;
+const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+const currentRecords = filteredLogs.slice(indexOfFirstRecord, indexOfLastRecord);
+const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
 
   const formElement = [
     {
@@ -437,8 +444,12 @@ body: JSON.stringify({
                         ...prev,
                         [item.id]: val,
                       }));
+                        if (item.id === "callSearch") {
+            setCurrentPage(1);
+          }
                     }}
                   />
+                  
 
                   {/* ✅ ADDED: Show name error if any */}
                   {item.id === "phoneName" && nameError && (
@@ -452,6 +463,7 @@ body: JSON.stringify({
                   {item.id === "phoneDuration" && NmberpersonErro && (
                     <div className="error-message">{NmberpersonErro}</div>
                   )}
+                  
                 </div>
               );
             }

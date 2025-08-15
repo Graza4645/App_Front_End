@@ -56,12 +56,20 @@ const handleEdit = async (item) => {
 };
 
 
-  // Pagination logic
-  const recordsPerPage = 10;
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = logs.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(logs.length / recordsPerPage);  
+
+// ✅ Filter based on search input (Reference No)
+const searchTerm = (formData.callSearch || "").toLowerCase();
+
+const filteredLogs = logs.filter((log) =>
+  log.name?.toLowerCase().includes(searchTerm)
+);
+
+// ✅ Pagination logic after filtering
+const recordsPerPage = 10;
+const indexOfLastRecord = currentPage * recordsPerPage;
+const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+const currentRecords = filteredLogs.slice(indexOfFirstRecord, indexOfLastRecord);
+const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
 
   let num = 1;
     const formElement =[
@@ -146,6 +154,7 @@ const handleEdit = async (item) => {
   };
   /**  -------------------------> End Name Validation   <------------------------------------- */
 
+
   /** ----------------------->  Start Mobile Validation  <-------------------------------  */
   const [phoneError, setPhoneError] = useState("");
   const validatePhone = (value) => {
@@ -158,6 +167,8 @@ const handleEdit = async (item) => {
     }
   };
   /** ------------------------->  End Mobile Validation    <--------------------------------------  */
+
+
 
   /**  -------------------------> start TextArea Validation   <------------------------------------- */
   const [remarksError, setRemarksError] = useState({});
@@ -384,25 +395,34 @@ const handleSubmit = async (e) => {
                         ? 10
                         : undefined
                     }
-                    onChange={(e) => {
-                      let val = e.target.value;
+                   onChange={(e) => {
+  let val = e.target.value;
 
-                      if (item.id === "phoneName") {
-                        validateName(val);
-                      }
+  // ✅ Trigger validation if needed
+  if (item.id === "phoneName") {
+    validateName(val);
+  }
 
-                      if (item.id === "phoneNumber") {
-                        validatePhone(val);
-                      }
+  if (item.id === "phoneNumber") {
+    validatePhone(val);
+  }
 
-                      if (item.id === "phoneDuration") {
-                        validatenumberperson(val);
-                      }
-                      setFormData((prev) => ({
-                        ...prev,
-                        [item.id]: val,
-                      }));
-                    }}
+  if (item.id === "phoneDuration") {
+    validatenumberperson(val);
+  }
+
+  // ✅ Reset pagination when searching
+  if (item.id === "callSearch") {
+    setCurrentPage(1);
+  }
+
+  // ✅ Always update form data
+  setFormData((prev) => ({
+    ...prev,
+    [item.id]: val,
+  }));
+}}
+
                   />
 
                   {/* ✅ ADDED: Show name error if any */}

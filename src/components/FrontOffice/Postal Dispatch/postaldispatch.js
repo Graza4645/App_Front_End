@@ -63,12 +63,21 @@ const PostalDispatch = () => {
     }
   };
 
-  // Pagination logic
-  const recordsPerPage = 10;
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = logs.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(logs.length / recordsPerPage);
+
+// ✅ Filter based on search input (Reference No)
+const searchTerm = (formData.callSearch || "").toLowerCase();
+
+const filteredLogs = logs.filter((log) =>
+  log.reference_no?.toLowerCase().includes(searchTerm)
+);
+
+// ✅ Pagination logic after filtering
+const recordsPerPage = 10;
+const indexOfLastRecord = currentPage * recordsPerPage;
+const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+const currentRecords = filteredLogs.slice(indexOfFirstRecord, indexOfLastRecord);
+const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
+
 
   const formElement = [
     {
@@ -379,63 +388,61 @@ const PostalDispatch = () => {
                 </div>
               );
             }
+if (item.type === "text") {
+  return (
+    <div key={item.id} className="call-group-create">
+      <label htmlFor={item.id}>
+        {item.label}
+        {item.require && <span className="required">*</span>}
+      </label>
+      <input
+        type="text"
+        id={item.id}
+        name={item.id}
+        className="call-group-create-input"
+        value={formData[item.id] || ""}
+        maxLength={
+          item.id === "phoneNumber"
+            ? 10
+            : item.id === "phoneDuration"
+            ? 10
+            : undefined
+        }
+        onChange={(e) => {
+          const val = e.target.value;
 
-            if (item.type === "text") {
-              return (
-                <div key={item.id} className="call-group-create">
-                  <label htmlFor={item.id}>
-                    {item.label}
-                    {item.require && <span className="required">*</span>}
-                  </label>
-                  <input
-                    type="text"
-                    id={item.id}
-                    name={item.id}
-                    className="call-group-create-input"
-                    value={formData[item.id] || ""} // step -1
-                    maxLength={
-                      item.id === "phoneNumber"
-                        ? 10
-                        : item.id === "phoneDuration"
-                        ? 10
-                        : undefined
-                    }
-                    onChange={(e) => {
-                      let val = e.target.value;
+          // ✅ Run validations for specific fields
+          if (item.id === "phoneName") validateName(val);
+          if (item.id === "phoneNumber") validatePhone(val);
+          if (item.id === "phoneDuration") validatenumberperson(val);
 
-                      if (item.id === "phoneName") {
-                        validateName(val);
-                      }
+          setFormData((prev) => ({
+            ...prev,
+            [item.id]: val,
+          }));
 
-                      if (item.id === "phoneNumber") {
-                        validatePhone(val);
-                      }
+          // ✅ Reset pagination for search field
+          if (item.id === "callSearch") {
+            setCurrentPage(1);
+          }
+        }}
+      />
 
-                      if (item.id === "phoneDuration") {
-                        validatenumberperson(val);
-                      }
-                      setFormData((prev) => ({
-                        ...prev,
-                        [item.id]: val,
-                      }));
-                    }}
-                  />
+      {/* ✅ Show validation errors */}
+      
+      {item.id === "phoneName" && nameError && (
+        <div className="error-message">{nameError}</div>
+      )}
+      {item.id === "phoneNumber" && phoneError && (
+        <div className="error-message">{phoneError}</div>
+      )}
+      {item.id === "phoneDuration" && NmberpersonErro && (
+        <div className="error-message">{NmberpersonErro}</div>
+      )}
+    </div>
+  );
+}
 
-                  {/* ✅ ADDED: Show name error if any */}
-                  {item.id === "phoneName" && nameError && (
-                    <div className="error-message">{nameError}</div>
-                  )}
-
-                  {item.id === "phoneNumber" && phoneError && (
-                    <div className="error-message">{phoneError}</div>
-                  )}
-
-                  {item.id === "phoneDuration" && NmberpersonErro && (
-                    <div className="error-message">{NmberpersonErro}</div>
-                  )}
-                </div>
-              );
-            }
 
             return null;
           })}
