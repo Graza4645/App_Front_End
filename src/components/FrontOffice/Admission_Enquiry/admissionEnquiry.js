@@ -18,6 +18,7 @@ const AdmissionEnquiry = () => {
 
   const [enquiries, setEnquiries] = useState([]);
   useEffect(() => {
+    console.log('hello => ', API_BASE_URL)
 
     fetch(`${API_BASE_URL}/getadmission`)
       .then((res) => res.json())
