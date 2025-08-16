@@ -1,23 +1,17 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import { DoubleNavbar } from './components/Navbar/DoubleNavbar';
+// Add more components as needed
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+   return (
+    <div >
+      <DoubleNavbar /> {/* Always visible on the left */}
+      {/* <div >
+        <Routes>
+          <Route path="/" element={<FrontOffice />} />
+          <Route path="/front-office" element={<FrontOffice />} />
+        </Routes>
+      </div> */}
     </div>
   );
 }
