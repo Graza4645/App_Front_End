@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 // import { useNavigate } from "react-router-dom";
 import "./createadmission.css";
+import { API_BASE_URL } from "../../../config.js";
 
 const AdmissionEnquiryForm = () => {
   const formElements = [
@@ -240,7 +241,8 @@ const AdmissionEnquiryForm = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/admissioncraete", {
+      console.log('from create---',API_BASE_URL)
+      const response = await fetch( `${API_BASE_URL}/admissioncraete`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
