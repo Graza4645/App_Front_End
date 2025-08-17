@@ -127,7 +127,7 @@ const AdmissionEnquiry = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/updateadmission/${item.id}`,
+        `${API_BASE_URL}/updateadmission/${item.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -154,7 +154,7 @@ const AdmissionEnquiry = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/deleteadmission/${item.id}`,
+        `${API_BASE_URL}/deleteadmission/${item.id}`,
         {
           method: "DELETE",
         }

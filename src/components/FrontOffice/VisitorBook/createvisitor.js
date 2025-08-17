@@ -2,122 +2,28 @@ import React, { useState, useEffect } from "react";
 import "./createvisitor.css";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
+import { API_BASE_URL } from "../../../config";
 
 // here i will implement  you code
 
 const formElements = [
-  {
-    id: "Purpose",
-    label: "Purpose",
-    type: "dropdown",
-    options: [
-      "Marketing",
-      "Parent Teacher Meeting",
-      "Student Meeting",
-      "Staff Meeting",
-      "Principal Meeting",
-    ],
-    position: "left",
-    require: true,
-  },
-  {
-    id: "MeetingWith",
-    label: "Meeting With",
-    type: "dropdown",
-    options: ["Staff", "Student", "Parent"],
-    position: "right",
-    require: true,
-  },
-  {
-    id: "Staff",
-    label: "Staff",
-    type: "dropdown",
-    options: [],
-    position: "left",
-    require: true,
-  },
-  {
-    id: "class",
-    label: "Class",
-    type: "dropdown",
-    options: ["10th", "9th", "8th"],
-    position: "left",
-    require: true,
-  },
-  {
-    id: "section",
-    label: "Section",
-    type: "dropdown",
-    options: ["A", "B", "C"],
-    position: "right",
-    require: true,
-  },
-  {
-    id: "student",
-    label: "Student",
-    type: "dropdown",
-    options: ["Kallua", "Pandra", "Motka", "Chunnu", "kaliya"],
-    position: "right",
-    require: true,
-  },
-  {
-    id: "VisitorName",
-    label: "Visitor Name",
-    type: "text",
-    position: "right",
-    require: true,
-  },
-  {
-    id: "Phone",
-    label: "Phone Number",
-    type: "text",
-    position: "right",
-    require: true,
-  },
-  {
-    id: "idcard",
-    label: "ID Card",
-    type: "text",
-    position: "left",
-    require: true,
-  },
-  {
-    id: "Numberperson",
-    label: "Number Of Person",
-    type: "text",
-    position: "right",
-    require: true,
-  },
-  { id: "createdate", label: "Date", type: "date", position: "left", require: true },
-  {
-    id: "inTime",
-    label: "In Time",
-    type: "time",
-    position: "left",
-    require: true,
-  },
-  {
-    id: "outTime",
-    label: "Out Time",
-    type: "time",
-    position: "right",
-    require: true,
-  },
-  {
-    id: "fileUpload",
-    label: "Upload Documents",
-    type: "file",
-    position: "right",
-    require: true,
-  },
-  {
-    id: "comments",
-    label: "Write comments",
-    type: "text",
-    position: "left",
-    require: true,
-  },
+  {id:"Purpose",label:"Purpose",type:"dropdown",options:["Marketing","Parent Teacher Meeting","Student Meeting","Staff Meeting","Principal Meeting"],position:"left",require:true},
+  {id:"MeetingWith",label:"Meeting With",type:"dropdown",options:["Staff","Student","Parent"],position:"right",require:true},
+  {id:"Staff",label:"Staff",type:"dropdown",options:[],position:"left",require:true},
+  {id:"class",label:"Class",type:"dropdown",options:["10th","9th","8th"],position:"left",require:true},
+  {id:"section",label:"Section",type:"dropdown",options:["A","B","C"],position:"right",require:true},
+  {id:"student",label:"Student",type:"dropdown",options:["Kallua","Pandra","Motka","Chunnu","kaliya"],position:"right",require:true},
+  {id:"VisitorName",label:"Visitor Name",type:"text",position:"right",require:true},
+  {id:"Phone",label:"Phone Number",type:"text",position:"right",require:true},
+  {id:"idcard",label:"ID Card",type:"text",position:"left",require:true},
+  {id:"Numberperson",label:"Number Of Person",type:"text",position:"right",require:true},
+  {id:"createdate",label:"Date",type:"date",position:"left",require:true},
+  {id:"inTime",label:"In Time",type:"time",position:"left",require:true},
+  {id:"outTime",label:"Out Time",type:"time",position:"right",require:true},
+  {id:"fileUpload",label:"Upload Documents",type:"file",position:"right",require:true},
+  {id:"comments",label:"Write comments",type:"text",position:"left",require:true}
 ];
+
 
 export default function CreateVisitorBook() {
   const leftItems = formElements.filter((item) => item.position === "left");
@@ -142,7 +48,7 @@ export default function CreateVisitorBook() {
     if (meetingWith === "Staff") {
       const fetchStaff = async () => {
         try {
-          const res = await fetch("http://localhost:3000/getStaffDetails");
+          const res = await fetch(`${API_BASE_URL}/getStaffDetails`);
           const json = await res.json();
           const staffList = Array.isArray(json) ? json : json.data;
           if (!Array.isArray(staffList)) {
@@ -214,19 +120,20 @@ export default function CreateVisitorBook() {
 
   const handleSubmit = async () => {
     try {
-      const commonPayload = {
-        purpose: formData.Purpose,
-        meeting_with: formData.MeetingWith,
-        id_card: formData.idcard,
-        date: formData.date,
-        visitor_name: formData.VisitorName,
-        out_time: formData.outTime,
-        phone_number: formData.Phone,
-        comments: formData.comments,
-        number_of_person: formData.Numberperson,
-        in_time: formData.inTime,
-        upload_documents: formData.fileUpload || "",
-      };
+     const commonPayload = {
+  purpose: formData.Purpose,
+  meeting_with: formData.MeetingWith,
+  id_card: formData.idcard,
+  date: formData.createdate,   // ✅ Fix here
+  visitor_name: formData.VisitorName,
+  out_time: formData.outTime,
+  phone_number: formData.Phone,
+  comments: formData.comments,
+  number_of_person: formData.Numberperson,
+  in_time: formData.inTime,
+  upload_documents: formData.fileUpload || "",
+};
+
 
       let payload = {};
       let apiUrl = "";
@@ -236,7 +143,7 @@ export default function CreateVisitorBook() {
           ...commonPayload,
           staff: formData.Staff,
         };
-        apiUrl = "http://localhost:3000/visitorstaff";
+        apiUrl = `${API_BASE_URL}/visitorstaff`;
       } else if (formData.MeetingWith === "Student") {
         payload = {
           ...commonPayload,
@@ -244,7 +151,7 @@ export default function CreateVisitorBook() {
           section: formData.section,
           student: formData.student,
         };
-        apiUrl = "http://localhost:3000/visitorstudent";
+        apiUrl = `${API_BASE_URL}/visitorstudent`;
       } else {
         alert("Unsupported Meeting With type.");
         return;
