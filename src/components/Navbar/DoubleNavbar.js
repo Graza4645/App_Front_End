@@ -744,7 +744,7 @@ function handleClick(route) {
           </UnstyledButton>
           {!collapsed && (
             <div className={classes.logo}>
-              <img src="./header.png" alt="Logo" style={{ width: '160px' }} />
+              {/* <img src="./header.png" alt="Logo" style={{ width: '160px' }} /> */}
             </div>
           )}
         </div>
