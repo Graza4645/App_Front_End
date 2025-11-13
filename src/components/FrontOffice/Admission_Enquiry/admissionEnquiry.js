@@ -17,14 +17,16 @@ const AdmissionEnquiry = () => {
   });
 
   const [enquiries, setEnquiries] = useState([]);
+  const [originalEnquiries, setOriginalEnquiries] = useState([]);
   useEffect(() => {
-    console.log('hello => ', API_BASE_URL)
+    const apiUrl = API_BASE_URL || 'http://localhost:3000/api/v1';
+    console.log('API URL => ', apiUrl)
 
-    fetch(`${API_BASE_URL}/getadmission`)
+    fetch(`${apiUrl}/admissionenquiry`)
       .then((res) => res.json())
       .then((data) => {
         setEnquiries(data);
-       
+        setOriginalEnquiries(data);
       })
       .catch((err) => {
         console.error("Failed to fetch enquiries:", err);
@@ -96,7 +98,7 @@ const AdmissionEnquiry = () => {
     },
     {
       id: "EnquiryToDate",
-      label: "Enquiry To Date",
+      label: "Last Follow Up Date",
       type: "date",
       position: "left",
       require: true,
@@ -127,7 +129,7 @@ const AdmissionEnquiry = () => {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/updateadmission/${item.id}`,
+        `${API_BASE_URL || 'http://localhost:3000/api/v1'}/updateadmission/${item.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -154,7 +156,7 @@ const AdmissionEnquiry = () => {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/deleteadmission/${item.id}`,
+        `${API_BASE_URL || 'http://localhost:3000/api/v1'}/deleteadmission/${item.id}`,
         {
           method: "DELETE",
         }
@@ -194,7 +196,42 @@ const AdmissionEnquiry = () => {
 
   const handleSearch = () => {
     console.log("Search triggered with:", formData);
-    // Add fetch logic for admission enquiries based on criteria
+    
+    let filtered = originalEnquiries;
+    
+    if (formData.Std) {
+      filtered = filtered.filter(item => item.class === formData.Std);
+    }
+    
+    if (formData.Source) {
+      filtered = filtered.filter(item => item.source === formData.Source);
+    }
+    
+    if (formData.EnquiryFromDate && formData.EnquiryToDate) {
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.date);
+        const fromDate = new Date(formData.EnquiryFromDate);
+        const toDate = new Date(formData.EnquiryToDate);
+        return itemDate >= fromDate && itemDate <= toDate;
+      });
+    }
+    
+    // Last Follow Up Date filter
+    if (formData.EnquiryToDate) {
+      filtered = filtered.filter(item => {
+        const lastFollowUpDate = new Date(item.next_follow_up_date);
+        const toDate = new Date(formData.EnquiryToDate);
+        // const status = item.status || 'Active'; // Use dummy Active status if not present
+        return lastFollowUpDate <= toDate;
+      });
+    }
+    
+    if (formData.status && formData.status !== 'All') {
+      filtered = filtered.filter(item => item.status === formData.status);
+    }
+    
+    setEnquiries(filtered);
+    setCurrentPage(1);
   };
 
   return (
@@ -225,7 +262,7 @@ const AdmissionEnquiry = () => {
                       name={item.id}
                       value={value}
                       className="dropdown-admission"
-                      onChange={handleChange}
+                      onChange={(e) => handleChange(item.id, e.target.value)}
                     >
                       <option value="">Select {item.label}</option>
                       {item.options.map((option, idx) => (
@@ -288,6 +325,19 @@ const AdmissionEnquiry = () => {
           <div className="addmisson-group">
             <button onClick={handleSearch} className="search-btn">
               Search
+            </button>
+            <button onClick={() => {
+              setFormData({
+                Std: "",
+                Source: "",
+                EnquiryFromDate: null,
+                EnquiryToDate: null,
+                status: "",
+              });
+              setEnquiries(originalEnquiries);
+              setCurrentPage(1);
+            }} className="search-btn" style={{marginLeft: '10px'}}>
+              Reset
             </button>
           </div>
         </div>
@@ -361,9 +411,9 @@ const AdmissionEnquiry = () => {
                     <td>{item.phone}</td>
                     <td>{item.source}</td>
                     <td>{item.date}</td>
-                    <td>{item.date || "-"}</td>
+                    <td>{item.date}</td>
                     <td>{item.next_follow_up_date}</td>
-                    <td>{item.status || "Active"}</td>
+                    <td>Active</td>
                     <td>
                       <div className="action-menu">
                         <i className="fas fa-ellipsis-v"></i>
@@ -401,25 +451,19 @@ const AdmissionEnquiry = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Enquiry Details</h3>
-            <p>
-              <strong>Name:</strong> {selectedEnquiry.name}
-            </p>
-            <p>
-              <strong>Phone:</strong> {selectedEnquiry.phone}
-            </p>
-            <p>
-              <strong>Source:</strong> {selectedEnquiry.source}
-            </p>
-            <p>
-              <strong>Enquiry Date:</strong> {selectedEnquiry.date}
-            </p>
-            <p>
-              <strong>Next Follow Up:</strong>{" "}
-              {selectedEnquiry.next_follow_up_date || "-"}
-            </p>
-            <p>
-              <strong>Status:</strong> {selectedEnquiry.status}
-            </p>
+            <p><strong>Name:</strong> {selectedEnquiry.name}</p>
+            <p><strong>Phone:</strong> {selectedEnquiry.phone}</p>
+            <p><strong>Email:</strong> {selectedEnquiry.email}</p>
+            <p><strong>Address:</strong> {selectedEnquiry.address}</p>
+            <p><strong>Class:</strong> {selectedEnquiry.class}</p>
+            <p><strong>Source:</strong> {selectedEnquiry.source}</p>
+            <p><strong>Reference:</strong> {selectedEnquiry.reference}</p>
+            <p><strong>Enquiry Date:</strong> {selectedEnquiry.date}</p>
+            <p><strong>Next Follow Up:</strong> {selectedEnquiry.next_follow_up_date}</p>
+            <p><strong>Assigned:</strong> {selectedEnquiry.assigned}</p>
+            <p><strong>Number of Children:</strong> {selectedEnquiry.number_of_child}</p>
+            <p><strong>Description:</strong> {selectedEnquiry.description}</p>
+            <p><strong>Note:</strong> {selectedEnquiry.note}</p>
             <button onClick={() => setShowModal(false)}>Close</button>
           </div>
         </div>

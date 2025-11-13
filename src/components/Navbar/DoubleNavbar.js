@@ -531,16 +531,6 @@
 
 import { Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import {
-  IconCalendarStats,
-  IconDeviceDesktopAnalytics,
-  IconFingerprint,
-  IconGauge,
-  IconHome2,
-  IconSettings,
-  IconUser,
-  IconMenu2,
-} from '@tabler/icons-react';
 import { UnstyledButton, Tooltip } from '@mantine/core';
 import classes from './DoubleNavbar.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -553,6 +543,16 @@ import PhoneCallLog from '../FrontOffice/Phonecalllog/phonecall.js';
 import PostalDispatch from '../FrontOffice/Postal Dispatch/postaldispatch.js';
 import PostalReceive from '../FrontOffice/Postal Receive/postalreceive.js';
 import Complain from '../FrontOffice/Complain/complain.js';
+
+// Simple icon components using Unicode symbols
+const IconHome2 = ({ size = 20 }) => <span style={{ fontSize: size }}>🏠</span>;
+const IconGauge = ({ size = 20 }) => <span style={{ fontSize: size }}>📊</span>;
+const IconDeviceDesktopAnalytics = ({ size = 20 }) => <span style={{ fontSize: size }}>💻</span>;
+const IconCalendarStats = ({ size = 20 }) => <span style={{ fontSize: size }}>📅</span>;
+const IconUser = ({ size = 20 }) => <span style={{ fontSize: size }}>👤</span>;
+const IconFingerprint = ({ size = 20 }) => <span style={{ fontSize: size }}>🔐</span>;
+const IconSettings = ({ size = 20 }) => <span style={{ fontSize: size }}>⚙️</span>;
+const IconMenu2 = ({ size = 20 }) => <span style={{ fontSize: size }}>☰</span>;
 
 
 

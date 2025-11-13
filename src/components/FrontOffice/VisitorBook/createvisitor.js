@@ -10,7 +10,7 @@ const formElements = [
   {id:"Purpose",label:"Purpose",type:"dropdown",options:["Marketing","Parent Teacher Meeting","Student Meeting","Staff Meeting","Principal Meeting"],position:"left",require:true},
   {id:"MeetingWith",label:"Meeting With",type:"dropdown",options:["Staff","Student","Parent"],position:"right",require:true},
   {id:"Staff",label:"Staff",type:"dropdown",options:[],position:"left",require:true},
-  {id:"class",label:"Class",type:"dropdown",options:["10th","9th","8th"],position:"left",require:true},
+  {id:"class",label:"Class",type:"dropdown",options:["Class 10","Class 9","Class 8"],position:"left",require:true},
   {id:"section",label:"Section",type:"dropdown",options:["A","B","C"],position:"right",require:true},
   {id:"student",label:"Student",type:"dropdown",options:["Kallua","Pandra","Motka","Chunnu","kaliya"],position:"right",require:true},
   {id:"VisitorName",label:"Visitor Name",type:"text",position:"right",require:true},
@@ -48,7 +48,11 @@ export default function CreateVisitorBook() {
     if (meetingWith === "Staff") {
       const fetchStaff = async () => {
         try {
-          const res = await fetch(`${API_BASE_URL}/getStaffDetails`);
+
+          const apiUrl = API_BASE_URL || 'http://localhost:3000/api/v1';
+          console.log('API_BASE_URL:', apiUrl);
+          console.log('Fetching stafflist from:', `${apiUrl}/stafflist`);
+          const res = await fetch(`${apiUrl}/stafflist`);
           const json = await res.json();
           const staffList = Array.isArray(json) ? json : json.data;
           if (!Array.isArray(staffList)) {
@@ -111,8 +115,8 @@ export default function CreateVisitorBook() {
       return value && value.toString().trim() !== "";
     });
 
-    setIsFormValid(allFilled && !phoneError);
-  }, [formData, meetingWith, phoneError]);
+    setIsFormValid(allFilled && !phoneError && !visitorNameError && !NmberpersonErro && !inTimeError && !outTimeError);
+  }, [formData, meetingWith, phoneError, visitorNameError, NmberpersonErro, inTimeError, outTimeError]);
 
   const handleChange = (id, value) => {
     setFormData((prev) => ({ ...prev, [id]: value }));
@@ -120,38 +124,52 @@ export default function CreateVisitorBook() {
 
   const handleSubmit = async () => {
     try {
-     const commonPayload = {
-  purpose: formData.Purpose,
-  meeting_with: formData.MeetingWith,
-  id_card: formData.idcard,
-  date: formData.createdate,   // ✅ Fix here
-  visitor_name: formData.VisitorName,
-  out_time: formData.outTime,
-  phone_number: formData.Phone,
-  comments: formData.comments,
-  number_of_person: formData.Numberperson,
-  in_time: formData.inTime,
-  upload_documents: formData.fileUpload || "",
-};
+      // Validate required fields before submission
+      if (!formData.MeetingWith) {
+        alert("Please select Meeting With type");
+        return;
+      }
 
+      const commonPayload = {
+        purpose: formData.Purpose || "",
+        meeting_with: formData.MeetingWith,
+        id_card: formData.idcard || "",
+        date: formData.createdate || "",
+        visitor_name: formData.VisitorName || "",
+        out_time: formData.outTime || "",
+        phone_number: formData.Phone || "",
+        comments: formData.comments || "",
+        number_of_person: parseInt(formData.Numberperson) || 1,
+        in_time: formData.inTime || "",
+        upload_documents: formData.fileUpload || "",
+      };
 
       let payload = {};
       let apiUrl = "";
 
       if (formData.MeetingWith === "Staff") {
+        if (!formData.Staff) {
+          alert("Please select a staff member");
+          return;
+        }
         payload = {
           ...commonPayload,
           staff: formData.Staff,
+          staff_id: formData.StaffId,
         };
-        apiUrl = `${API_BASE_URL}/visitorstaff`;
+        apiUrl = `${API_BASE_URL || 'http://localhost:3000/api/v1'}/visitorstaff`;
       } else if (formData.MeetingWith === "Student") {
+        if (!formData.class || !formData.section || !formData.student) {
+          alert("Please select class, section, and student");
+          return;
+        }
         payload = {
           ...commonPayload,
           class: formData.class,
           section: formData.section,
           student: formData.student,
         };
-        apiUrl = `${API_BASE_URL}/visitorstudent`;
+        apiUrl = `${API_BASE_URL || 'http://localhost:3000/api/v1'}/visitorStudent`;
       } else {
         alert("Unsupported Meeting With type.");
         return;
@@ -168,8 +186,12 @@ export default function CreateVisitorBook() {
         body: JSON.stringify(payload),
       });
 
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       const data = await res.json();
-      // console.log(data);
+      console.log("Response:", data);
 
       if (res.ok) {
         alert("Visitor added successfully!");
@@ -177,11 +199,12 @@ export default function CreateVisitorBook() {
         setMeetingWith("");
         setPhone("");
       } else {
-        alert("Error: " + (data.error || "Failed to add visitor"));
+        console.error("Server error:", data);
+        alert("Error: " + (data.message || data.error || "Failed to add visitor"));
       }
     } catch (err) {
       console.error("Submission error:", err);
-      alert("Submission failed.");
+      alert("Submission failed: " + err.message);
     }
   };
 
@@ -218,14 +241,28 @@ export default function CreateVisitorBook() {
             value={item.id === "MeetingWith" ? meetingWith : value}
             onChange={(e) => {
               const val = e.target.value;
-              if (item.id === "MeetingWith") setMeetingWith(val);
+              if (item.id === "MeetingWith") {
+                setMeetingWith(val);
+                // Clear related fields when changing meeting type
+                if (val === "Student") {
+                  handleChange("Staff", "");
+                } else if (val === "Staff") {
+                  handleChange("class", "");
+                  handleChange("section", "");
+                  handleChange("student", "");
+                }
+              }
 
               if (item.id === "Staff") {
                 const selected = staffOptions.find((s) => s.staff_name === val);
-                if (selected && selected.mobile_number) {
-                  setPhone(selected.mobile_number);
-                  validatePhone(selected.mobile_number);
-                  handleChange("Phone", selected.mobile_number);
+                if (selected) {
+                  if (selected.mobile_number) {
+                    setPhone(selected.mobile_number);
+                    validatePhone(selected.mobile_number);
+                    handleChange("Phone", selected.mobile_number);
+                  }
+                  // Auto-populate ID Card with user_id
+                  handleChange("idcard", selected.user_id);
                 }
               }
 
@@ -335,7 +372,7 @@ export default function CreateVisitorBook() {
   const oneYearAhead = new Date(today);
   oneYearAhead.setFullYear(today.getFullYear() + 1);
 
-  // 📌 Format date as: 15-Aug-2025
+  // Format date as: DD-MMM-YYYY
   const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, "0");
     const month = date.toLocaleString("en-US", { month: "short" });

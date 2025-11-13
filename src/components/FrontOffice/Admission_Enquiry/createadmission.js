@@ -73,28 +73,28 @@ const AdmissionEnquiryForm = () => {
       id: "assigned",
       label: "Assigned",
       type: "dropdown",
-      options: ["Nursery", "LKG"],
+      options: ["Priya", "Rahul", "Vagisha", "Amit", "Neha"],
       require: true,
     },
     {
       id: "reference",
       label: "Reference",
       type: "dropdown",
-      options: ["Nursery", "LKG"],
+      options: ["Google Ads", "Facebook Ad Campaign", "Website", "Walk-in", "Referral"],
       require: true,
     },
     {
       id: "source",
       label: "Source",
       type: "dropdown",
-      options: ["Nursery", "LKG"],
+      options: ["Walk-in", "Online Enquiry Form", "Phone Call", "Email", "Social Media"],
       require: true,
     },
     {
       id: "classadmissioncreate",
       label: "Class",
       type: "dropdown",
-      options: ["Nursery", "LKG"],
+      options: ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Nursery", "LKG", "UKG"],
       require: true,
     },
     {
@@ -242,7 +242,7 @@ const AdmissionEnquiryForm = () => {
 
     try {
       console.log('from create---',API_BASE_URL)
-      const response = await fetch( `${API_BASE_URL}/admissioncraete`, {
+      const response = await fetch( `${API_BASE_URL || 'http://localhost:3000/api/v1'}/admissionenquiry`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
