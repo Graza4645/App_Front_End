@@ -48,7 +48,11 @@ export default function CreateVisitorBook() {
     if (meetingWith === "Staff") {
       const fetchStaff = async () => {
         try {
-          const res = await fetch(`${API_BASE_URL}/getStaffDetails`);
+
+          const apiUrl = API_BASE_URL || 'http://localhost:3000/api/v1';
+          console.log('API_BASE_URL:', apiUrl);
+          console.log('Fetching visitorstaff from:', `${apiUrl}/visitorstaff`);
+          const res = await fetch(`${apiUrl}/visitorstaff`);
           const json = await res.json();
           const staffList = Array.isArray(json) ? json : json.data;
           if (!Array.isArray(staffList)) {
@@ -143,7 +147,7 @@ export default function CreateVisitorBook() {
           ...commonPayload,
           staff: formData.Staff,
         };
-        apiUrl = `${API_BASE_URL}/visitorstaff`;
+        apiUrl = `${API_BASE_URL || 'http://localhost:3000/api/v1'}/visitorstaff`;
       } else if (formData.MeetingWith === "Student") {
         payload = {
           ...commonPayload,
@@ -151,7 +155,7 @@ export default function CreateVisitorBook() {
           section: formData.section,
           student: formData.student,
         };
-        apiUrl = `${API_BASE_URL}/visitorstudent`;
+        apiUrl = `${API_BASE_URL || 'http://localhost:3000/api/v1'}/visitorStudent`;
       } else {
         alert("Unsupported Meeting With type.");
         return;
