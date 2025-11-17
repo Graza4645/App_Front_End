@@ -19,7 +19,7 @@ const AdmissionEnquiry = () => {
   const [enquiries, setEnquiries] = useState([]);
   const [originalEnquiries, setOriginalEnquiries] = useState([]);
   useEffect(() => {
-    const apiUrl = API_BASE_URL || 'http://localhost:3000/api/v1';
+    const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
     console.log('API URL => ', apiUrl)
 
     fetch(`${apiUrl}/admissionenquiry`)
@@ -87,6 +87,7 @@ const AdmissionEnquiry = () => {
         "Front Office",
         "parents",
         "Student",
+        "Walk-in"
       ],
     },
     {
@@ -129,7 +130,7 @@ const AdmissionEnquiry = () => {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL || 'http://localhost:3000/api/v1'}/updateadmission/${item.id}`,
+        `${API_BASE_URL || 'http://localhost:8000/api/v1'}/updateadmission/${item.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -156,7 +157,7 @@ const AdmissionEnquiry = () => {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL || 'http://localhost:3000/api/v1'}/deleteadmission/${item.id}`,
+        `${API_BASE_URL || 'http://localhost:8000/api/v1'}/admissionenquiry/${item.id}`,
         {
           method: "DELETE",
         }
@@ -294,7 +295,7 @@ const AdmissionEnquiry = () => {
                 };
 
                 return (
-                  <div key={item.id} className="addmisson-group">
+                  <div key={item.id} className="addmisson-group" >
                     <label htmlFor={item.id}>
                       {item.label}
                       {item.require && <span className="required">*</span>}
@@ -322,24 +323,36 @@ const AdmissionEnquiry = () => {
               return null;
             })}
           </div>
-          <div className="addmisson-group">
-            <button onClick={handleSearch} className="search-btn">
-              Search
-            </button>
-            <button onClick={() => {
-              setFormData({
-                Std: "",
-                Source: "",
-                EnquiryFromDate: null,
-                EnquiryToDate: null,
-                status: "",
-              });
-              setEnquiries(originalEnquiries);
-              setCurrentPage(1);
-            }} className="search-btn" style={{marginLeft: '10px'}}>
-              Reset
-            </button>
-          </div>
+
+          
+        <div className="addmission-groups">
+  <button 
+    onClick={handleSearch} 
+    className="search-btns"
+    disabled={!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status}
+    style={{opacity: (!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status) ? 0.5 : 1}}
+  >
+    Search
+  </button>
+
+  <button
+    onClick={() => {
+      setFormData({
+        Std: "",
+        Source: "",
+        EnquiryFromDate: null,
+        EnquiryToDate: null,
+        status: "",
+      });
+      setEnquiries(originalEnquiries);
+      setCurrentPage(1);
+    }}
+    className="search-btns"
+  >
+    Reset
+  </button>
+</div>
+
         </div>
 
         <div className="table-section">
@@ -369,15 +382,16 @@ const AdmissionEnquiry = () => {
             style={{ display: "flex", justifyContent: "end", gap: "10px" }}
           >
            <VisitorToolbar
-  visitors={currentRecords} // only current table data
+  visitors={currentRecords}
+  fileName="Admission_Enquiry_Data"
   columns={[
     { key: "name", label: "NAME" },
     { key: "phone", label: "PHONE" },
     { key: "source", label: "SOURCE" },
     { key: "date", label: "ENQUIRY DATE" },
-    { key: "last_follow_up_date", label: "LAST FOLLOW UP DATE" },
+    { key: "date", label: "LAST FOLLOW UP DATE" },
     { key: "next_follow_up_date", label: "NEXT FOLLOW UP DATE" },
-    { key: "status", label: "STATUS" }
+    { key: "Active", label: "STATUS" }
   ]}
 />
           </div>
@@ -413,7 +427,7 @@ const AdmissionEnquiry = () => {
                     <td>{item.date}</td>
                     <td>{item.date}</td>
                     <td>{item.next_follow_up_date}</td>
-                    <td>Active</td>
+                  <td style={{ color: "green", fontWeight: "600" }}>Active</td>
                     <td>
                       <div className="action-menu">
                         <i className="fas fa-ellipsis-v"></i>
@@ -425,13 +439,13 @@ const AdmissionEnquiry = () => {
                             View
                           </div>
                           <div
-                            className="edit"
+                            className="edit" style={{ color: "#1E88E5" }}
                             onClick={() => handleEdit(item)}
                           >
                             Edit
                           </div>
                           <div
-                            className="delete"
+                            className="delete" style={{color : "red"}}
                             onClick={() => handleDelete(item)}
                           >
                             Delete
@@ -449,22 +463,26 @@ const AdmissionEnquiry = () => {
 
       {showModal && selectedEnquiry && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Enquiry Details</h3>
-            <p><strong>Name:</strong> {selectedEnquiry.name}</p>
-            <p><strong>Phone:</strong> {selectedEnquiry.phone}</p>
-            <p><strong>Email:</strong> {selectedEnquiry.email}</p>
-            <p><strong>Address:</strong> {selectedEnquiry.address}</p>
-            <p><strong>Class:</strong> {selectedEnquiry.class}</p>
-            <p><strong>Source:</strong> {selectedEnquiry.source}</p>
-            <p><strong>Reference:</strong> {selectedEnquiry.reference}</p>
-            <p><strong>Enquiry Date:</strong> {selectedEnquiry.date}</p>
-            <p><strong>Next Follow Up:</strong> {selectedEnquiry.next_follow_up_date}</p>
-            <p><strong>Assigned:</strong> {selectedEnquiry.assigned}</p>
-            <p><strong>Number of Children:</strong> {selectedEnquiry.number_of_child}</p>
-            <p><strong>Description:</strong> {selectedEnquiry.description}</p>
-            <p><strong>Note:</strong> {selectedEnquiry.note}</p>
-            <button onClick={() => setShowModal(false)}>Close</button>
+          <div className="modal-content" style={{backgroundColor: 'white', color: 'black', width: '500px', maxWidth: '90vw', padding: '20px', borderRadius: '8px', maxHeight: '80vh', overflowY: 'auto'}}>
+            <h3 style={{color: 'black', fontSize: '18px', marginBottom: '15px'}}>Enquiry Details</h3>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Name:</strong> {selectedEnquiry.name}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Phone:</strong> {selectedEnquiry.phone}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Email:</strong> {selectedEnquiry.email}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Address:</strong> {selectedEnquiry.address}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Class:</strong> {selectedEnquiry.class}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Source:</strong> {selectedEnquiry.source}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Reference:</strong> {selectedEnquiry.reference}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Enquiry Date:</strong> {selectedEnquiry.date}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Next Follow Up:</strong> {selectedEnquiry.next_follow_up_date}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Assigned:</strong> {selectedEnquiry.assigned}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Number of Children:</strong> {selectedEnquiry.number_of_child}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Description:</strong> {selectedEnquiry.description}</p>
+            <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Note:</strong> {selectedEnquiry.note}</p>
+            
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+  <button className="close-btn-addmision" onClick={() => setShowModal(false)} style={{ color: 'black' }}>Close</button>
+</div>
+
           </div>
         </div>
       )}
@@ -490,15 +508,6 @@ const AdmissionEnquiry = () => {
           Next
         </button>
       </div>
-      {Array.from({ length: totalPages }, (_, i) => (
-        <button
-          key={i + 1}
-          className={currentPage === i + 1 ? "active" : ""}
-          onClick={() => setCurrentPage(i + 1)}
-        >
-          {i + 1}
-        </button>
-      ))}
     </>
   );
 };

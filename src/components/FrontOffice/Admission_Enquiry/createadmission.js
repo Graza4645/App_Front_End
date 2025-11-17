@@ -188,6 +188,12 @@ const AdmissionEnquiryForm = () => {
   });
 
   const isFormValid = () => {
+    const enquiryDate = new Date(formData.admissiondate);
+    const followUpDate = new Date(formData.admissiondatefollowUp);
+    const minFollowUpDate = new Date(enquiryDate);
+    minFollowUpDate.setDate(enquiryDate.getDate() + 5);
+    const isDateValid = formData.admissiondate && formData.admissiondatefollowUp && followUpDate >= minFollowUpDate && followUpDate.getDay() !== 0;
+    
     return (
       formData.admissionname.trim() !== "" &&
       formData.admissionphone.trim().length === 10 &&
@@ -196,8 +202,7 @@ const AdmissionEnquiryForm = () => {
       formData.Addressadmission.trim() !== "" &&
       formData.Descriptionadmission.trim() !== "" &&
       formData.Noteadmission.trim() !== "" &&
-      formData.admissiondate !== "" &&
-      formData.admissiondatefollowUp !== "" &&
+      isDateValid &&
       formData.assigned !== "" &&
       formData.reference !== "" &&
       formData.source !== "" &&
@@ -419,12 +424,47 @@ const AdmissionEnquiryForm = () => {
                         ...prev,
                         [item.id]: formatted,
                       }));
+                      
+                      // Auto-set Next Follow Up Date when Enquiry Date is selected
+                      if (item.id === "admissiondate") {
+                        let followUpDate = new Date(date);
+                        followUpDate.setDate(followUpDate.getDate() + 5);
+                        
+                        // If it's Sunday, add one more day
+                        if (followUpDate.getDay() === 0) {
+                          followUpDate.setDate(followUpDate.getDate() + 1);
+                        }
+                        
+                        const followUpFormatted = formatDate(followUpDate);
+                        setFormData((prev) => ({
+                          ...prev,
+                          admissiondatefollowUp: followUpFormatted,
+                        }));
+                      }
                     }}
-                    minDate={oneYearBack}
+                    minDate={item.id === "admissiondatefollowUp" && formData.admissiondate ? (() => {
+                      const enquiryDate = new Date(formData.admissiondate);
+                      enquiryDate.setDate(enquiryDate.getDate() + 5);
+                      return enquiryDate;
+                    })() : oneYearBack}
                     maxDate={oneYearAhead}
+                    filterDate={item.id === "admissiondatefollowUp" ? (date) => date.getDay() !== 0 : undefined}
                     placeholderText="Select Date"
                     dateFormat="dd-MMM-yyyy"
                   />
+                  {item.id === "admissiondatefollowUp" && formData.admissiondate && formData.admissiondatefollowUp && (() => {
+                    const enquiryDate = new Date(formData.admissiondate);
+                    const followUpDate = new Date(formData.admissiondatefollowUp);
+                    const minFollowUpDate = new Date(enquiryDate);
+                    minFollowUpDate.setDate(enquiryDate.getDate() + 5);
+                    return followUpDate < minFollowUpDate || followUpDate.getDay() === 0;
+                  })() && (
+                    <div className="error-message">
+                      {new Date(formData.admissiondatefollowUp).getDay() === 0 
+                        ? "Next Follow Up Date cannot be Sunday" 
+                        : "Next Follow Up Date must be at least 5 days after Enquiry Date"}
+                    </div>
+                  )}
                 </div>
               </div>
             );
