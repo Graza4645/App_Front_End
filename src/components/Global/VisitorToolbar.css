@@ -1,4 +1,5 @@
 .icon-container {
+  position: relative;
   /* display: inline-flex;
   align-items: center;
   justify-content: center; */
@@ -7,4 +8,26 @@
 
 .icon-container i {
   /* font-size: 12px; */
+}
+
+.icon-container::before {
+  content: attr(title);
+  position: absolute;
+  left: 50%;
+  top: -18px;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 9px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 1000;
+}
+
+.icon-container:hover::before {
+  opacity: 1;
 }

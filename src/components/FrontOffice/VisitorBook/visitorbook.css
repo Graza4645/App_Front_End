@@ -241,16 +241,16 @@ margin-right: 6px;
 
 .dropdown-content {
   display: none;
-  position: absolute;
-  right: -72px;
-  top: -6px;
-  background-color: #fff;
-  min-width: 73px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  z-index: 10;
-  border-radius: 4px;
-  overflow: hidden;
-  border: 1px solid #ddd;
+    position: absolute;
+    right: 10px;
+    top: -41px;
+    background-color: #fff;
+    min-width: 73px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 11;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #ddd;
 }
 
 .dropdown-content div {

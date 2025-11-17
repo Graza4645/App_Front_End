@@ -3,7 +3,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import './VisitorToolbar.css';
 
-export default function VisitorToolbar({ visitors, columns }) {
+export default function VisitorToolbar({ visitors, columns, fileName = "VisitorData" }) {
   const headers = columns.map(col => col.label); // display names
 
   const handleCopy = () => {
@@ -39,7 +39,7 @@ export default function VisitorToolbar({ visitors, columns }) {
       const worksheet = XLSX.utils.json_to_sheet(exportData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Visitors");
-      XLSX.writeFile(workbook, `VisitorData.${type === "csv" ? "csv" : "xlsx"}`);
+      XLSX.writeFile(workbook, `${fileName}.${type === "csv" ? "csv" : "xlsx"}`);
     }
 
     if (type === "pdf") {
@@ -51,7 +51,7 @@ export default function VisitorToolbar({ visitors, columns }) {
         startY: 20,
         styles: { fontSize: 8 },
       });
-      doc.save("VisitorData.pdf");
+      doc.save(`${fileName}.pdf`);
     }
   };
 
@@ -62,16 +62,16 @@ export default function VisitorToolbar({ visitors, columns }) {
       <span className="icon-container" onClick={handleCopy} title="Copy">
         <i className="fas fa-copy"></i>
       </span>
-      <span className="icon-container" onClick={() => handleExport("excel")}>
+      <span className="icon-container" onClick={() => handleExport("excel")} title="Excel">
         <i className="fas fa-file-excel"></i>
       </span>
-      <span className="icon-container" onClick={() => handleExport("csv")}>
+      <span className="icon-container" onClick={() => handleExport("csv")} title="Csv">
         <i className="fas fa-file-csv"></i>
       </span>
-      <span className="icon-container" onClick={() => handleExport("pdf")}>
+      <span className="icon-container" onClick={() => handleExport("pdf")} title="Pdf">
         <i className="fas fa-file-pdf"></i>
       </span>
-      <span className="icon-container" onClick={handlePrint}>
+      <span className="icon-container" onClick={handlePrint} title="Print">
         <i className="fas fa-print"></i>
       </span>
     </div>
