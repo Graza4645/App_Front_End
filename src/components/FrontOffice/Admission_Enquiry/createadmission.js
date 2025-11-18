@@ -1,11 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "./createadmission.css";
 import { API_BASE_URL } from "../../../config.js";
 
+const CustomAlert = ({ message, onClose, type = 'success' }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        minWidth: '300px'
+      }}>
+        <p style={{ margin: '0 0 15px 0', color: type === 'error' ? 'red' : 'green' }}>{message}</p>
+        <button 
+          onClick={onClose}
+          style={{
+            backgroundColor: 'black',
+            color: 'white',
+            border: 'none',
+            padding: '0px 27px',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const AdmissionEnquiryForm = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('edit');
+  const editDataParam = searchParams.get('data');
+  const editData = editDataParam ? JSON.parse(decodeURIComponent(editDataParam)) : null;
+  const isEditMode = !!editId && !!editData;
   const formElements = [
     {
       id: "admissionname",
@@ -171,6 +218,16 @@ const AdmissionEnquiryForm = () => {
 
   /**  -------------------------> End Number of prson Validation   <------------------------------------- */
 
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
+
+  const showCustomAlert = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+  };
+
   const [formData, setFormData] = useState({
     admissionname: "",
     admissionphone: "",
@@ -187,12 +244,44 @@ const AdmissionEnquiryForm = () => {
     numberofchild: "",
   });
 
+  useEffect(() => {
+    if (isEditMode && editId && editDataParam) {
+      const newFormData = {
+        admissionname: editData.name || "",
+        admissionphone: editData.phone || "",
+        admissionEmail: editData.email || "",
+        Addressadmission: editData.address || "",
+        Descriptionadmission: editData.description || "",
+        Noteadmission: editData.note || "",
+        admissiondate: editData.date || "",
+        admissiondatefollowUp: editData.next_follow_up_date || "",
+        assigned: editData.assigned || "",
+        reference: editData.reference || "",
+        source: editData.source || "",
+        classadmissioncreate: editData.class || "",
+        numberofchild: editData.number_of_child?.toString() || "",
+      };
+      setFormData(newFormData);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editId, editDataParam]);
+
   const isFormValid = () => {
-    const enquiryDate = new Date(formData.admissiondate);
-    const followUpDate = new Date(formData.admissiondatefollowUp);
+    if (!formData.admissiondate || !formData.admissiondatefollowUp) {
+      return false;
+    }
+    
+    let enquiryDate, followUpDate;
+    try {
+      enquiryDate = new Date(formData.admissiondate);
+      followUpDate = new Date(formData.admissiondatefollowUp);
+    } catch {
+      return false;
+    }
+    
     const minFollowUpDate = new Date(enquiryDate);
     minFollowUpDate.setDate(enquiryDate.getDate() + 5);
-    const isDateValid = formData.admissiondate && formData.admissiondatefollowUp && followUpDate >= minFollowUpDate && followUpDate.getDay() !== 0;
+    const isDateValid = !isNaN(enquiryDate.getTime()) && !isNaN(followUpDate.getTime()) && followUpDate >= minFollowUpDate && followUpDate.getDay() !== 0;
     
     return (
       formData.admissionname.trim() !== "" &&
@@ -246,49 +335,34 @@ const AdmissionEnquiryForm = () => {
     };
 
     try {
-      console.log('from create---',API_BASE_URL)
-      const response = await fetch( `${API_BASE_URL || 'http://localhost:3000/api/v1'}/admissionenquiry`, {
-        method: "POST",
+      const url = isEditMode 
+        ? `${API_BASE_URL || 'http://localhost:8000/api/v1'}/admissionenquiry/${editData.id}`
+        : `${API_BASE_URL || 'http://localhost:8000/api/v1'}/admissionenquiry`;
+      
+      const method = isEditMode ? "PATCH" : "POST";
+      
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-
       if (response.ok) {
-        alert("Enquiry submitted successfully!");
-        console.log("API Response:", data);
-        // Reset form if needed
-        setFormData({
-          admissionname: "",
-          admissionphone: "",
-          admissionEmail: "",
-          Addressadmission: "",
-          Descriptionadmission: "",
-          Noteadmission: "",
-          admissiondate: "",
-          admissiondatefollowUp: "",
-          assigned: "",
-          reference: "",
-          source: "",
-          classadmissioncreate: "",
-          numberofchild: "",
-        });
+        showCustomAlert(isEditMode ? "Enquiry updated successfully!" : "Enquiry submitted successfully!");
+        setTimeout(() => navigate("/admission-enquiry"), 2000);
       } else {
-        console.error("Submission failed:", data.error);
-        alert("Failed to submit enquiry. Try again.");
+        showCustomAlert(`Failed to ${isEditMode ? 'update' : 'submit'} enquiry. Try again.`, 'error');
       }
     } catch (error) {
-      console.error("API Error:", error);
-      alert("Server error occurred. Check console.");
+      showCustomAlert("Server error occurred.", 'error');
     }
   };
 
   return (
     <div className="admission-enquiry-container">
-      <h4 style={{marginLeft : "13px"}}>Admission Enquiry</h4>
+      <h4 style={{marginLeft : "13px"}}>{isEditMode ? 'Edit' : 'Create'} Admission Enquiry</h4>
       <form className="form-grid" onSubmit={handleSubmit}>
         {formElements.map((item) => {
           if (item.type === "text") {
@@ -307,6 +381,7 @@ const AdmissionEnquiryForm = () => {
                   maxLength={item.id === "admissionphone" ? 10 : undefined} // step -2
                   onChange={(e) => {
                     let val = e.target.value;
+
 
                     if (item.id === "admissionphone") {
                       val = val.replace(/\D/g, "");
@@ -416,10 +491,17 @@ const AdmissionEnquiryForm = () => {
                   <DatePicker
                     id={item.id}
                     selected={
-                      formData[item.id] ? new Date(formData[item.id]) : null
+                      formData[item.id] ? (() => {
+                        try {
+                          return new Date(formData[item.id]);
+                        } catch {
+                          return null;
+                        }
+                      })() : null
                     }
                     onChange={(date) => {
                       const formatted = formatDate(date);
+
                       setFormData((prev) => ({
                         ...prev,
                         [item.id]: formatted,
@@ -480,7 +562,7 @@ const AdmissionEnquiryForm = () => {
                 <select
                   id={item.id}
                   name={item.id}
-                  // value={value}
+                  value={formData[item.id] || ""}
                   className="dropdown-admission-create"
                   onChange={handleChange}
                 >
@@ -504,10 +586,30 @@ const AdmissionEnquiryForm = () => {
           onClick={handleSubmit}
           disabled={!isFormValid()}
           className={!isFormValid() ? "disabled-button" : ""}
+          style={isEditMode ? { backgroundColor: '#6c757d', color: 'white' } : {}}
         >
-          Save
+          {isEditMode ? 'Update' : 'Save'}
+        </button>
+        <button 
+          type="button"
+          onClick={() => navigate("/admission-enquiry")}
+          style={{ marginLeft: '10px', backgroundColor: '#6c757d' }}
+        >
+          Cancel
         </button>
       </div>
+      {showAlert && (
+        <CustomAlert 
+          message={alertMessage} 
+          type={alertType}
+          onClose={() => {
+            setShowAlert(false);
+            if (alertType === 'success') {
+              navigate("/admission-enquiry");
+            }
+          }} 
+        />
+      )}
     </div>
   );
 };

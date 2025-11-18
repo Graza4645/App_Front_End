@@ -59,19 +59,19 @@ export default function VisitorToolbar({ visitors, columns, fileName = "VisitorD
 
   return (
     <div className="icon-toolbar">
-      <span className="icon-container" onClick={handleCopy} title="Copy">
+      <span className="icon-container" onClick={handleCopy} data-tooltip="Copy">
         <i className="fas fa-copy"></i>
       </span>
-      <span className="icon-container" onClick={() => handleExport("excel")} title="Excel">
-        <i className="fas fa-file-excel"></i>
+      <span className="icon-container" onClick={() => handleExport("excel")} data-tooltip="Excel">
+        <i className="fas fa-download"></i>
       </span>
-      <span className="icon-container" onClick={() => handleExport("csv")} title="Csv">
-        <i className="fas fa-file-csv"></i>
+      <span className="icon-container" onClick={() => handleExport("csv")} data-tooltip="CSV">
+        <i className="fas fa-cloud-download-alt"></i>
       </span>
-      <span className="icon-container" onClick={() => handleExport("pdf")} title="Pdf">
-        <i className="fas fa-file-pdf"></i>
+      <span className="icon-container" onClick={() => handleExport("pdf")} data-tooltip="PDF">
+        <i className="fas fa-arrow-circle-down"></i>
       </span>
-      <span className="icon-container" onClick={handlePrint} title="Print">
+      <span className="icon-container" onClick={handlePrint} data-tooltip="Print">
         <i className="fas fa-print"></i>
       </span>
     </div>

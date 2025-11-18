@@ -11,12 +11,12 @@
 }
 
 .icon-container::before {
-  content: attr(title);
+  content: attr(data-tooltip);
   position: absolute;
   left: 50%;
   top: -18px;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(95, 95, 95, 0.8);
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
