@@ -126,6 +126,8 @@
   border-radius: 6px;
   padding: 7px;
   box-shadow: 0 0 4px #ccc;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .table-header {
@@ -169,6 +171,8 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 3px;
+  min-width: 800px;
+  table-layout: fixed;
 }
 
 .enquiry-table th {

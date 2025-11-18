@@ -6,6 +6,103 @@ import { useNavigate } from "react-router-dom";
 import VisitorToolbar from "../../Global/VisitorToolbar";
 import { API_BASE_URL } from "../../../config.js";
 
+const CustomAlert = ({ message, onClose, type = 'success' }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        minWidth: '300px'
+      }}>
+        <p style={{ margin: '0 0 15px 0', color: type === 'error' ? 'red' : 'green' }}>{message}</p>
+        <button 
+          onClick={onClose}
+          style={{
+            backgroundColor: 'black',
+            color: 'white',
+            border: 'none',
+            padding: '0px 16px',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        minWidth: '300px'
+      }}>
+        <p style={{ margin: '0 0 20px 0' }}>{message}</p>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+          <button 
+            onClick={onCancel}
+            style={{
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              padding: '0px 32px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={onConfirm}
+            style={{
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              padding: '0px 16px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdmissionEnquiry = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -18,6 +115,18 @@ const AdmissionEnquiry = () => {
 
   const [enquiries, setEnquiries] = useState([]);
   const [originalEnquiries, setOriginalEnquiries] = useState([]);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [itemToDelete, setItemToDelete] = useState(null);
+
+  const showCustomAlert = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+  };
   useEffect(() => {
     const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
     console.log('API URL => ', apiUrl)
@@ -124,40 +233,22 @@ const AdmissionEnquiry = () => {
     setShowModal(true);
   };
 
-  const handleEdit = async (item) => {
-    const updatedName = prompt("Edit Name", item.name);
-    if (!updatedName || updatedName.trim() === "") return;
-
-    try {
-      const response = await fetch(
-        `${API_BASE_URL || 'http://localhost:8000/api/v1'}/updateadmission/${item.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...item, name: updatedName }),
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to update admission");
-
-      setEnquiries((prev) =>
-        prev.map((e) => (e.id === item.id ? { ...item, name: updatedName } : e))
-      );
-
-      alert("Updated successfully!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update");
-    }
+  const handleEdit = (item) => {
+    navigate(`/admissionform?edit=${item.id}&data=${encodeURIComponent(JSON.stringify(item))}`);
   };
 
-  const handleDelete = async (item) => {
-    const confirmDelete = window.confirm(`Delete ${item.name}?`);
-    if (!confirmDelete) return;
+  const handleDelete = (item) => {
+    setItemToDelete(item);
+    setConfirmMessage(`Are you sure you want to delete ${item.name}?`);
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
 
     try {
       const response = await fetch(
-        `${API_BASE_URL || 'http://localhost:8000/api/v1'}/admissionenquiry/${item.id}`,
+        `${API_BASE_URL || 'http://localhost:8000/api/v1'}/admissionenquiry/${itemToDelete.id}`,
         {
           method: "DELETE",
         }
@@ -165,12 +256,20 @@ const AdmissionEnquiry = () => {
 
       if (!response.ok) throw new Error("Failed to delete");
 
-      setEnquiries((prev) => prev.filter((e) => e.id !== item.id));
-      alert("Deleted successfully!");
+      setEnquiries((prev) => prev.filter((e) => e.id !== itemToDelete.id));
+      showCustomAlert("Deleted successfully!");
     } catch (err) {
       console.error(err);
-      alert("Failed to delete");
+      showCustomAlert("Failed to delete", 'error');
+    } finally {
+      setShowConfirm(false);
+      setItemToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowConfirm(false);
+    setItemToDelete(null);
   };
 
   // 🔍 This uses the search input correctly
@@ -182,7 +281,7 @@ const AdmissionEnquiry = () => {
   );
 
   // ✅ Then paginate the filtered results
-  const recordsPerPage = 7;
+  const recordsPerPage = 6
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const currentRecords = filteredLogs.slice(
@@ -331,6 +430,7 @@ const AdmissionEnquiry = () => {
     className="search-btns"
     disabled={!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status}
     style={{opacity: (!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status) ? 0.5 : 1}}
+  
   >
     Search
   </button>
@@ -348,6 +448,9 @@ const AdmissionEnquiry = () => {
       setCurrentPage(1);
     }}
     className="search-btns"
+    disabled={!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status}
+    style={{opacity: (!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status) ? 0.5 : 1}}
+  
   >
     Reset
   </button>
@@ -480,7 +583,7 @@ const AdmissionEnquiry = () => {
             <p style={{color: 'black', fontSize: '14px', margin: '5px 0'}}><strong>Note:</strong> {selectedEnquiry.note}</p>
             
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-  <button className="close-btn-addmision" onClick={() => setShowModal(false)} style={{ color: 'black' }}>Close</button>
+  <button className="close-btn-addmision" onClick={() => setShowModal(false)} style={{ color: 'wight', backgroundColor : 'red' }}>Close</button>
 </div>
 
           </div>
@@ -508,6 +611,20 @@ const AdmissionEnquiry = () => {
           Next
         </button>
       </div>
+      {showAlert && (
+        <CustomAlert 
+          message={alertMessage} 
+          type={alertType}
+          onClose={() => setShowAlert(false)} 
+        />
+      )}
+      {showConfirm && (
+        <ConfirmDialog 
+          message={confirmMessage}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
+      )}
     </>
   );
 };
