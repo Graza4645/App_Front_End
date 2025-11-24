@@ -476,7 +476,7 @@ const AdmissionEnquiry = () => {
                 className="add-btn"
                 onClick={() => navigate("/admissionform")}
               >
-                Create +
+                Create
               </button>
             </div>
           </div>
