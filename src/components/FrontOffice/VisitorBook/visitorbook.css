@@ -281,6 +281,11 @@ margin-right: 6px;
   color: white;
 }
 
+.edit:hover {
+  background-color: #1E88E5 !important;
+  color: white;
+}
+
 /* Show dropdown when hovering on icon */
 .action-menu:hover .dropdown-content {
   display: block;
@@ -376,5 +381,6 @@ body{
 }
 
 .modal-body p {
-  margin: 10px 0;
+    margin: 8px 0;
+    font-size: 12px;
 } 

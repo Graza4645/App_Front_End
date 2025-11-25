@@ -3,8 +3,48 @@ import "./createvisitor.css";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 import { API_BASE_URL } from "../../../config";
+import { useNavigate } from "react-router-dom";
 
-// here i will implement  you code
+const CustomAlert = ({ message, onClose, type = 'success' }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        minWidth: '300px'
+      }}>
+        <p style={{ margin: '0 0 15px 0', color: type === 'error' ? 'red' : 'green' }}>{message}</p>
+        <button 
+          onClick={onClose}
+          style={{
+            backgroundColor: 'black',
+            color: 'white',
+            border: 'none',
+            padding: '0px 27px',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const formElements = [
   {id:"Purpose",label:"Purpose",type:"dropdown",options:["Marketing","Parent Teacher Meeting","Student Meeting","Staff Meeting","Principal Meeting"],position:"left",require:true},
@@ -24,8 +64,8 @@ const formElements = [
   {id:"comments",label:"Write comments",type:"text",position:"left",require:true}
 ];
 
-
 export default function CreateVisitorBook() {
+  const navigate = useNavigate();
   const leftItems = formElements.filter((item) => item.position === "left");
   const rightItems = formElements.filter((item) => item.position === "right");
 
@@ -36,20 +76,27 @@ export default function CreateVisitorBook() {
   const [isFormValid, setIsFormValid] = useState(false);
 
   const [staffOptions, setStaffOptions] = useState([]);
-  // const [selectedDate, setSelectedDate] = useState(null);
-
   const [visitorNameError, setVisitornameError] = useState("");
   const [NmberpersonErro, setNumberpersonError] = useState("");
 
   const [inTimeError, setInTimeError] = useState("");
   const [outTimeError, setOutTimeError] = useState("");
 
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
+
+  const showCustomAlert = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+  };
+
   useEffect(() => {
     if (meetingWith === "Staff") {
       const fetchStaff = async () => {
         try {
-
-          const apiUrl = API_BASE_URL || 'http://localhost:3000/api/v1';
+          const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
           console.log('API_BASE_URL:', apiUrl);
           console.log('Fetching stafflist from:', `${apiUrl}/stafflist`);
           const res = await fetch(`${apiUrl}/stafflist`);
@@ -80,7 +127,6 @@ export default function CreateVisitorBook() {
 
   const validatevisitorname = (value) => {
     const alphabetRegex = /^[A-Za-z\s]+$/;
-
     if (!alphabetRegex.test(value)) {
       setVisitornameError("allows letters and spaces");
     } else {
@@ -90,7 +136,6 @@ export default function CreateVisitorBook() {
 
   const validatenumberperson = (value) => {
     const number = parseInt(value, 10);
-
     if (isNaN(number) || number < 0 || number >= 200) {
       setNumberpersonError("Enter a number between 0 and 199");
     } else {
@@ -157,7 +202,7 @@ export default function CreateVisitorBook() {
           staff: formData.Staff,
           staff_id: formData.StaffId,
         };
-        apiUrl = `${API_BASE_URL || 'http://localhost:3000/api/v1'}/visitorstaff`;
+        apiUrl = `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorstaff`;
       } else if (formData.MeetingWith === "Student") {
         if (!formData.class || !formData.section || !formData.student) {
           alert("Please select class, section, and student");
@@ -169,7 +214,7 @@ export default function CreateVisitorBook() {
           section: formData.section,
           student: formData.student,
         };
-        apiUrl = `${API_BASE_URL || 'http://localhost:3000/api/v1'}/visitorStudent`;
+        apiUrl = `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorStudent`;
       } else {
         alert("Unsupported Meeting With type.");
         return;
@@ -194,17 +239,20 @@ export default function CreateVisitorBook() {
       console.log("Response:", data);
 
       if (res.ok) {
-        alert("Visitor added successfully!");
-        setFormData({});
-        setMeetingWith("");
-        setPhone("");
+        showCustomAlert("Visitor added successfully!");
+        setTimeout(() => {
+          setFormData({});
+          setMeetingWith("");
+          setPhone("");
+          navigate("/visitorbook");
+        }, 2000);
       } else {
         console.error("Server error:", data);
-        alert("Error: " + (data.message || data.error || "Failed to add visitor"));
+        showCustomAlert("Error: " + (data.message || data.error || "Failed to add visitor"), 'error');
       }
     } catch (err) {
       console.error("Submission error:", err);
-      alert("Submission failed: " + err.message);
+      showCustomAlert("Submission failed: " + err.message, 'error');
     }
   };
 
@@ -411,20 +459,16 @@ export default function CreateVisitorBook() {
       const generateTimeOptions = () => {
   const options = [];
   const start = new Date();
-  start.setHours(9, 0, 0, 0); // 09:00
+  start.setHours(7, 0, 0, 0); // 07:00
   const end = new Date();
-  end.setHours(18, 0, 0, 0); // 18:00
+  end.setHours(17, 0, 0, 0); // 17:00
 
   while (start <= end) {
     const hour = start.getHours().toString().padStart(2, "0");
     const minute = start.getMinutes().toString().padStart(2, "0");
     const value24 = `${hour}:${minute}`;
 
-    const hour12 = (start.getHours() % 12 || 12).toString();
-    const ampm = start.getHours() < 12 ? "AM" : "PM";
-    const label = `${hour12}:${minute} ${ampm}`;
-
-    options.push({ value: value24, label });
+    options.push({ value: value24, label: value24 });
 
     start.setMinutes(start.getMinutes() + 1); // step 1 minute
   }
@@ -480,7 +524,7 @@ export default function CreateVisitorBook() {
             <option value="">-- Select Time --</option>
             {timeOptions.map((t) => (
               <option key={t.value} value={t.value}>
-                {t.label}
+                {t.value}
               </option>
             ))}
           </select>
@@ -525,7 +569,7 @@ export default function CreateVisitorBook() {
       <div className="header">
         Front Office → Visitor Book → Create New Visitor
       </div>
-      <div className="container">
+      <div className="containercreatevisitor">
         <div className="left">
           <span className="headline">Create New VisitorBook</span>
           <br />
@@ -548,6 +592,18 @@ export default function CreateVisitorBook() {
           </div>
         </div>
       </div>
+      {showAlert && (
+        <CustomAlert 
+          message={alertMessage} 
+          type={alertType}
+          onClose={() => {
+            setShowAlert(false);
+            if (alertType === 'success') {
+              navigate("/visitorbook");
+            }
+          }} 
+        />
+      )}
     </>
   );
 }
