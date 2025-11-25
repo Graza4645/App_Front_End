@@ -3,7 +3,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import './VisitorToolbar.css';
 
-export default function VisitorToolbar({ visitors, columns, fileName = "VisitorData" }) {
+export default function VisitorToolbar({ visitors, columns, fileName = "visitor_book_data" }) {
   const headers = columns.map(col => col.label); // display names
 
   const handleCopy = () => {

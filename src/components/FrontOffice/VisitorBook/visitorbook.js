@@ -22,13 +22,17 @@ export default function VisitorBook() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedVisitor, setSelectedVisitor] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [itemToDelete, setItemToDelete] = useState(null);
+
 
   const visitorsPerPage = 20;
 
   useEffect(() => {
   const fetchVisitors = async () => {
     try {
-      const apiUrl = API_BASE_URL || 'http://localhost:3000/api/v1';
+      const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
       console.log('API_BASE_URL:', apiUrl);
 
       // Fetch student visitors
@@ -70,6 +74,8 @@ export default function VisitorBook() {
     setShowModal(true);
   };
 
+
+
   const handleEdit = async (visitor) => {
     const updatedName = prompt("Edit visitor name:", visitor.visitor_name);
     if (!updatedName?.trim()) return;
@@ -91,22 +97,120 @@ export default function VisitorBook() {
     }
   };
 
-  const handleDelete = async (visitor) => {
-    const name = visitor.visitor_name;
-    if (!window.confirm(`Are you sure you want to delete ${name}?`)) return;
+  // const handleDelete = async (visitor) => {
+  //   const name = visitor.visitor_name;
+  //   if (!window.confirm(`Are you sure you want to delete ${name}?`)) return;
+
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/deleteVisitor/${visitor.id}`, {
+  //       method: "DELETE"
+  //     });
+  //     if (!response.ok) throw new Error("Failed to delete visitor");
+
+  //     setVisitors((prev) => prev.filter((v) => v.id !== visitor.id));
+  //     alert("Visitor deleted successfully");
+  //   } catch (error) {
+  //     console.error("Delete error:", error);
+  //     alert("Error deleting visitor");
+  //   }
+  // };
+
+
+const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        minWidth: '300px'
+      }}>
+        <p style={{ margin: '0 0 20px 0' }}>{message}</p>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+          <button 
+            onClick={onCancel}
+            style={{
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              padding: '0px 32px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={onConfirm}
+            style={{
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              padding: '0px 16px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+  const handleDelete = (visitor) => {
+    setItemToDelete(visitor);
+    setConfirmMessage(`Are you sure you want to delete ${visitor.visitor_name}?`);
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/deleteVisitor/${visitor.id}`, {
-        method: "DELETE"
-      });
+      const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
+      let response;
+      
+      if(itemToDelete.meeting_with === 'Staff'){
+        response = await fetch(`${apiUrl}/visitorstaff/${itemToDelete.id}`, {
+          method: "DELETE"
+        });
+      } else {
+        response = await fetch(`${apiUrl}/visitorStudent/${itemToDelete.id}`, {
+          method: "DELETE"
+        });
+      }
+      
       if (!response.ok) throw new Error("Failed to delete visitor");
-
-      setVisitors((prev) => prev.filter((v) => v.id !== visitor.id));
-      alert("Visitor deleted successfully");
+      
+      setVisitors((prev) => prev.filter((v) => v.id !== itemToDelete.id));
+      setShowConfirm(false);
+      setItemToDelete(null);
+     // alert("Visitor deleted successfully");
     } catch (error) {
       console.error("Delete error:", error);
       alert("Error deleting visitor");
     }
+  };
+
+  const cancelDelete = () => {
+    setShowConfirm(false);
+    setItemToDelete(null);
   };
 
   const totalPages = Math.ceil(visitors.length / visitorsPerPage);
@@ -155,8 +259,8 @@ export default function VisitorBook() {
                         <i className="fas fa-ellipsis-v"></i>
                         <div className="dropdown-content">
                           <div className="view" onClick={() => handleView(visitor)}>View</div>
-                          <div className="edit" onClick={() => handleEdit(visitor)}>Edit</div>
-                          <div className="Delete" onClick={() => handleDelete(visitor)}>Delete</div>
+                          <div className="edit" style={{}} onClick={() => handleEdit(visitor)}>Edit</div>
+                          <div className="Delete" onClick={() => handleDelete(visitor)}>Delete</div>   
                         </div>
                       </div>
                     </td>
@@ -192,6 +296,14 @@ export default function VisitorBook() {
         <button className="active">{currentPage}</button>
         <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>Next</button>
       </div>
+      
+      {showConfirm && (
+        <ConfirmDialog 
+          message={confirmMessage}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
+      )}
     </>
   );
 }

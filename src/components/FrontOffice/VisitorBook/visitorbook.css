@@ -64,10 +64,12 @@ th:last-child {
 
 
     .table-container {
-      max-height: 490px; /* Adjust based on need */
-      height: 490px;
+      max-height: 510px; /* Adjust based on need */
+      height: 510px;
       overflow-y: auto;
       border: 1px solid #ccc;
+      margin: 5px;
+      border-radius: 10px;
     }
 
     table {
@@ -81,8 +83,8 @@ th:last-child {
       background-color: #003366;
       color: rgb(255, 255, 255);
       padding: 7px;
-      text-align: left;
-      font-size: 13px;
+      /* text-align: left; */
+      font-size: 10px;
       z-index: 10;
     }
 
@@ -100,6 +102,7 @@ td[colspan="20"] {
     tbody td {
       padding: 7px;
       font-size: 11px;
+      text-align: center;
     }
 
     tbody tr:nth-child(even) {
@@ -131,13 +134,22 @@ th:last-child {
 }
 
 button{
-  border: 0px;
-  background-color: #7258df;
+  /* border: 0px;
+  background-color: #757575;
   border-radius: 4px;
   padding: 2px 7px 3px 3px;
   color: white;
-  cursor: grab;
+  cursor: grab; */
   
+}
+
+.create{
+   border: 0px;
+  background-color: #757575;
+  border-radius: 4px;
+  padding: 2px 7px 3px 7px;
+  color: white;
+  cursor: grab;
 }
 
 
@@ -269,6 +281,11 @@ margin-right: 6px;
   color: white;
 }
 
+.edit:hover {
+  background-color: #1E88E5 !important;
+  color: white;
+}
+
 /* Show dropdown when hovering on icon */
 .action-menu:hover .dropdown-content {
   display: block;
@@ -286,7 +303,7 @@ margin-right: 6px;
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 20px;
+  margin-top: 11px;
 }
 
 .pagination button {
@@ -364,5 +381,6 @@ body{
 }
 
 .modal-body p {
-  margin: 10px 0;
+    margin: 8px 0;
+    font-size: 12px;
 } 

@@ -476,7 +476,7 @@ const AdmissionEnquiry = () => {
                 className="add-btn"
                 onClick={() => navigate("/admissionform")}
               >
-                Create +
+                Create
               </button>
             </div>
           </div>
@@ -542,13 +542,13 @@ const AdmissionEnquiry = () => {
                             View
                           </div>
                           <div
-                            className="edit" style={{ color: "#1E88E5" }}
+                            className="edit" style={{  }}
                             onClick={() => handleEdit(item)}
                           >
                             Edit
                           </div>
                           <div
-                            className="delete" style={{color : "red"}}
+                            className="Delete" style={{}}
                             onClick={() => handleDelete(item)}
                           >
                             Delete

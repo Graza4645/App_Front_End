@@ -7,9 +7,21 @@
   margin: 12px;
   background-color: #ffffff;
   border-radius: 12px;
-  border-style: double;
+  /* border-style: double; */
 }
 
+.containercreatevisitor {
+  position: relative;
+  display: flex;    
+  flex-wrap: wrap;
+  gap: 2rem;
+  height: 92%;
+  margin: 12px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  /* border-style: double; */
+  box-shadow: 0 0 5px #ccc;
+}
 .left,
 .right {
   flex: 1;
