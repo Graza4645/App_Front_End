@@ -2,6 +2,7 @@ import React, { useState ,useEffect} from "react";
 import "./phonecall.css"; // Optional: Create this for styling
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { API_BASE_URL } from "../../../config.js";
 
 const PhoneCallLog = () => {
   
@@ -23,7 +24,8 @@ useEffect(() => {
 }, []);
 
 const fetchLogs = () => {
-  fetch("http://localhost:8000/api/v1/calllogs")
+  const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
+  fetch(`${apiUrl}/calllogs`)
     .then((res) => res.json())
     .then((data) => {
       console.log("Fetched call logs data:", data);
@@ -41,7 +43,8 @@ const handleEdit = async (item) => {
   if (!updatedName || updatedName.trim() === "") return;
 
   try {
-    const response = await fetch(`http://localhost:8000/api/v1/calllogs/${item.id}`, {
+    const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
+    const response = await fetch(`${apiUrl}/calllogs/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...item, name: updatedName }),
@@ -228,7 +231,8 @@ const handleDelete = async (item) => {
   if (!window.confirm("Are you sure you want to delete this record?")) return;
 
   try {
-    const response = await fetch(`http://localhost:8000/api/v1/calllogs/${item.id}`, {
+    const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
+    const response = await fetch(`${apiUrl}/calllogs/${item.id}`, {
       method: "DELETE",
     });
 
@@ -247,7 +251,8 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const response = await fetch("http://localhost:8000/api/v1/calllogs", {
+    const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
+    const response = await fetch(`${apiUrl}/calllogs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -351,6 +356,21 @@ const handleSubmit = async (e) => {
                 return `${day}-${month}-${year}`;
               };
 
+              // Function to add business days (excluding Sundays)
+              const addBusinessDays = (date, days) => {
+                const result = new Date(date);
+                let businessDaysAdded = 0;
+                
+                while (businessDaysAdded < days) {
+                  result.setDate(result.getDate() + 1);
+                  // Count only non-Sunday days (Monday=1 to Saturday=6)
+                  if (result.getDay() !== 0) {
+                    businessDaysAdded++;
+                  }
+                }
+                return result;
+              };
+
               return (
                 <div key={item.id} className="call-group-create">
                   <label htmlFor={item.id}>
@@ -365,10 +385,20 @@ const handleSubmit = async (e) => {
                       }
                       onChange={(date) => {
                         const formatted = formatDate(date);
-                        setFormData((prev) => ({
-                          ...prev,
-                          [item.id]: formatted,
-                        }));
+                        setFormData((prev) => {
+                          const newData = {
+                            ...prev,
+                            [item.id]: formatted,
+                          };
+                          
+                          // Auto-calculate next follow-up date when call date is selected
+                          if (item.id === "phonedate") {
+                            const nextFollowUp = addBusinessDays(date, 5);
+                            newData.phonedatefollow = formatDate(nextFollowUp);
+                          }
+                          
+                          return newData;
+                        });
                       }}
                       minDate={oneYearBack}
                       maxDate={oneYearAhead}
