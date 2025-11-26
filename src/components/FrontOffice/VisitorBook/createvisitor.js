@@ -3,7 +3,7 @@ import "./createvisitor.css";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 import { API_BASE_URL } from "../../../config";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const CustomAlert = ({ message, onClose, type = 'success' }) => {
   return (
@@ -66,8 +66,16 @@ const formElements = [
 
 export default function CreateVisitorBook() {
   const navigate = useNavigate();
+  const location = useLocation();
   const leftItems = formElements.filter((item) => item.position === "left");
   const rightItems = formElements.filter((item) => item.position === "right");
+
+  // Edit mode detection
+  const urlParams = new URLSearchParams(location.search);
+  const editId = urlParams.get('edit');
+  const editDataParam = urlParams.get('data');
+  const isEditMode = !!editId && !!editDataParam;
+  const editData = isEditMode ? JSON.parse(decodeURIComponent(editDataParam)) : null;
 
   const [meetingWith, setMeetingWith] = useState("");
   const [phone, setPhone] = useState("");
@@ -91,6 +99,32 @@ export default function CreateVisitorBook() {
     setAlertType(type);
     setShowAlert(true);
   };
+
+  // Populate form data in edit mode
+  useEffect(() => {
+    if (isEditMode && editData) {
+      const newFormData = {
+        Purpose: editData.purpose || "",
+        MeetingWith: editData.meeting_with || "",
+        Staff: editData.staff || "",
+        class: editData.class || "",
+        section: editData.section || "",
+        student: editData.student || "",
+        VisitorName: editData.visitor_name || "",
+        Phone: editData.phone_number || "",
+        idcard: editData.id_card || "",
+        Numberperson: editData.number_of_person?.toString() || "",
+        createdate: editData.date || "",
+        inTime: editData.in_time || "",
+        outTime: editData.out_time || "",
+        fileUpload: editData.upload_documents || "",
+        comments: editData.comments || ""
+      };
+      setFormData(newFormData);
+      setMeetingWith(editData.meeting_with || "");
+      setPhone(editData.phone_number || "");
+    }
+  }, [isEditMode, editData]);
 
   useEffect(() => {
     if (meetingWith === "Staff") {
@@ -191,6 +225,7 @@ export default function CreateVisitorBook() {
 
       let payload = {};
       let apiUrl = "";
+      let method = isEditMode ? "PATCH" : "POST";
 
       if (formData.MeetingWith === "Staff") {
         if (!formData.Staff) {
@@ -202,7 +237,9 @@ export default function CreateVisitorBook() {
           staff: formData.Staff,
           staff_id: formData.StaffId,
         };
-        apiUrl = `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorstaff`;
+        apiUrl = isEditMode 
+          ? `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorstaff/${editData.id}`
+          : `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorstaff`;
       } else if (formData.MeetingWith === "Student") {
         if (!formData.class || !formData.section || !formData.student) {
           alert("Please select class, section, and student");
@@ -214,7 +251,9 @@ export default function CreateVisitorBook() {
           section: formData.section,
           student: formData.student,
         };
-        apiUrl = `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorStudent`;
+        apiUrl = isEditMode 
+          ? `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorStudent/${editData.id}`
+          : `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorStudent`;
       } else {
         alert("Unsupported Meeting With type.");
         return;
@@ -224,7 +263,7 @@ export default function CreateVisitorBook() {
       console.log("Payload:", payload);
 
       const res = await fetch(apiUrl, {
-        method: "POST",
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -239,7 +278,7 @@ export default function CreateVisitorBook() {
       console.log("Response:", data);
 
       if (res.ok) {
-        showCustomAlert("Visitor added successfully!");
+        showCustomAlert(isEditMode ? "Visitor updated successfully!" : "Visitor added successfully!");
         setTimeout(() => {
           setFormData({});
           setMeetingWith("");
@@ -248,7 +287,7 @@ export default function CreateVisitorBook() {
         }, 2000);
       } else {
         console.error("Server error:", data);
-        showCustomAlert("Error: " + (data.message || data.error || "Failed to add visitor"), 'error');
+        showCustomAlert("Error: " + (data.message || data.error || `Failed to ${isEditMode ? 'update' : 'add'} visitor`), 'error');
       }
     } catch (err) {
       console.error("Submission error:", err);
@@ -277,6 +316,7 @@ export default function CreateVisitorBook() {
       }
 
       return (
+
         <div key={item.id} className="form-group">
           <label htmlFor={item.id}>
             {item.label}
@@ -567,17 +607,17 @@ export default function CreateVisitorBook() {
   return (
     <>
       <div className="header">
-        Front Office → Visitor Book → Create New Visitor
+        Front Office → Visitor Book → {isEditMode ? 'Edit' : 'Create New'} Visitor
       </div>
       <div className="containercreatevisitor">
         <div className="left">
-          <span className="headline">Create New VisitorBook</span>
+          <span className="headline">{isEditMode ? 'Edit' : 'Create New'} VisitorBook</span>
           <br />
           <br />
           {leftItems.map(renderItem)}
         </div>
         <div className="right">
-          <span className="headlines">Create New VisitorBook</span>
+          <span className="headlines">{isEditMode ? 'Edit' : 'Create New'} VisitorBook</span>
           <br />
           <br />
           {rightItems.map(renderItem)}
@@ -587,7 +627,7 @@ export default function CreateVisitorBook() {
               disabled={!isFormValid}
               onClick={handleSubmit}
             >
-              Submit
+              {isEditMode ? 'Update' : 'Submit'}
             </button>
           </div>
         </div>
