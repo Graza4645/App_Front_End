@@ -509,12 +509,16 @@ const AdmissionEnquiryForm = () => {
                       
                       // Auto-set Next Follow Up Date when Enquiry Date is selected
                       if (item.id === "admissiondate") {
+                        // Add 5 business days (excluding Sundays)
                         let followUpDate = new Date(date);
-                        followUpDate.setDate(followUpDate.getDate() + 5);
+                        let businessDaysAdded = 0;
                         
-                        // If it's Sunday, add one more day
-                        if (followUpDate.getDay() === 0) {
+                        while (businessDaysAdded < 5) {
                           followUpDate.setDate(followUpDate.getDate() + 1);
+                          // Count only non-Sunday days (Monday=1 to Saturday=6)
+                          if (followUpDate.getDay() !== 0) {
+                            businessDaysAdded++;
+                          }
                         }
                         
                         const followUpFormatted = formatDate(followUpDate);

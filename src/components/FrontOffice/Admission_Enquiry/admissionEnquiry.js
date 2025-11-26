@@ -281,7 +281,7 @@ const AdmissionEnquiry = () => {
   );
 
   // ✅ Then paginate the filtered results
-  const recordsPerPage = 6
+  const recordsPerPage = 10
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const currentRecords = filteredLogs.slice(
@@ -533,18 +533,51 @@ const AdmissionEnquiry = () => {
                       const nextFollowUp = new Date(item.next_follow_up_date);
                       const enquiryDate = new Date(item.date);
                       
+                      // Function to add business days (excluding Sundays)
+                      const addBusinessDays = (date, days) => {
+                        const result = new Date(date);
+                        let businessDaysAdded = 0;
+                        
+                        while (businessDaysAdded < days) {
+                          result.setDate(result.getDate() + 1);
+                          // Count only non-Sunday days (Monday=1 to Saturday=6)
+                          if (result.getDay() !== 0) {
+                            businessDaysAdded++;
+                          }
+                        }
+                        return result;
+                      };
+                      
+                      // Function to subtract business days (excluding Sundays)
+                      const subtractBusinessDays = (date, days) => {
+                        const result = new Date(date);
+                        let businessDaysSubtracted = 0;
+                        
+                        while (businessDaysSubtracted < days) {
+                          result.setDate(result.getDate() - 1);
+                          // Count only non-Sunday days (Monday=1 to Saturday=6)
+                          if (result.getDay() !== 0) {
+                            businessDaysSubtracted++;
+                          }
+                        }
+                        return result;
+                      };
+                      
+                      // Check if this is the first follow-up (5 business days from enquiry)
+                      const firstFollowUp = addBusinessDays(enquiryDate, 5);
+                      const isFirstFollowUp = Math.abs(nextFollowUp - firstFollowUp) < 24 * 60 * 60 * 1000; // Within 1 day tolerance
+                      
+                      if (isFirstFollowUp) {
+                        return "-";
+                      }
+                      
                       // If next follow-up date has passed, show it as last follow-up
                       if (nextFollowUp < today) {
                         return item.next_follow_up_date;
                       }
-                      // If it's the first follow-up (within 5 days of enquiry), show "-"
-                      const daysDiff = Math.ceil((nextFollowUp - enquiryDate) / (1000 * 60 * 60 * 24));
-                      if (daysDiff <= 7) { // Allow some buffer for weekends
-                        return "-";
-                      }
-                      // Calculate previous follow-up date (5 days before next)
-                      const lastFollowUp = new Date(nextFollowUp);
-                      lastFollowUp.setDate(lastFollowUp.getDate() - 5);
+                      
+                      // Calculate previous follow-up date (5 business days before next)
+                      const lastFollowUp = subtractBusinessDays(nextFollowUp, 5);
                       return lastFollowUp.toLocaleDateString('en-GB', {
                         day: '2-digit',
                         month: 'short',

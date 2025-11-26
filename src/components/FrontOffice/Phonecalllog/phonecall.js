@@ -23,7 +23,7 @@ useEffect(() => {
 }, []);
 
 const fetchLogs = () => {
-  fetch("http://localhost:3000/api/v1/calllogs")
+  fetch("http://localhost:8000/api/v1/calllogs")
     .then((res) => res.json())
     .then((data) => {
       console.log("Fetched call logs data:", data);
@@ -41,7 +41,7 @@ const handleEdit = async (item) => {
   if (!updatedName || updatedName.trim() === "") return;
 
   try {
-    const response = await fetch(`http://localhost:3000/api/v1/calllogs/${item.id}`, {
+    const response = await fetch(`http://localhost:8000/api/v1/calllogs/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...item, name: updatedName }),
@@ -228,7 +228,7 @@ const handleDelete = async (item) => {
   if (!window.confirm("Are you sure you want to delete this record?")) return;
 
   try {
-    const response = await fetch(`http://localhost:3000/api/v1/calllogs/${item.id}`, {
+    const response = await fetch(`http://localhost:8000/api/v1/calllogs/${item.id}`, {
       method: "DELETE",
     });
 
@@ -247,7 +247,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const response = await fetch("http://localhost:3000/api/v1/calllogs", {
+    const response = await fetch("http://localhost:8000/api/v1/calllogs", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -90,6 +90,16 @@ select {
   /* border-style: double; */
 }
 
+table td:first-child,
+table th:first-child {
+  width: 200px; 
+}
+
+table td {
+  padding: 3px 7px !important; 
+  line-height: 1 !important;
+}
+
 
 
 .addmisson-group-create {

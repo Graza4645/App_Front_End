@@ -167,11 +167,20 @@
   padding: 4px;
 }
 
+
+.activeSub {
+  background-color: #5a5a5a !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  padding-left: 10px !important;
+}
+
+
 .mainLink {
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 3px 9px;
+  padding: 0px 9px;
   border-radius: var(--mantine-radius-md);
   color: var(--mantine-color-gray-7);
   cursor: pointer;
@@ -182,12 +191,14 @@
 }
 
 .mainLink:hover {
-  background-color: rgb(196, 216, 243);
+  /* background-color: rgb(196, 216, 243); */
+    background-color: #e4edfa !important;
+  color: black !important;
 }
 
 .active {
-  background-color: var(--mantine-color-blue-light);
-  color: var(--mantine-color-blue-light-color);
+   background-color: #5a5a5a !important;
+  color: #fff !important;
 
 }
 

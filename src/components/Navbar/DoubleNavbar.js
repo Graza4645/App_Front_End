@@ -170,7 +170,7 @@ function handleClick(route) {
           )}
         </UnstyledButton>
 
-        {!collapsed && isOpen && hasSubLinks && (
+        {/* {!collapsed && isOpen && hasSubLinks && (
           <div className={classes.subLinkGroup}>
             {link.subLinks.map((sub) => (
               <div
@@ -188,7 +188,37 @@ function handleClick(route) {
               </div>
             ))}
           </div>
-        )}
+        )} */}
+
+          {!collapsed && isOpen && hasSubLinks && (
+  <div className={classes.subLinkGroup}>
+    {link.subLinks.map((sub) => (
+      <div
+        key={sub.label}
+
+        /* 🔥 UPDATE #1 — Added route-based highlight check */
+        className={`${classes.subLink} ${
+          activeSub === sub.label ||
+          window.location.pathname === sub.route   // <-- Added
+            ? classes.activeSub
+            : ''
+        }`}
+
+        onClick={() => {
+          /* 🔥 UPDATE #2 — activeSub now highlights after navigation */
+          setActiveSub(sub.label);
+          setActiveMain(link.label);
+          handleClick(sub.route);
+        }}
+      >
+        {sub.label}
+      </div>
+    ))}
+  </div>
+)}
+
+
+
       </div>
     );
   });
