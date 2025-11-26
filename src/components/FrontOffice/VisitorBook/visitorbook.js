@@ -131,7 +131,7 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
 };
 
     const handleEdit = (item) => {
-    navigate(`/createvisitor?edit=${item.id}&data=${encodeURIComponent(JSON.stringify(item))}`);
+    navigate(`/editvisitor?edit=${item.id}&data=${encodeURIComponent(JSON.stringify(item))}`);
   };
 
   const handleDelete = (visitor) => {
