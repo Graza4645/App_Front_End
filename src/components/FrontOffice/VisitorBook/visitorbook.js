@@ -74,48 +74,6 @@ export default function VisitorBook() {
     setShowModal(true);
   };
 
-
-
-  const handleEdit = async (visitor) => {
-    const updatedName = prompt("Edit visitor name:", visitor.visitor_name);
-    if (!updatedName?.trim()) return;
-
-    try {
-      const updatedVisitor = { ...visitor, visitor_name: updatedName };
-      const response = await fetch(`${API_BASE_URL}/updateVisitor/${visitor.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedVisitor),
-      });
-      if (!response.ok) throw new Error("Failed to update visitor");
-
-      setVisitors((prev) => prev.map((v) => (v.id === visitor.id ? updatedVisitor : v)));
-      alert("Visitor updated successfully!");
-    } catch (err) {
-      console.error("Error updating visitor:", err);
-      alert("Update failed!");
-    }
-  };
-
-  // const handleDelete = async (visitor) => {
-  //   const name = visitor.visitor_name;
-  //   if (!window.confirm(`Are you sure you want to delete ${name}?`)) return;
-
-  //   try {
-  //     const response = await fetch(`${API_BASE_URL}/deleteVisitor/${visitor.id}`, {
-  //       method: "DELETE"
-  //     });
-  //     if (!response.ok) throw new Error("Failed to delete visitor");
-
-  //     setVisitors((prev) => prev.filter((v) => v.id !== visitor.id));
-  //     alert("Visitor deleted successfully");
-  //   } catch (error) {
-  //     console.error("Delete error:", error);
-  //     alert("Error deleting visitor");
-  //   }
-  // };
-
-
 const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
   return (
     <div style={{
@@ -172,6 +130,9 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
   );
 };
 
+    const handleEdit = (item) => {
+    navigate(`/editvisitor?edit=${item.id}&data=${encodeURIComponent(JSON.stringify(item))}`);
+  };
 
   const handleDelete = (visitor) => {
     setItemToDelete(visitor);

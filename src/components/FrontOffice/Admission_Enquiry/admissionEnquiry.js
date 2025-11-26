@@ -528,31 +528,38 @@ const AdmissionEnquiry = () => {
                     <td>{item.phone}</td>
                     <td>{item.source}</td>
                     <td>{item.date}</td>
-                    <td>{item.date}</td>
+                    <td>{(() => {
+                      const today = new Date();
+                      const nextFollowUp = new Date(item.next_follow_up_date);
+                      const enquiryDate = new Date(item.date);
+                      
+                      // If next follow-up date has passed, show it as last follow-up
+                      if (nextFollowUp < today) {
+                        return item.next_follow_up_date;
+                      }
+                      // If it's the first follow-up (within 5 days of enquiry), show "-"
+                      const daysDiff = Math.ceil((nextFollowUp - enquiryDate) / (1000 * 60 * 60 * 24));
+                      if (daysDiff <= 7) { // Allow some buffer for weekends
+                        return "-";
+                      }
+                      // Calculate previous follow-up date (5 days before next)
+                      const lastFollowUp = new Date(nextFollowUp);
+                      lastFollowUp.setDate(lastFollowUp.getDate() - 5);
+                      return lastFollowUp.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                      }).replace(/ /g, '-');
+                    })()}</td>
                     <td>{item.next_follow_up_date}</td>
                   <td style={{ color: "green", fontWeight: "600" }}>Active</td>
                     <td>
                       <div className="action-menu">
                         <i className="fas fa-ellipsis-v"></i>
                         <div className="dropdown-content">
-                          <div
-                            className="view"
-                            onClick={() => handleView(item)}
-                          >
-                            View
-                          </div>
-                          <div
-                            className="edit" style={{  }}
-                            onClick={() => handleEdit(item)}
-                          >
-                            Edit
-                          </div>
-                          <div
-                            className="Delete" style={{}}
-                            onClick={() => handleDelete(item)}
-                          >
-                            Delete
-                          </div>
+                          <div className="view" onClick={() => handleView(item)}>View</div>
+                          <div className="edit" style={{  }} onClick={() => handleEdit(item)}>Edit</div>
+                          <div className="Delete" style={{}} onClick={() => handleDelete(item)}>Delete</div>
                         </div>
                       </div>
                     </td>

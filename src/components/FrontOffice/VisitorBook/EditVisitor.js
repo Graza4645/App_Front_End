@@ -64,7 +64,7 @@ const formElements = [
   {id:"comments",label:"Write comments",type:"text",position:"left",require:true}
 ];
 
-export default function CreateVisitorBook() {
+export default function EditVisitor() {
   const navigate = useNavigate();
   const location = useLocation();
   const leftItems = formElements.filter((item) => item.position === "left");
@@ -72,24 +72,21 @@ export default function CreateVisitorBook() {
 
   // Edit mode detection
   const urlParams = new URLSearchParams(location.search);
+  // eslint-disable-next-line no-unused-vars
   const editId = urlParams.get('edit');
   const editDataParam = urlParams.get('data');
-  const isEditMode = !!editId && !!editDataParam;
-  const editData = isEditMode ? JSON.parse(decodeURIComponent(editDataParam)) : null;
+  const editData = editDataParam ? JSON.parse(decodeURIComponent(editDataParam)) : null;
 
-  const [meetingWith, setMeetingWith] = useState("");
-  const [phone, setPhone] = useState("");
-  const [phoneError, setPhoneError] = useState("");
   const [formData, setFormData] = useState({});
-  const [isFormValid, setIsFormValid] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  
 
   const [staffOptions, setStaffOptions] = useState([]);
+  const [phoneError, setPhoneError] = useState("");
   const [visitorNameError, setVisitornameError] = useState("");
   const [NmberpersonErro, setNumberpersonError] = useState("");
-
   const [inTimeError, setInTimeError] = useState("");
   const [outTimeError, setOutTimeError] = useState("");
-
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('success');
@@ -100,9 +97,8 @@ export default function CreateVisitorBook() {
     setShowAlert(true);
   };
 
-  // Populate form data in edit mode
   useEffect(() => {
-    if (isEditMode && editData) {
+    if (editData && !isInitialized) {
       const newFormData = {
         Purpose: editData.purpose || "",
         MeetingWith: editData.meeting_with || "",
@@ -115,39 +111,34 @@ export default function CreateVisitorBook() {
         idcard: editData.id_card || "",
         Numberperson: editData.number_of_person?.toString() || "",
         createdate: editData.date || "",
-        inTime: editData.in_time || "",
-        outTime: editData.out_time || "",
+        inTime: editData.in_time ? editData.in_time.substring(0, 5) : "",
+        outTime: editData.out_time ? editData.out_time.substring(0, 5) : "",
         fileUpload: editData.upload_documents || "",
         comments: editData.comments || ""
       };
       setFormData(newFormData);
-      setMeetingWith(editData.meeting_with || "");
-      setPhone(editData.phone_number || "");
+      setIsInitialized(true);
     }
-  }, [isEditMode, editData]);
+  }, [editData, isInitialized]);
 
   useEffect(() => {
-    if (meetingWith === "Staff") {
+    if (formData.MeetingWith === "Staff") {
       const fetchStaff = async () => {
         try {
           const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
-          console.log('API_BASE_URL:', apiUrl);
-          console.log('Fetching stafflist from:', `${apiUrl}/stafflist`);
           const res = await fetch(`${apiUrl}/stafflist`);
           const json = await res.json();
           const staffList = Array.isArray(json) ? json : json.data;
-          if (!Array.isArray(staffList)) {
-            console.error("Invalid staff data:", json);
-            return;
+          if (Array.isArray(staffList)) {
+            setStaffOptions(staffList);
           }
-          setStaffOptions(staffList); // keep full objects
         } catch (err) {
           console.error("Error fetching staff list", err);
         }
       };
       fetchStaff();
     }
-  }, [meetingWith]);
+  }, [formData.MeetingWith]);
 
   const validatePhone = (value) => {
     if (value.length !== 10) {
@@ -177,14 +168,14 @@ export default function CreateVisitorBook() {
     }
   };
 
-  useEffect(() => {
+  const isFormValid = () => {
     const requiredFields = formElements.filter((f) => f.require);
     const visibleRequiredFields = requiredFields.filter((field) => {
       if (["class", "section", "student"].includes(field.id)) {
-        return meetingWith === "Student";
+        return formData.MeetingWith === "Student";
       }
       if (field.id === "Staff") {
-        return meetingWith === "Staff";
+        return formData.MeetingWith === "Staff";
       }
       return true;
     });
@@ -194,16 +185,11 @@ export default function CreateVisitorBook() {
       return value && value.toString().trim() !== "";
     });
 
-    setIsFormValid(allFilled && !phoneError && !visitorNameError && !NmberpersonErro && !inTimeError && !outTimeError);
-  }, [formData, meetingWith, phoneError, visitorNameError, NmberpersonErro, inTimeError, outTimeError]);
-
-  const handleChange = (id, value) => {
-    setFormData((prev) => ({ ...prev, [id]: value }));
+    return allFilled && !phoneError && !visitorNameError && !NmberpersonErro && !inTimeError && !outTimeError;
   };
 
   const handleSubmit = async () => {
     try {
-      // Validate required fields before submission
       if (!formData.MeetingWith) {
         alert("Please select Meeting With type");
         return;
@@ -225,7 +211,6 @@ export default function CreateVisitorBook() {
 
       let payload = {};
       let apiUrl = "";
-      let method = isEditMode ? "PATCH" : "POST";
 
       if (formData.MeetingWith === "Staff") {
         if (!formData.Staff) {
@@ -237,9 +222,7 @@ export default function CreateVisitorBook() {
           staff: formData.Staff,
           staff_id: formData.StaffId,
         };
-        apiUrl = isEditMode 
-          ? `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorstaff/${editData.id}`
-          : `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorstaff`;
+        apiUrl = `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorstaff/${editData.id}`;
       } else if (formData.MeetingWith === "Student") {
         if (!formData.class || !formData.section || !formData.student) {
           alert("Please select class, section, and student");
@@ -251,43 +234,25 @@ export default function CreateVisitorBook() {
           section: formData.section,
           student: formData.student,
         };
-        apiUrl = isEditMode 
-          ? `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorStudent/${editData.id}`
-          : `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorStudent`;
+        apiUrl = `${API_BASE_URL || 'http://localhost:8000/api/v1'}/visitorStudent/${editData.id}`;
       } else {
         alert("Unsupported Meeting With type.");
         return;
       }
 
-      console.log("Submitting to:", apiUrl);
-      console.log("Payload:", payload);
-
       const res = await fetch(apiUrl, {
-        method,
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      const data = await res.json();
-      console.log("Response:", data);
-
       if (res.ok) {
-        showCustomAlert(isEditMode ? "Visitor updated successfully!" : "Visitor added successfully!");
-        setTimeout(() => {
-          setFormData({});
-          setMeetingWith("");
-          setPhone("");
-          navigate("/visitorbook");
-        }, 2000);
+        showCustomAlert("Visitor updated successfully!");
+        setTimeout(() => navigate("/visitorbook"), 2000);
       } else {
-        console.error("Server error:", data);
-        showCustomAlert("Error: " + (data.message || data.error || `Failed to ${isEditMode ? 'update' : 'add'} visitor`), 'error');
+        showCustomAlert("Error: Failed to update visitor", 'error');
       }
     } catch (err) {
       console.error("Submission error:", err);
@@ -298,12 +263,12 @@ export default function CreateVisitorBook() {
   const renderItem = (item) => {
     if (
       ["class", "section", "student"].includes(item.id) &&
-      meetingWith !== "Student"
+      formData.MeetingWith !== "Student"
     ) {
       return null;
     }
 
-    if (item.id === "Staff" && meetingWith !== "Staff") {
+    if (item.id === "Staff" && formData.MeetingWith !== "Staff") {
       return null;
     }
 
@@ -316,7 +281,6 @@ export default function CreateVisitorBook() {
       }
 
       return (
-
         <div key={item.id} className="form-group">
           <label htmlFor={item.id}>
             {item.label}
@@ -326,18 +290,20 @@ export default function CreateVisitorBook() {
             id={item.id}
             name={item.id}
             className="dropdown"
-            value={item.id === "MeetingWith" ? meetingWith : value}
+            value={value}
             onChange={(e) => {
               const val = e.target.value;
+              
+              setFormData(prev => ({
+                ...prev,
+                [item.id]: val
+              }));
+              
               if (item.id === "MeetingWith") {
-                setMeetingWith(val);
-                // Clear related fields when changing meeting type
                 if (val === "Student") {
-                  handleChange("Staff", "");
+                  setFormData(prev => ({ ...prev, Staff: "" }));
                 } else if (val === "Staff") {
-                  handleChange("class", "");
-                  handleChange("section", "");
-                  handleChange("student", "");
+                  setFormData(prev => ({ ...prev, class: "", section: "", student: "" }));
                 }
               }
 
@@ -345,16 +311,12 @@ export default function CreateVisitorBook() {
                 const selected = staffOptions.find((s) => s.staff_name === val);
                 if (selected) {
                   if (selected.mobile_number) {
-                    setPhone(selected.mobile_number);
                     validatePhone(selected.mobile_number);
-                    handleChange("Phone", selected.mobile_number);
+                    setFormData(prev => ({ ...prev, Phone: selected.mobile_number }));
                   }
-                  // Auto-populate ID Card with user_id
-                  handleChange("idcard", selected.user_id);
+                  setFormData(prev => ({ ...prev, idcard: selected.user_id }));
                 }
               }
-
-              handleChange(item.id, val);
             }}
           >
             <option value="">--Select--</option>
@@ -383,9 +345,12 @@ export default function CreateVisitorBook() {
           <textarea
             id={item.id}
             name={item.id}
+            key={`${item.id}-${isInitialized}`}
             className="comments"
-            value={value}
-            onChange={(e) => handleChange(item.id, e.target.value)}
+            defaultValue={value}
+            onChange={(e) => {
+              setFormData(prev => ({ ...prev, [item.id]: e.target.value }));
+            }}
           />
         </div>
       );
@@ -404,14 +369,14 @@ export default function CreateVisitorBook() {
               type="text"
               id={item.id}
               name={item.id}
-              className="text-input"
-              value={phone}
+              key={`${item.id}-${isInitialized}`}
+              style={{width: '93%', height: '30px', padding: '0px 12px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box', backgroundColor: 'white', pointerEvents: 'auto'}}
+              defaultValue={value}
               maxLength={10}
               onChange={(e) => {
                 const val = e.target.value.replace(/\D/g, "");
-                setPhone(val);
                 validatePhone(val);
-                handleChange(item.id, val);
+                setFormData(prev => ({ ...prev, [item.id]: val }));
               }}
             />
             {phoneError && <p className="error">{phoneError}</p>}
@@ -429,22 +394,23 @@ export default function CreateVisitorBook() {
             type="text"
             id={item.id}
             name={item.id}
-            className="text-input"
-            value={value}
+            key={`${item.id}-${isInitialized}`}
+            style={{width: '93%', height: '30px', padding: '0px 12px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box', backgroundColor: 'white', pointerEvents: 'auto'}}
+            defaultValue={value}
             onChange={(e) => {
-              handleChange(item.id, e.target.value);
+              const val = e.target.value;
+              setFormData(prev => ({ ...prev, [item.id]: val }));
               if (item.id === "VisitorName") {
-                validatevisitorname(e.target.value);
+                validatevisitorname(val);
               }
               if (item.id === "Numberperson") {
-                validatenumberperson(e.target.value);
+                validatenumberperson(val);
               }
             }}
           />
           {item.id === "VisitorName" && visitorNameError && (
             <p className="error">{visitorNameError}</p>
           )}
-
           {item.id === "Numberperson" && NmberpersonErro && (
             <p className="error">{NmberpersonErro}</p>
           )}
@@ -453,100 +419,81 @@ export default function CreateVisitorBook() {
     }
 
     if (item.type === "date") {
-  const today = new Date();
-  const oneYearBack = new Date(today);
-  oneYearBack.setFullYear(today.getFullYear() - 1);
+      const today = new Date();
+      const oneYearBack = new Date(today);
+      oneYearBack.setFullYear(today.getFullYear() - 1);
+      const oneYearAhead = new Date(today);
+      oneYearAhead.setFullYear(today.getFullYear() + 1);
 
-  const oneYearAhead = new Date(today);
-  oneYearAhead.setFullYear(today.getFullYear() + 1);
+      const formatDate = (date) => {
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = date.toLocaleString("en-US", { month: "short" });
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+      };
 
-  // Format date as: DD-MMM-YYYY
-  const formatDate = (date) => {
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = date.toLocaleString("en-US", { month: "short" });
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
-
-  return (
-    <div key={item.id} className="form-group">
-      <label htmlFor={item.id}>
-        {item.label}
-        {item.require && <span className="required">*</span>}
-      </label>
-      <div className="datepicker-wrapper-create">
-        <DatePicker
-          id={item.id}
-          selected={formData[item.id] ? new Date(formData[item.id]) : null}
-          onChange={(date) => {
-            const formatted = formatDate(date);
-            handleChange(item.id, formatted);
-          }}
-          minDate={oneYearBack}
-          maxDate={oneYearAhead}
-          placeholderText="Select Date"
-          dateFormat="dd-MMM-yyyy"
-        />
-      </div>
-    </div>
-  );
-}
-
+      return (
+        <div key={item.id} className="form-group">
+          <label htmlFor={item.id}>
+            {item.label}
+            {item.require && <span className="required">*</span>}
+          </label>
+          <div className="datepicker-wrapper-create">
+            <DatePicker
+              id={item.id}
+              selected={formData[item.id] ? (() => {
+                try {
+                  const dateStr = formData[item.id];
+                  if (dateStr.includes('-')) {
+                    const parts = dateStr.split('-');
+                    if (parts.length === 3) {
+                      const day = parseInt(parts[0]);
+                      const monthStr = parts[1];
+                      const year = parseInt(parts[2]);
+                      const monthIndex = new Date(`${monthStr} 1, 2000`).getMonth();
+                      return new Date(year, monthIndex, day);
+                    }
+                  }
+                  return new Date(dateStr);
+                } catch {
+                  return null;
+                }
+              })() : null}
+              onChange={(date) => {
+                const formatted = formatDate(date);
+                setFormData(prev => ({ ...prev, [item.id]: formatted }));
+              }}
+              minDate={oneYearBack}
+              maxDate={oneYearAhead}
+              placeholderText="Select Date"
+              dateFormat="dd-MMM-yyyy"
+            />
+          </div>
+        </div>
+      );
+    }
 
     if (item.type === "time") {
       const value = formData[item.id] || "";
 
       const generateTimeOptions = () => {
-  const options = [];
-  const start = new Date();
-  start.setHours(7, 0, 0, 0); // 07:00
-  const end = new Date();
-  end.setHours(17, 0, 0, 0); // 17:00
+        const options = [];
+        const start = new Date();
+        start.setHours(7, 0, 0, 0);
+        const end = new Date();
+        end.setHours(17, 0, 0, 0);
 
-  while (start <= end) {
-    const hour = start.getHours().toString().padStart(2, "0");
-    const minute = start.getMinutes().toString().padStart(2, "0");
-    const value24 = `${hour}:${minute}`;
-
-    options.push({ value: value24, label: value24 });
-
-    start.setMinutes(start.getMinutes() + 1); // step 1 minute
-  }
-
-  return options;
-};
-
+        while (start <= end) {
+          const hour = start.getHours().toString().padStart(2, "0");
+          const minute = start.getMinutes().toString().padStart(2, "0");
+          const value24 = `${hour}:${minute}`;
+          options.push({ value: value24, label: value24 });
+          start.setMinutes(start.getMinutes() + 1);
+        }
+        return options;
+      };
 
       const timeOptions = generateTimeOptions();
-
-      const handleTimeChange = (id, selectedValue) => {
-        const inTime = formData["inTime"];
-        const outTime = formData["outTime"];
-
-        // Clear previous errors
-        setInTimeError("");
-        setOutTimeError("");
-
-        if (id === "inTime" && outTime) {
-          const inT = new Date(`2000-01-01T${selectedValue}`);
-          const outT = new Date(`2000-01-01T${outTime}`);
-          if (inT >= outT) {
-            setInTimeError("In Time must be earlier than Out Time.");
-            return;
-          }
-        }
-
-        if (id === "outTime" && inTime) {
-          const inT = new Date(`2000-01-01T${inTime}`);
-          const outT = new Date(`2000-01-01T${selectedValue}`);
-          if (outT <= inT) {
-            setOutTimeError("Out Time must be later than In Time.");
-            return;
-          }
-        }
-
-        handleChange(id, selectedValue);
-      };
 
       return (
         <div key={item.id} className="form-group">
@@ -559,7 +506,34 @@ export default function CreateVisitorBook() {
             name={item.id}
             className="dropdown"
             value={value}
-            onChange={(e) => handleTimeChange(item.id, e.target.value)}
+            onChange={(e) => {
+              const selectedValue = e.target.value;
+              const inTime = formData["inTime"];
+              const outTime = formData["outTime"];
+
+              setInTimeError("");
+              setOutTimeError("");
+
+              if (item.id === "inTime" && outTime) {
+                const inT = new Date(`2000-01-01T${selectedValue}`);
+                const outT = new Date(`2000-01-01T${outTime}`);
+                if (inT >= outT) {
+                  setInTimeError("In Time must be earlier than Out Time.");
+                  return;
+                }
+              }
+
+              if (item.id === "outTime" && inTime) {
+                const inT = new Date(`2000-01-01T${inTime}`);
+                const outT = new Date(`2000-01-01T${selectedValue}`);
+                if (outT <= inT) {
+                  setOutTimeError("Out Time must be later than In Time.");
+                  return;
+                }
+              }
+
+              setFormData(prev => ({ ...prev, [item.id]: selectedValue }));
+            }}
           >
             <option value="">-- Select Time --</option>
             {timeOptions.map((t) => (
@@ -568,8 +542,6 @@ export default function CreateVisitorBook() {
               </option>
             ))}
           </select>
-
-          {/* ✅ Show error messages below each field if applicable */}
           {item.id === "inTime" && inTimeError && (
             <p className="error">{inTimeError}</p>
           )}
@@ -594,7 +566,7 @@ export default function CreateVisitorBook() {
             className="file"
             onChange={(e) => {
               const file = e.target.files[0];
-              handleChange(item.id, file?.name || "");
+              setFormData(prev => ({ ...prev, [item.id]: file?.name || "" }));
             }}
           />
         </div>
@@ -607,27 +579,27 @@ export default function CreateVisitorBook() {
   return (
     <>
       <div className="header">
-        Front Office → Visitor Book → {isEditMode ? 'Edit' : 'Create New'} Visitor
+        Front Office → Visitor Book → Edit Visitor
       </div>
       <div className="containercreatevisitor">
         <div className="left">
-          <span className="headline">{isEditMode ? 'Edit' : 'Create New'} VisitorBook</span>
+          <span className="headline">Edit VisitorBook</span>
           <br />
           <br />
           {leftItems.map(renderItem)}
         </div>
         <div className="right">
-          <span className="headlines">{isEditMode ? 'Edit' : 'Create New'} VisitorBook</span>
+          <span className="headlines">Edit VisitorBook</span>
           <br />
           <br />
           {rightItems.map(renderItem)}
           <div>
             <button
               className="submit"
-              disabled={!isFormValid}
+              disabled={!isFormValid()}
               onClick={handleSubmit}
             >
-              {isEditMode ? 'Update' : 'Submit'}
+              Update
             </button>
           </div>
         </div>
