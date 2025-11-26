@@ -80,10 +80,7 @@ export default function EditVisitor() {
   const [formData, setFormData] = useState({});
   const [isInitialized, setIsInitialized] = useState(false);
   
-  // Debug: Log formData changes
-  useEffect(() => {
-    console.log('FormData updated:', formData);
-  }, [formData]);
+
   const [staffOptions, setStaffOptions] = useState([]);
   const [phoneError, setPhoneError] = useState("");
   const [visitorNameError, setVisitornameError] = useState("");
@@ -100,10 +97,8 @@ export default function EditVisitor() {
     setShowAlert(true);
   };
 
-  // Populate form data in edit mode
   useEffect(() => {
     if (editData && !isInitialized) {
-      console.log('EditData received:', editData);
       const newFormData = {
         Purpose: editData.purpose || "",
         MeetingWith: editData.meeting_with || "",
@@ -121,7 +116,6 @@ export default function EditVisitor() {
         fileUpload: editData.upload_documents || "",
         comments: editData.comments || ""
       };
-      console.log('Setting formData:', newFormData);
       setFormData(newFormData);
       setIsInitialized(true);
     }
@@ -297,9 +291,7 @@ export default function EditVisitor() {
             name={item.id}
             className="dropdown"
             value={value}
-            disabled={false}
             onChange={(e) => {
-              console.log(`${item.id} dropdown changed:`, e.target.value);
               const val = e.target.value;
               
               setFormData(prev => ({
@@ -356,10 +348,7 @@ export default function EditVisitor() {
             key={`${item.id}-${isInitialized}`}
             className="comments"
             defaultValue={value}
-            readOnly={false}
-            disabled={false}
             onChange={(e) => {
-              console.log('Comments changed:', e.target.value);
               setFormData(prev => ({ ...prev, [item.id]: e.target.value }));
             }}
           />
@@ -384,10 +373,7 @@ export default function EditVisitor() {
               style={{width: '93%', height: '30px', padding: '0px 12px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box', backgroundColor: 'white', pointerEvents: 'auto'}}
               defaultValue={value}
               maxLength={10}
-              readOnly={false}
-              disabled={false}
               onChange={(e) => {
-                console.log('Phone input changed:', e.target.value);
                 const val = e.target.value.replace(/\D/g, "");
                 validatePhone(val);
                 setFormData(prev => ({ ...prev, [item.id]: val }));
@@ -411,10 +397,7 @@ export default function EditVisitor() {
             key={`${item.id}-${isInitialized}`}
             style={{width: '93%', height: '30px', padding: '0px 12px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box', backgroundColor: 'white', pointerEvents: 'auto'}}
             defaultValue={value}
-            readOnly={false}
-            disabled={false}
             onChange={(e) => {
-              console.log(`${item.id} input changed:`, e.target.value);
               const val = e.target.value;
               setFormData(prev => ({ ...prev, [item.id]: val }));
               if (item.id === "VisitorName") {
@@ -602,29 +585,12 @@ export default function EditVisitor() {
         <div className="left">
           <span className="headline">Edit VisitorBook</span>
           <br />
-          <div style={{marginBottom: '10px', padding: '10px', border: '1px solid #ccc'}}>
-            <label>Test Input:</label>
-            <input 
-              type="text" 
-              defaultValue="" 
-              onChange={(e) => {
-                console.log('Test input changed:', e.target.value);
-              }}
-              style={{marginLeft: '10px', padding: '5px', border: '1px solid red'}}
-            />
-          </div>
           <br />
           {leftItems.map(renderItem)}
         </div>
         <div className="right">
           <span className="headlines">Edit VisitorBook</span>
           <br />
-          <div style={{marginBottom: '10px', padding: '10px', border: '1px solid #ccc'}}>
-            <label>FormData Debug:</label>
-            <pre style={{fontSize: '10px', maxHeight: '100px', overflow: 'auto'}}>
-              {JSON.stringify(formData, null, 2)}
-            </pre>
-          </div>
           <br />
           {rightItems.map(renderItem)}
           <div>
