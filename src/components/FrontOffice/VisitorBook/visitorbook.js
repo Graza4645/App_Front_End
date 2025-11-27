@@ -25,6 +25,7 @@ export default function VisitorBook() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
 
   const visitorsPerPage = 20;
@@ -73,6 +74,7 @@ export default function VisitorBook() {
     setSelectedVisitor(visitor);
     setShowModal(true);
   };
+
 
 const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
   return (
@@ -174,10 +176,15 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
     setItemToDelete(null);
   };
 
-  const totalPages = Math.ceil(visitors.length / visitorsPerPage);
+  // Filter visitors based on search query
+  const filteredVisitors = visitors.filter(visitor =>
+    visitor.visitor_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredVisitors.length / visitorsPerPage);
   const indexOfLastVisitor = currentPage * visitorsPerPage;
   const indexOfFirstVisitor = indexOfLastVisitor - visitorsPerPage;
-  const currentVisitors = visitors.slice(indexOfFirstVisitor, indexOfLastVisitor);
+  const currentVisitors = filteredVisitors.slice(indexOfFirstVisitor, indexOfLastVisitor);
   
  
 
@@ -192,6 +199,18 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
           </button>
         </div>
       </div>
+      <div><label style={{marginLeft :"7px"}}>Search</label></div>
+      
+      <input 
+        type="text" 
+        style={{padding: "0px" , borderRadius : "4px", border : "1px solid #ccc", marginLeft:"7px", width : "180px"}} 
+        className="search" 
+        value={searchQuery}
+        onChange={(e) => {
+          setSearchQuery(e.target.value);
+          setCurrentPage(1); // Reset to first page when searching
+        }}
+      />
 
       <main>
         <div id="printArea" className="table-container">
@@ -237,7 +256,6 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
             <div className="modal">
               <div className="modal-header">
                 <h3>Visitor Details</h3>
-                <span className="close-button" onClick={() => setShowModal(false)}>×</span>
               </div>
               <div className="modal-body">
                 {columns.map((col) => (
@@ -246,6 +264,23 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
                   </p>
                 ))}
               </div>
+               <button
+        onClick={() => setShowModal(false)}
+        style={{
+          display: "block",
+          margin: "20px auto",     
+          padding: "8px 16px",
+          backgroundColor: "#f44336",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          fontSize: "16px",
+          textAlign: "center"
+        }}
+      >
+        Close
+      </button>
             </div>
           </div>
         )}

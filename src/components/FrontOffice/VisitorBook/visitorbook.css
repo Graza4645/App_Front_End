@@ -64,7 +64,7 @@ th:last-child {
 
 
     .table-container {
-      max-height: 510px; /* Adjust based on need */
+      max-height:507px; /* Adjust based on need */
       height: 510px;
       overflow-y: auto;
       border: 1px solid #ccc;
