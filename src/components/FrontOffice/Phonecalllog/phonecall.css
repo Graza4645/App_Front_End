@@ -64,3 +64,40 @@
   background-size: 16px 16px;
   cursor: pointer;
 }
+
+
+
+
+.phonetable td:nth-child(2),
+.phonetable th:nth-child(2) {
+  width: 200px;
+}
+
+.phonetable td:nth-child(1),
+.phonetable th:nth-child(1) {
+  width: 50px;
+}
+
+.enquiry-table td {
+  padding: 3px 7px !important;
+  line-height: 1 !important;
+}
+
+.phonetable {
+  border-collapse: collapse;
+}
+
+.phonetable th,
+.phonetable td {
+  border: 1px solid #ccc;   /* Grid lines */
+  padding: 6px 10px;
+}
+
+.phonetable tbody tr:hover {
+  background: #f9f9f9;      /* Optional hover */
+}
+
+
+.phonetable td{
+  padding: 3px 7px; /* reduce vertical space */
+}
