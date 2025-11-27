@@ -384,3 +384,38 @@ body{
     margin: 8px 0;
     font-size: 12px;
 } 
+
+
+
+.visitortable td:nth-child(2),
+.visitortable th:nth-child(2) {
+  width: 200px;
+}
+
+.visitortable td:nth-child(1),
+.visitortable th:nth-child(1) {
+  width: 50px;
+}
+
+.enquiry-table td {
+  padding: 3px 7px !important;
+  line-height: 1 !important;
+}
+
+.visitortable {
+  border-collapse: collapse;
+}
+
+.visitortable th,
+.visitortable td {
+  border: 1px solid #ccc;   /* Grid lines */
+  padding: 6px 10px;
+}
+
+.visitortable tbody tr:hover {
+  background: #f9f9f9;      /* Optional hover */
+}
+
+.visitortable td{
+  padding: 3px 7px; /* reduce vertical space */
+}

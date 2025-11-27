@@ -247,3 +247,26 @@
     border-radius: 9px;
     cursor: pointer;
 }
+
+
+.enquiry-table td:nth-child(2),
+.enquiry-table th:nth-child(2) {
+  width: 200px;
+}
+
+
+.enquiry-table td:nth-child(1),
+.enquiry-table th:nth-child(1) {
+  width: 50px;
+}
+
+
+
+
+.enquiry-table td{
+  padding: 3px 7px; /* reduce vertical space */
+}
+
+
+
+

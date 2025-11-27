@@ -121,6 +121,8 @@ const AdmissionEnquiry = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [itemToDelete, setItemToDelete] = useState(null);
+  
+  let num = 1;
 
   const showCustomAlert = (message, type = 'success') => {
     setAlertMessage(message);
@@ -502,6 +504,7 @@ const AdmissionEnquiry = () => {
           <table className="enquiry-table">
             <thead>
               <tr>
+                <th>SL NO</th>
                 <th>NAME</th>
                 <th>PHONE</th>
                 <th>SOURCE</th>
@@ -524,6 +527,7 @@ const AdmissionEnquiry = () => {
               ) : (
                 currentRecords.map((item, index) => (
                   <tr key={item.id || index}>
+                    <td>{num++}</td>
                     <td>{item.name}</td>
                     <td>{item.phone}</td>
                     <td>{item.source}</td>

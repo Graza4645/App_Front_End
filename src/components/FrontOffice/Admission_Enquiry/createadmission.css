@@ -89,7 +89,7 @@ select {
   border-radius: 12px;
   /* border-style: double; */
 }
-
+/* 
 table td:first-child,
 table th:first-child {
   width: 200px; 
@@ -98,7 +98,7 @@ table th:first-child {
 table td {
   padding: 3px 7px !important; 
   line-height: 1 !important;
-}
+} */
 
 
 

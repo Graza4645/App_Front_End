@@ -648,7 +648,7 @@ const handleSubmit = async (e) => {
           // ...handle textarea and date types below
         })}
        <div style={{ maxHeight: "450px", overflowY: "auto" }}>
-        <table border="0" cellPadding="10" cellSpacing="0" width="100%" className="enquiry-table">
+        <table className="phonetable">
           <thead>
             <tr>
               <th>Sl No</th>
@@ -660,7 +660,7 @@ const handleSubmit = async (e) => {
               <th>Action</th>
             </tr>
           </thead>
-          <tbody style={{ border: "1px solid red" }}>
+          <tbody style={{  }}>
          {currentRecords.map((log, index) => (
               <tr key={index}>
                 <td>{num++}</td>

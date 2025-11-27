@@ -185,7 +185,7 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
   const indexOfLastVisitor = currentPage * visitorsPerPage;
   const indexOfFirstVisitor = indexOfLastVisitor - visitorsPerPage;
   const currentVisitors = filteredVisitors.slice(indexOfFirstVisitor, indexOfLastVisitor);
-  
+   let num = 1;
  
 
   return (
@@ -214,9 +214,11 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
 
       <main>
         <div id="printArea" className="table-container">
-          <table>
+          <table className="visitortable">
             <thead>
+             
               <tr>
+                <th>SL NO</th>
                 {columns.map((col) => (
                   <th key={col.key}>{col.label}</th>
                 ))}
@@ -225,12 +227,15 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
             </thead>
             <tbody>
               {currentVisitors.length === 0 ? (
+                
                 <tr>
+                  
                   <td colSpan={columns.length + 1}>No visitor data available.</td>
                 </tr>
               ) : (
                 currentVisitors.map((visitor, index) => (
                   <tr key={index}>
+                    <td>{num++}</td>
                     {columns.map((col) => (
                       <td key={col.key}>{visitor[col.key] || "N/A"}</td>
                     ))}
