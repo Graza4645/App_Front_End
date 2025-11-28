@@ -116,6 +116,8 @@ const PostalDispatch = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   const showCustomAlert = (message, type = 'success') => {
     setAlertMessage(message);
@@ -146,32 +148,18 @@ const PostalDispatch = () => {
       });
   };
 
-  const handleEdit = async (item) => {
-    const updatedName = prompt("Edit Name", item.name);
-    if (!updatedName || updatedName.trim() === "") return;
-
-    try {
-      const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
-      const response = await fetch(
-        `${apiUrl}/postaldispatch/${item.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...item, name: updatedName }),
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to update dispatch");
-
-      setLogs((prev) =>
-        prev.map((e) => (e.id === item.id ? { ...item, name: updatedName } : e))
-      );
-
-      showCustomAlert("Updated successfully!");
-    } catch (err) {
-      console.error(err);
-      showCustomAlert("Failed to update", 'error');
-    }
+  const handleEdit = (item) => {
+    setFormData({
+      totitaldispatch: item.to_title,
+      refrenecedispatch: item.reference_no,
+      addressdispatch: item.address,
+      notedispatch: item.note,
+      fromtiteldispatch: item.from_title,
+      dispatchdate: item.date,
+      fileUpload: item.upload_documents
+    });
+    setIsEditing(true);
+    setEditingId(item.id);
   };
 
   // Filter based on search input (Reference No)
@@ -312,8 +300,11 @@ const PostalDispatch = () => {
 
     try {
       const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
-      const response = await fetch(`${apiUrl}/postaldispatch`, {
-        method: "POST",
+      const url = isEditing ? `${apiUrl}/postaldispatch/${editingId}` : `${apiUrl}/postaldispatch`;
+      const method = isEditing ? "PATCH" : "POST";
+      
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -321,12 +312,14 @@ const PostalDispatch = () => {
       });
 
       if (response.ok) {
-        showCustomAlert("Dispatch saved successfully!");
+        showCustomAlert(isEditing ? "Updated successfully!" : "Dispatch saved successfully!");
         setFormData({});
         setRemarksError({});
+        setIsEditing(false);
+        setEditingId(null);
         fetchLogs();
       } else {
-        showCustomAlert("Failed to save dispatch", 'error');
+        showCustomAlert(isEditing ? "Failed to update" : "Failed to save dispatch", 'error');
       }
     } catch (error) {
       console.error("Error saving dispatch:", error);
@@ -339,7 +332,7 @@ const PostalDispatch = () => {
       {/* Left Section - Form */}
       <div className="leftCreatepostdispatch">
         <h4 style={{ padding: "0px", margin: "0px 0px 13px" }}>
-          Add Postal Dispatch
+          {isEditing ? 'Edit Postal Dispatch' : 'Add Postal Dispatch'}
         </h4>
         <form>
           <div style={{}}>
@@ -484,7 +477,7 @@ const PostalDispatch = () => {
               onClick={handleSubmit}
               style={{
                 fontSize: "14px",
-                width: "44%",
+                width: isEditing ? "44%" : "44%",
                 height: "25px",
                 padding: "0px",
                 backgroundColor: isFormValid() ? "#474849ff" : "#ccc",
@@ -494,8 +487,31 @@ const PostalDispatch = () => {
               }}
               disabled={!isFormValid()}
             >
-              Save
+              {isEditing ? 'Update' : 'Save'}
             </button>
+            {isEditing && (
+              <button
+                onClick={() => {
+                  setFormData({});
+                  setIsEditing(false);
+                  setEditingId(null);
+                  setRemarksError({});
+                }}
+                style={{
+                  fontSize: "14px",
+                  width: "44%",
+                  height: "25px",
+                  padding: "0px",
+                  backgroundColor: "#6c757d",
+                  color: "white",
+                  border: "none",
+                  cursor: "pointer",
+                  marginLeft: "10px"
+                }}
+              >
+                Cancel
+              </button>
+            )}
           </div>
         </form>
       </div>
