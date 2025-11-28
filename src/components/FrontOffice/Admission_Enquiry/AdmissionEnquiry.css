@@ -169,6 +169,17 @@
   /* background-color: white; */
 }
 
+
+.createadmission{
+  height: 26px;
+  margin-right: 7px;
+  width: 71px;
+  background-color: #757575;
+  color: white;
+  font-size : smaller
+}
+
+
 .enquiry-table {
   width: 100%;
   border-collapse: collapse;

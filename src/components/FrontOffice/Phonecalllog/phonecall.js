@@ -3,6 +3,7 @@ import "./phonecall.css"; // Optional: Create this for styling
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { API_BASE_URL } from "../../../config.js";
+import VisitorToolbar from "../../Global/VisitorToolbar.js";
 
 const PhoneCallLog = () => {
   
@@ -75,16 +76,6 @@ const currentRecords = filteredLogs.slice(indexOfFirstRecord, indexOfLastRecord)
 const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
 
   let num = 1;
-    const formElement =[
-      {
-  
-      id: "callSearch",
-      label: "Search",
-      type: "text",
-      require: true,
-  
-      }
-    ]
 
 
   const formElements = [
@@ -305,7 +296,7 @@ const handleSubmit = async (e) => {
     <div style={{ display: "flex" }}>
       {/* Left Section - Form */}
       <div style={{boxShadow: "0 0 5px #ccc" , margin: "7px" , borderRadius : "4px", }}>
-      <div style={{ flex: 1, padding: "6px 2px 6px 7px", margin: "0px", boxShadow: "0 0 5px #ccc" , width : "220px"}}>
+      <div style={{ flex: 1, padding: "6px 2px 6px 7px", margin: "0px", boxShadow: "0 0 5px #ccc" , width : "294px"}}>
         {/* Dynamic title based on editing mode (similar to admission enquiry) */}
         <h4 style={{ padding: "0px", margin: "0px 0px 13px"  }}>
           {isEditing ? 'Edit Phone Call Log' : 'Add Phone Call Log'}
@@ -617,36 +608,42 @@ const handleSubmit = async (e) => {
           style={{ marginBottom: "10px", width: "20%" }}
         /> */}
 
-        {formElement.map((item) => {
-          if (item.id === "callSearch") {
-            return (
-              <div key={item.id} className="call-group-create">
-                <label htmlFor={item.id}>
-                  {item.label}
-                  {item.require && <span className="required">*</span>}
-                </label>
-                <input
-                  style={{ width: "20%" }}
-                  type="text"
-                  id={item.id}
-                  name={item.id}
-                  className="call-group-create-input"
-                  value={formData[item.id] || ""}
-                  onChange={(e) => {
-                    let val = e.target.value;
-
-                    setFormData((prev) => ({
-                      ...prev,
-                      [item.id]: val,
-                    }));
-                  }}
-                />
-              </div>
-            );
-          }
-          return null;
-          // ...handle textarea and date types below
-        })}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <input
+              type="text"
+              placeholder="Search..."
+              style={{ 
+                padding: "5px", 
+                borderRadius: "4px", 
+                border: "1px solid #ccc", 
+                width: "180px",
+                height: "26px"
+              }}
+              value={formData.callSearch || ""}
+              onChange={(e) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  callSearch: e.target.value,
+                }));
+                setCurrentPage(1);
+              }}
+            />
+          </div>
+          <div>
+            <VisitorToolbar 
+              visitors={currentRecords} 
+               fileName="Phone_Call_Data"
+              columns={[
+                { key: "name", label: "NAME" },
+                { key: "number", label: "PHONE" },
+                { key: "date", label: "DATE" },
+                { key: "nextFollowUpDate", label: "NEXT FOLLOW UP DATE" },
+                { key: "callType", label: "CALL TYPE" }
+              ]} 
+            />
+          </div>
+        </div>
        <div style={{ maxHeight: "450px", overflowY: "auto" }}>
         <table className="phonetable">
           <thead>

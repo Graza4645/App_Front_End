@@ -427,14 +427,16 @@ const AdmissionEnquiry = () => {
 
           
         <div className="addmission-groups">
+         
+
+          {/* <button type="button" className="createadmission" onClick={() => navigate("/admissionform")}>SEARCH</button> */}
+
   <button 
     onClick={handleSearch} 
-    className="search-btns"
+    type="button" className="createadmission"
     disabled={!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status}
-    style={{opacity: (!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status) ? 0.5 : 1}}
-  
-  >
-    Search
+    style={{marginRight : "0px",opacity: (!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status) ? 0.5 : 1}}>
+    SEARCH
   </button>
 
   <button
@@ -449,56 +451,65 @@ const AdmissionEnquiry = () => {
       setEnquiries(originalEnquiries);
       setCurrentPage(1);
     }}
-    className="search-btns"
+      type="button" className="createadmission"
     disabled={!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status}
-    style={{opacity: (!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status) ? 0.5 : 1}}
-  
-  >
-    Reset
+    style={{marginRight : "0px", opacity: (!formData.Std || !formData.Source || !formData.EnquiryFromDate || !formData.EnquiryToDate || !formData.status) ? 0.5 : 1}}>
+    RESET
   </button>
 </div>
 
         </div>
 
         <div className="table-section">
-          <div className="table-header">
-            <h4 className="admissioncriteria" style={{ margin: "4px 0" }}>
-              Admission Enquiry
-            </h4>
-
-            <div className="right-actions">
-              <input
-                type="text"
-                placeholder="Search..." //🔎
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input"
-              />
-              <button
-                className="add-btn"
-                onClick={() => navigate("/admissionform")}
-              >
-                Create
-              </button>
+          <div style={{ fontWeight: "bold" , marginBottom:"3px"}}>Admission Enquiry Details</div>
+          <div className="createbutton" style={{ width: "100%" }}>
+            
+            <div className="bottomRow" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", paddingBottom : "5px"}}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <input 
+                  type="text" 
+                  style={{ 
+                    padding: "5px", 
+                    borderRadius: "4px", 
+                    border: "1px solid #ccc", 
+                    width: "180px",   
+                    marginLeft: "1px", 
+                    height: "26px"  
+                  }}
+                  className="search" 
+                  placeholder="Search..." 
+                  value={searchQuery} 
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
+       
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <VisitorToolbar
+                  visitors={currentRecords}
+                  fileName="Admission_Enquiry_Data"
+                  columns={[
+                    { key: "name", label: "NAME" },
+                    { key: "phone", label: "PHONE" },
+                    { key: "source", label: "SOURCE" },
+                    { key: "date", label: "ENQUIRY DATE" },
+                    { key: "date", label: "LAST FOLLOW UP DATE" },
+                    { key: "next_follow_up_date", label: "NEXT FOLLOW UP DATE" },
+                    { key: "Active", label: "STATUS" }
+                  ]}
+                />
+                <button
+                  type="button"
+                  className="createadmission" 
+                  style={{marginRight : "0px"}}
+                  onClick={() => navigate("/admissionform")}
+                >
+                  CREATE
+                </button>
+              </div>
             </div>
-          </div>
-          <div
-            className="rightvisitor"
-            style={{ display: "flex", justifyContent: "end", gap: "10px" }}
-          >
-           <VisitorToolbar
-  visitors={currentRecords}
-  fileName="Admission_Enquiry_Data"
-  columns={[
-    { key: "name", label: "NAME" },
-    { key: "phone", label: "PHONE" },
-    { key: "source", label: "SOURCE" },
-    { key: "date", label: "ENQUIRY DATE" },
-    { key: "date", label: "LAST FOLLOW UP DATE" },
-    { key: "next_follow_up_date", label: "NEXT FOLLOW UP DATE" },
-    { key: "Active", label: "STATUS" }
-  ]}
-/>
           </div>
 
           <table className="enquiry-table">

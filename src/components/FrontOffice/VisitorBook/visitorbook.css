@@ -127,7 +127,7 @@ th:last-child {
      font-size: 11px;
     display: flex;
     justify-content: space-between;
-    height: 36px;
+    height: 26px;
     align-items: center;
 
     
@@ -202,9 +202,14 @@ button{
 
 
 
-.create{
+.createvisitor{
   /* border: 1px solid red; */
   height: 26px;
+  margin-right: 7px;
+  width: 71px;
+  background-color: #757575;
+  color: white;
+  font-size : smaller
 }
 
 .leftvistor{

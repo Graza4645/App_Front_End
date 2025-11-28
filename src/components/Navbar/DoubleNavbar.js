@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { UnstyledButton, Tooltip } from '@mantine/core';
 import classes from './DoubleNavbar.module.css';
 import { useNavigate } from 'react-router-dom';
+// import { Tooltip } from '@mantine/core';
 
 // =====================================================
 //  PAGE IMPORTS
@@ -28,30 +29,20 @@ import Complain from '../FrontOffice/Complain/complain.js';
 // =====================================================
 //  ICON IMPORTS (Lucide)
 // =====================================================
-import {
-  Home,
-  Users,
-  BookOpen,
-  DollarSign,
-  BarChart2,
-  FileMinus,
-  ClipboardCheck,
-  Calendar,
-  Menu,
-} from "lucide-react";
+import { Home, Users, BookOpen, DollarSign, BarChart2, FileMinus, ClipboardCheck, Calendar, Menu,} from "lucide-react";
 
 // =====================================================
 //  ICON COMPONENTS (NEW COLORFUL SET)
 // =====================================================
-export const IconDashboard = ({ size = 20 }) => <Home size={size} color="#607D8B" />;      // Deep Orange
-export const IconFrontOffice = ({ size = 20 }) => <Users size={size} color="#607D8B" />;   // Light Blue
-export const IconStudent = ({ size = 20 }) => <BookOpen size={size} color="#607D8B" />;    // Purple
-export const IconFee = ({ size = 20 }) => <DollarSign size={size} color="#607D8B" />;      // Green
-export const IconIncome = ({ size = 20 }) => <BarChart2 size={size} color="#607D8B" />;    // Amber
-export const IconExpenses = ({ size = 20 }) => <FileMinus size={size} color="#607D8B" />;  // Red
-export const IconExam = ({ size = 20 }) => <ClipboardCheck size={size} color="#607D8B" />; // Deep Purple
-export const IconAttendance = ({ size = 20 }) => <Calendar size={size} color="#607D8B" />; // Cyan
-export const IconMenu2 = ({ size = 20 }) => <Menu size={size} color="#607D8B" />;          // Slate Grey
+export const IconDashboard = ({ size = 20 }) => <Home size={size} color="#607D8B" />;
+export const IconFrontOffice = ({ size = 20 }) => <Users size={size} color="#607D8B" />;
+export const IconStudent = ({ size = 20 }) => <BookOpen size={size} color="#607D8B" />;
+export const IconFee = ({ size = 20 }) => <DollarSign size={size} color="#607D8B" />;
+export const IconIncome = ({ size = 20 }) => <BarChart2 size={size} color="#607D8B" />;
+export const IconExpenses = ({ size = 20 }) => <FileMinus size={size} color="#607D8B" />;
+export const IconExam = ({ size = 20 }) => <ClipboardCheck size={size} color="#607D8B" />;
+export const IconAttendance = ({ size = 20 }) => <Calendar size={size} color="#607D8B" />;
+export const IconMenu2 = ({ size = 20 }) => <Menu size={size} color="#607D8B" />;
 
 // =====================================================
 //  MENU DATA WITH NEW ICONS
@@ -164,8 +155,10 @@ export function DoubleNavbar() {
             }}
           >
             {collapsed ? (
-              <Tooltip label={link.label} position="right" withArrow>
-                <link.icon size={20} />
+              <Tooltip label={link.label} position="right" withArrow style={{backgroundColor : "#757575"}}>
+                <div>
+                  <link.icon size={20} />
+                </div>
               </Tooltip>
             ) : (
               <link.icon size={20} />
@@ -236,7 +229,11 @@ export function DoubleNavbar() {
             onClick={() => setCollapsed(c => !c)}
             className={classes.toggleButton}
           >
-            <IconMenu2 size={20} />
+            <Tooltip label="Menu" position="right" withArrow style={{backgroundColor : "#757575"}}>
+              <div>
+                <IconMenu2 size={20} />
+              </div>
+            </Tooltip>
           </UnstyledButton>
         </div>
         <div className={classes.linksContainer}>{mainLinks}</div>
