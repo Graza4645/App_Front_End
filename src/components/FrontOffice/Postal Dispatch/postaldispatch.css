@@ -64,3 +64,56 @@
   background-size: 16px 16px;
   cursor: pointer;
 }
+
+
+
+.leftCreatepostdispatch{
+  flex: 1;
+  padding: 7px;
+  border-right: 1px solid #ccc;
+  margin: 8px;
+  height: 90vh;
+  box-shadow: 0 0 5px #ccc;
+}
+
+.rightdispatchrecord{
+
+}
+
+
+
+
+
+.postDispatch td:nth-child(2),
+.postDispatch th:nth-child(2) {
+  width: 200px;
+}
+
+.postDispatch td:nth-child(1),
+.postDispatch th:nth-child(1) {
+  width: 50px;
+}
+
+.postDispatch td {
+  padding: 3px 7px !important;
+  line-height: 1 !important;
+}
+
+.postDispatch {
+  border-collapse: collapse;
+}
+
+.postDispatch th,
+.postDispatch td {
+  border: 1px solid #ccc;   /* Grid lines */
+  padding: 6px 10px;
+}
+
+.postDispatch tbody tr:hover {
+  background: #f9f9f9;      /* Optional hover */
+}
+
+
+.postDispatch td{
+  padding: 3px 7px; /* reduce vertical space */
+}

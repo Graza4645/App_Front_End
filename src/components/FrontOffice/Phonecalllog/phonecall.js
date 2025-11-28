@@ -5,6 +5,105 @@ import "react-datepicker/dist/react-datepicker.css";
 import { API_BASE_URL } from "../../../config.js";
 import VisitorToolbar from "../../Global/VisitorToolbar.js";
 
+
+const CustomAlert = ({ message, onClose, type = 'success' }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        minWidth: '300px'
+      }}>
+        <p style={{ margin: '0 0 15px 0', color: type === 'error' ? 'red' : 'green' }}>{message}</p>
+        <button 
+          onClick={onClose}
+          style={{
+            backgroundColor: 'black',
+            color: 'white',
+            border: 'none',
+            padding: '0px 27px',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        minWidth: '300px'
+      }}>
+        <p style={{ margin: '0 0 20px 0' }}>{message}</p>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+          <button 
+            onClick={onCancel}
+            style={{
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              padding: '0px 32px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={onConfirm}
+            style={{
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              padding: '0px 16px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 const PhoneCallLog = () => {
   
   // State variables
@@ -16,8 +115,27 @@ const PhoneCallLog = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
+
+  const [selectedEnquiry, setSelectedEnquiry] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [itemToDelete, setItemToDelete] = useState(null);
+
+  const showCustomAlert = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+  };
+
+  
+
   const handleView = (item) => {
-    alert(`Viewing: ${item.name}\nPhone: ${item.number}\nDate: ${item.date}`);
+    setSelectedEnquiry(item);
+    setShowModal(true);
   };
 
 
@@ -221,12 +339,18 @@ const isFormValid = () => {
 };
 
 
-const handleDelete = async (item) => {
-  if (!window.confirm("Are you sure you want to delete this record?")) return;
+const handleDelete = (item) => {
+  setItemToDelete(item);
+  setConfirmMessage(`Are you sure you want to delete ${item.name}?`);
+  setShowConfirm(true);
+};
+
+const confirmDelete = async () => {
+  if (!itemToDelete) return;
 
   try {
     const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
-    const response = await fetch(`${apiUrl}/calllogs/${item.id}`, {
+    const response = await fetch(`${apiUrl}/calllogs/${itemToDelete.id}`, {
       method: "DELETE",
     });
 
@@ -234,11 +358,19 @@ const handleDelete = async (item) => {
 
     // Refresh the logs
     fetchLogs();
-    alert("Deleted successfully!");
+    showCustomAlert("Deleted successfully!");
   } catch (err) {
     console.error(err);
-    alert("Failed to delete");
+    showCustomAlert("Failed to delete", 'error');
+  } finally {
+    setShowConfirm(false);
+    setItemToDelete(null);
   }
+};
+
+const cancelDelete = () => {
+  setShowConfirm(false);
+  setItemToDelete(null);
 };
 
 // Handle form submission - supports both create and update (similar to admission enquiry)
@@ -281,14 +413,14 @@ const handleSubmit = async (e) => {
       // No URL parameters to clear since form is on same screen
       
       fetchLogs(); // Refresh the list
-      alert(isEditing ? "Updated successfully!" : "Saved successfully!");
+      showCustomAlert(isEditing ? "Updated successfully!" : "Saved successfully!");
     }
 
     const data = await response.json();
     console.log("Call log saved:", data);
   } catch (error) {
     console.error("Error saving call log:", error);
-    alert("Error saving call log");
+    showCustomAlert("Error saving call log", 'error');
   }
 };
 
@@ -591,7 +723,7 @@ const handleSubmit = async (e) => {
 
       {/* Right Section - Table */}
       <div style={{boxShadow: "0 0 5px #ccc" , margin: "7px" , borderRadius : "4px" ,width: "84%"}}>
-      <div
+      <div className="rightdispatchrecord"
         style={{
           flex: 3,
           padding: "7px",
@@ -719,6 +851,80 @@ const handleSubmit = async (e) => {
           </button>
         </div>
       </div>
+
+      {/* View Modal */}
+      {showModal && selectedEnquiry && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            minWidth: '400px',
+            maxWidth: '500px'
+          }}>
+            <div style={{
+              borderBottom: '1px solid #eee',
+              paddingBottom: '10px',
+              marginBottom: '15px'
+            }}>
+              <h3 style={{ margin: 0 }}>Phone Call Details</h3>
+            </div>
+            <div>
+              <p><strong>Name:</strong> {selectedEnquiry.name || "N/A"}</p>
+              <p><strong>Phone:</strong> {selectedEnquiry.number || "N/A"}</p>
+              <p><strong>Date:</strong> {selectedEnquiry.date || "N/A"}</p>
+              <p><strong>Description:</strong> {selectedEnquiry.description || "N/A"}</p>
+              <p><strong>Next Follow Up Date:</strong> {selectedEnquiry.nextFollowUpDate || selectedEnquiry.next_follow_up_date || "N/A"}</p>
+              <p><strong>Duration:</strong> {selectedEnquiry.duration || "N/A"}</p>
+              <p><strong>Note:</strong> {selectedEnquiry.note || "N/A"}</p>
+              <p><strong>Call Type:</strong> {selectedEnquiry.callType || selectedEnquiry.call_type || "N/A"}</p>
+            </div>
+            <button
+              onClick={() => setShowModal(false)}
+              style={{
+                display: "block",
+                margin: "20px auto 0",
+                padding: "8px 16px",
+                backgroundColor: "#f44336",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "16px"
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showAlert && (
+        <CustomAlert 
+          message={alertMessage} 
+          type={alertType}
+          onClose={() => setShowAlert(false)} 
+        />
+      )}
+      {showConfirm && (
+        <ConfirmDialog 
+          message={confirmMessage}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
+      )}
     </div>
   );
 };

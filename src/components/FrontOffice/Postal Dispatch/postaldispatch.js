@@ -2,46 +2,158 @@ import React, { useState, useEffect } from "react";
 import "./postaldispatch.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import VisitorToolbar from "../../Global/VisitorToolbar";
+import { API_BASE_URL } from "../../../config.js";
+
+const CustomAlert = ({ message, onClose, type = 'success' }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        minWidth: '300px'
+      }}>
+        <p style={{ margin: '0 0 15px 0', color: type === 'error' ? 'red' : 'green' }}>{message}</p>
+        <button 
+          onClick={onClose}
+          style={{
+            backgroundColor: 'black',
+            color: 'white',
+            border: 'none',
+            padding: '0px 27px',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        minWidth: '300px'
+      }}>
+        <p style={{ margin: '0 0 20px 0' }}>{message}</p>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+          <button 
+            onClick={onCancel}
+            style={{
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              padding: '0px 32px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={onConfirm}
+            style={{
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              padding: '0px 16px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const PostalDispatch = () => {
   let num = 1;
 
-
   const [logs, setLogs] = useState([]);
-
-  const handleView = (item) => {
-    alert(`Viewing: ${item.to_title}\nReference: ${item.reference_no}\nDate: ${item.date}`);
-  };
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({});
+  const [selectedEnquiry, setSelectedEnquiry] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [itemToDelete, setItemToDelete] = useState(null);
 
+  const showCustomAlert = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+  };
+
+  const handleView = (item) => {
+    setSelectedEnquiry(item);
+    setShowModal(true);
+  };
 
   useEffect(() => {
     fetchLogs();
   }, []);
 
-
   const fetchLogs = () => {
-  fetch("http://localhost:3000/api/v1/postaldispatch")
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("Fetched data from /postaldispatch:", data);
-      setLogs(Array.isArray(data) ? data : data.data || []);  
-    })
-    .catch((err) => {
-      console.error("Error fetching dispatch logs:", err);
-      setLogs([]);
-    });
-};
-
+    const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
+    fetch(`${apiUrl}/postaldispatch`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched data from /postaldispatch:", data);
+        setLogs(Array.isArray(data) ? data : data.data || []);  
+      })
+      .catch((err) => {
+        console.error("Error fetching dispatch logs:", err);
+        setLogs([]);
+      });
+  };
 
   const handleEdit = async (item) => {
     const updatedName = prompt("Edit Name", item.name);
     if (!updatedName || updatedName.trim() === "") return;
 
     try {
+      const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
       const response = await fetch(
-        `http://localhost:3000/api/v1/postaldispatch/${item.id}`,
+        `${apiUrl}/postaldispatch/${item.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -49,43 +161,32 @@ const PostalDispatch = () => {
         }
       );
 
-      if (!response.ok) throw new Error("Failed to update admission");
+      if (!response.ok) throw new Error("Failed to update dispatch");
 
       setLogs((prev) =>
         prev.map((e) => (e.id === item.id ? { ...item, name: updatedName } : e))
       );
 
-      alert("Updated successfully!");
+      showCustomAlert("Updated successfully!");
     } catch (err) {
       console.error(err);
-      alert("Failed to update");
+      showCustomAlert("Failed to update", 'error');
     }
   };
 
+  // Filter based on search input (Reference No)
+  const searchTerm = (formData.callSearch || "").toLowerCase();
 
-// ✅ Filter based on search input (Reference No)
-const searchTerm = (formData.callSearch || "").toLowerCase();
+  const filteredLogs = (logs || []).filter((log) =>
+    log.reference_no?.toLowerCase().includes(searchTerm)
+  );
 
-const filteredLogs = (logs || []).filter((log) =>
-  log.reference_no?.toLowerCase().includes(searchTerm)
-);
-
-// ✅ Pagination logic after filtering
-const recordsPerPage = 10;
-const indexOfLastRecord = currentPage * recordsPerPage;
-const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-const currentRecords = filteredLogs.slice(indexOfFirstRecord, indexOfLastRecord);
-const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
-
-
-  const formElement = [
-    {
-      id: "callSearch",
-      label: "Search",
-      type: "text",
-      require: true,
-    },
-  ];
+  // Pagination logic after filtering
+  const recordsPerPage = 10;
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = filteredLogs.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
 
   const formElements = [
     {
@@ -96,7 +197,7 @@ const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
     },
     {
       id: "refrenecedispatch",
-      label: "Refrence No",
+      label: "Reference No",
       type: "text",
       require: true,
     },
@@ -118,7 +219,6 @@ const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
       type: "text",
       require: true,
     },
-
     {
       id: "dispatchdate",
       label: "Date",
@@ -135,31 +235,6 @@ const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
     },
   ];
 
-  /**  -------------------------> start Name Validation   <------------------------------------- */
-  const [nameError, setNameError] = useState("");
-  const validateName = (value) => {
-    if (!/^[a-zA-Z\s]*$/.test(value)) {
-      setNameError("Name should contain only alphabets and spaces");
-    } else {
-      setNameError("");
-    }
-  };
-  /**  -------------------------> End Name Validation   <------------------------------------- */
-
-  /** ----------------------->  Start Mobile Validation  <-------------------------------  */
-  const [phoneError, setPhoneError] = useState("");
-  const validatePhone = (value) => {
-    if (!/^[6-9]/.test(value)) {
-      setPhoneError("Indian mobile number should start with 6, 7, 8, or 9");
-    } else if (value.length !== 10) {
-      setPhoneError("Mobile number should be exactly 10 digits");
-    } else {
-      setPhoneError("");
-    }
-  };
-  /** ------------------------->  End Mobile Validation    <--------------------------------------  */
-
-  /**  -------------------------> start TextArea Validation   <------------------------------------- */
   const [remarksError, setRemarksError] = useState({});
   const validateTextarea = (id, value) => {
     if (value.length > 299) {
@@ -171,44 +246,55 @@ const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
       setRemarksError((prev) => ({ ...prev, [id]: "" }));
     }
   };
-  /**  -------------------------> End TextArea Validation   <------------------------------------- */
 
-  /**  -------------------------> start Duration Validation   <------------------------------------- */
-  const [NmberpersonErro, setNumberpersonError] = useState("");
-  const validatenumberperson = (value) => {
-    const number = parseInt(value, 10);
-
-    if (isNaN(number) || number < 0 || number >= 200) {
-      setNumberpersonError("Enter a number between 0 and 199");
-    } else {
-      setNumberpersonError("");
-    }
+  const handleDelete = (item) => {
+    setItemToDelete(item);
+    setConfirmMessage(`Are you sure you want to delete ${item.to_title}?`);
+    setShowConfirm(true);
   };
 
-  /**  -------------------------> End Duration Validation   <------------------------------------- */
-
-
-
-  const handleDelete = async (item) => {
-    if (!window.confirm("Are you sure you want to delete this record?")) return;
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
 
     try {
+      const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
       const response = await fetch(
-        `http://localhost:3000/api/v1/postaldispatch/${item.id}`,
+        `${apiUrl}/postaldispatch/${itemToDelete.id}`,
         {
           method: "DELETE",
         }
       );
 
-      if (!response.ok) throw new Error("Failed to delete call log");
+      if (!response.ok) throw new Error("Failed to delete dispatch");
 
-      // Refresh the logs
       fetchLogs();
-      alert("Deleted successfully!");
+      showCustomAlert("Deleted successfully!");
     } catch (err) {
       console.error(err);
-      alert("Failed to delete");
+      showCustomAlert("Failed to delete", 'error');
+    } finally {
+      setShowConfirm(false);
+      setItemToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowConfirm(false);
+    setItemToDelete(null);
+  };
+
+  const isFormValid = () => {
+    const requiredFields = formElements
+      .filter((el) => el.require)
+      .map((el) => el.id);
+
+    const allFieldsFilled = requiredFields.every(
+      (id) => formData[id] && formData[id].toString().trim() !== ""
+    );
+
+    const noErrors = Object.values(remarksError).every((err) => err === "");
+
+    return allFieldsFilled && noErrors;
   };
 
   const handleSubmit = async (e) => {
@@ -221,11 +307,12 @@ const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
       note: formData.notedispatch,
       from_title: formData.fromtiteldispatch,
       date: formData.dispatchdate,
-      upload_documents: formData.fileUpload || "", // Optional: handle file name
+      upload_documents: formData.fileUpload || "",
     };
 
     try {
-      const response = await fetch("http://localhost:3000/api/v1/postaldispatch", {
+      const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
+      const response = await fetch(`${apiUrl}/postaldispatch`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -234,37 +321,28 @@ const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
       });
 
       if (response.ok) {
-        alert("Dispatch saved successfully!");
+        showCustomAlert("Dispatch saved successfully!");
         setFormData({});
-        setNameError("");
-        setPhoneError("");
-        setNumberpersonError("");
         setRemarksError({});
-        fetchLogs(); // Refresh the list
+        fetchLogs();
       } else {
-        alert("Failed to save dispatch");
+        showCustomAlert("Failed to save dispatch", 'error');
       }
     } catch (error) {
       console.error("Error saving dispatch:", error);
-      alert("An error occurred while saving dispatch");
+      showCustomAlert("An error occurred while saving dispatch", 'error');
     }
   };
 
   return (
     <div style={{ display: "flex" }}>
       {/* Left Section - Form */}
-      <div
-        style={{
-          flex: 1,
-          padding: "7px",
-          borderRight: "1px solid #ccc",
-          margin: "0px",
-        }}
-      >
+      <div className="leftCreatepostdispatch">
         <h4 style={{ padding: "0px", margin: "0px 0px 13px" }}>
           Add Postal Dispatch
         </h4>
         <form>
+          <div style={{}}>
           {formElements.map((item) => {
             if (item.type === "textarea") {
               return (
@@ -295,35 +373,11 @@ const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
                     className="char-count"
                     style={{
                       fontSize: "10px",
-                      color:
-                        (formData[item.id]?.length || 0) > 300 ? "red" : "gray",
+                      color: (formData[item.id]?.length || 0) > 300 ? "red" : "gray",
                     }}
                   >
                     {formData[item.id]?.length || 0}/300
                   </div>
-                </div>
-              );
-            }
-            if (item.type === "file") {
-              return (
-                <div key={item.id} className="call-group-create">
-                  <label htmlFor={item.id}>
-                    {item.label}
-                    {item.require && <span className="required">*</span>}
-                  </label>
-                  <input
-                    type="file"
-                    id={item.id}
-                    name={item.id}
-                    className="call-group-create-input"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      setFormData((prev) => ({
-                        ...prev,
-                        [item.id]: file?.name || "",
-                      }));
-                    }}
-                  />
                 </div>
               );
             }
@@ -336,7 +390,6 @@ const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
               const oneYearAhead = new Date(today);
               oneYearAhead.setFullYear(today.getFullYear() + 1);
 
-              // 📌 Format date as: 15-Aug-2025
               const formatDate = (date) => {
                 const day = String(date.getDate()).padStart(2, "0");
                 const month = date.toLocaleString("en-US", { month: "short" });
@@ -372,81 +425,61 @@ const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
                 </div>
               );
             }
-if (item.type === "text") {
-  return (
-    <div key={item.id} className="call-group-create">
-      <label htmlFor={item.id}>
-        {item.label}
-        {item.require && <span className="required">*</span>}
-      </label>
-      <input
-        type="text"
-        id={item.id}
-        name={item.id}
-        className="call-group-create-input"
-        value={formData[item.id] || ""}
-        maxLength={
-          item.id === "phoneNumber"
-            ? 10
-            : item.id === "phoneDuration"
-            ? 10
-            : undefined
-        }
-        onChange={(e) => {
-          const val = e.target.value;
 
-          // ✅ Run validations for specific fields
-          if (item.id === "phoneName") validateName(val);
-          if (item.id === "phoneNumber") validatePhone(val);
-          if (item.id === "phoneDuration") validatenumberperson(val);
+            if (item.type === "text") {
+              return (
+                <div key={item.id} className="call-group-create">
+                  <label htmlFor={item.id}>
+                    {item.label}
+                    {item.require && <span className="required">*</span>}
+                  </label>
+                  <input
+                    type="text"
+                    id={item.id}
+                    name={item.id}
+                    className="call-group-create-input"
+                    value={formData[item.id] || ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFormData((prev) => ({
+                        ...prev,
+                        [item.id]: val,
+                      }));
+                    }}
+                  />
+                </div>
+              );
+            }
 
-          setFormData((prev) => ({
-            ...prev,
-            [item.id]: val,
-          }));
-
-          // ✅ Reset pagination for search field
-          if (item.id === "callSearch") {
-            setCurrentPage(1);
-          }
-        }}
-      />
-
-      {/* ✅ Show validation errors */}
-      
-      {item.id === "phoneName" && nameError && (
-        <div className="error-message">{nameError}</div>
-      )}
-      {item.id === "phoneNumber" && phoneError && (
-        <div className="error-message">{phoneError}</div>
-      )}
-      {item.id === "phoneDuration" && NmberpersonErro && (
-        <div className="error-message">{NmberpersonErro}</div>
-      )}
-    </div>
-  );
-}
-
+            if (item.type === "file") {
+              return (
+                <div key={item.id} className="call-group-create">
+                  <label htmlFor={item.id}>
+                    {item.label}
+                    {item.require && <span className="required">*</span>}
+                  </label>
+                  <input
+                    type="file"
+                    id={item.id}
+                    name={item.id}
+                    className="call-group-create-inputs"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      setFormData((prev) => ({
+                        ...prev,
+                        [item.id]: file ? file.name : "",
+                      }));
+                    }}
+                  />
+                </div>
+              );
+            }
 
             return null;
           })}
-          {/* <label style={{ fontSize: "14px", marginRight: "15px" }}>
-            Call Type
-          </label>
-          <label style={{ fontSize: "14px", marginRight: "6px" }}>
-            <input type="radio" name="callType" value="Incoming" /> Incoming
-          </label>
-          <label style={{ fontSize: "14px" }}>
-            <input type="radio" name="callType" value="Outgoing" /> Outgoing
-          </label> */}
+          </div>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "12px",
-            }}
-          >
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "12px" }}>
             <button
               onClick={handleSubmit}
               style={{
@@ -454,13 +487,12 @@ if (item.type === "text") {
                 width: "44%",
                 height: "25px",
                 padding: "0px",
-               // backgroundColor: isFormValid() ? "#007bff" : "#ccc",
-               backgroundColor :   "#007bff",
+                backgroundColor: isFormValid() ? "#474849ff" : "#ccc",
                 color: "white",
                 border: "none",
-               // cursor: isFormValid() ? "pointer" : "not-allowed",
+                cursor: isFormValid() ? "pointer" : "not-allowed",
               }}
-             // disabled={!isFormValid()}
+              disabled={!isFormValid()}
             >
               Save
             </button>
@@ -469,96 +501,78 @@ if (item.type === "text") {
       </div>
 
       {/* Right Section - Table */}
-      <div
-        style={{
-          flex: 3,
-          padding: "7px",
-          borderRight: "1px solid #ccc",
-          margin: "0px",
-        }}
-      >
+      <div style={{ flex: "3 1 0%", padding: "7px", borderRight: "1px solid rgb(204, 204, 204)", margin: "8px", boxShadow: "0 0 5px #ccc", borderRadius: "4px" }}>
+       
         <h4 style={{ padding: "0px", margin: "0px 0px 13px" }}>
           Postal Dispatch List
         </h4>
-        {/* <input
-          type="text"
-          placeholder="Search..."
-          style={{ marginBottom: "10px", width: "20%" }}
-        /> */}
 
-        {formElement.map((item) => {
-          if (item.id === "callSearch") {
-            return (
-              <div key={item.id} className="call-group-create">
-                <label htmlFor={item.id}>
-                  {item.label}
-                  {item.require && <span className="required">*</span>}
-                </label>
-                <input
-                  style={{ width: "20%" }}
-                  type="text"
-                  id={item.id}
-                  name={item.id}
-                  className="call-group-create-input"
-                  value={formData[item.id] || ""}
-                  onChange={(e) => {
-                    let val = e.target.value;
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <input
+              type="text"
+              placeholder="Search..."
+              style={{ 
+                padding: "5px", 
+                borderRadius: "4px", 
+                border: "1px solid #ccc", 
+                width: "180px",
+                height: "26px"
+              }}
+              value={formData.callSearch || ""}
+              onChange={(e) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  callSearch: e.target.value,
+                }));
+                setCurrentPage(1);
+              }}
+            />
+          </div>
+          <div>
+            <VisitorToolbar 
+              visitors={currentRecords} 
+              fileName="Postal_Dispatch_Data"
+              columns={[
+                { key: "to_title", label: "TO TITLE" },
+                { key: "reference_no", label: "REFERENCE NO" },
+                { key: "address", label: "ADDRESS" },
+                { key: "from_title", label: "FROM TITLE" },
+                { key: "date", label: "DATE" }
+              ]} 
+            />
+          </div>
+        </div>
 
-                    setFormData((prev) => ({
-                      ...prev,
-                      [item.id]: val,
-                    }));
-                  }}
-                />
-              </div>
-            );
-          }
-          return null;
-          // ...handle textarea and date types below
-        })}
         <div style={{ maxHeight: "450px", overflowY: "auto" }}>
-          <table
-            border="0"
-            cellPadding="10"
-            cellSpacing="0"
-            width="100%"
-            className="enquiry-table"
-          >
+          <table className="postDispatch">
             <thead>
               <tr>
                 <th>Sl No</th>
                 <th>To Title</th>
-                <th>Refrence No</th>
+                <th>Reference No</th>
+                <th>Address</th>
                 <th>From Title</th>
                 <th>Date</th>
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody style={{ border: "1px solid red" }}>
+            <tbody>
               {currentRecords.map((log, index) => (
                 <tr key={index}>
                   <td>{num++}</td>
                   <td>{log.to_title}</td>
                   <td>{log.reference_no}</td>
+                  <td>{log.address}</td>
                   <td>{log.from_title}</td>
                   <td>{log.date}</td>
-
                   <td>
                     <div className="action-menu">
                       <i className="fas fa-ellipsis-v"></i>
                       <div className="dropdown-content">
-                        <div className="view" onClick={() => handleView(log)}>
-                          View
-                        </div>
-                        <div className="edit" onClick={() => handleEdit(log)}>
-                          Edit
-                        </div>
-                        <div
-                          className="delete"
-                          onClick={() => handleDelete(log)}
-                        >
-                          Delete
-                        </div>
+                        <div className="view" onClick={() => handleView(log)}>View</div>
+                        <div className="edit" onClick={() => handleEdit(log)}>Edit</div>
+                        <div className="delete" onClick={() => handleDelete(log)}>Delete</div>
                       </div>
                     </div>
                   </td>
@@ -566,7 +580,7 @@ if (item.type === "text") {
               ))}
               {logs.length === 0 && (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: "center" }}>
+                  <td colSpan="7" style={{ textAlign: "center" }}>
                     No records found
                   </td>
                 </tr>
@@ -577,9 +591,7 @@ if (item.type === "text") {
 
         {/* Pagination */}
         <div className="pagination" style={{ marginTop: "10px" }}>
-          <span>
-            Page: {currentPage} of {totalPages}
-          </span>
+          <span>Page: {currentPage} of {totalPages}</span>
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
@@ -588,15 +600,86 @@ if (item.type === "text") {
           </button>
           <button className="active">{currentPage}</button>
           <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
           >
             Next
           </button>
         </div>
       </div>
+
+      {/* View Modal */}
+      {showModal && selectedEnquiry && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            minWidth: '400px',
+            maxWidth: '500px'
+          }}>
+            <div style={{
+              borderBottom: '1px solid #eee',
+              paddingBottom: '10px',
+              marginBottom: '15px'
+            }}>
+              <h3 style={{ margin: 0 }}>Postal Dispatch Details</h3>
+            </div>
+            <div>
+              <p><strong>To Title:</strong> {selectedEnquiry.to_title || "N/A"}</p>
+              <p><strong>Reference No:</strong> {selectedEnquiry.reference_no || "N/A"}</p>
+              <p><strong>Address:</strong> {selectedEnquiry.address || "N/A"}</p>
+              <p><strong>Note:</strong> {selectedEnquiry.note || "N/A"}</p>
+              <p><strong>From Title:</strong> {selectedEnquiry.from_title || "N/A"}</p>
+              <p><strong>Date:</strong> {selectedEnquiry.date || "N/A"}</p>
+              <p><strong>Upload Documents:</strong> {selectedEnquiry.upload_documents || "N/A"}</p>
+            </div>
+            <button
+              onClick={() => setShowModal(false)}
+              style={{
+                display: "block",
+                margin: "20px auto 0",
+                padding: "8px 16px",
+                backgroundColor: "#f44336",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "16px"
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showAlert && (
+        <CustomAlert 
+          message={alertMessage} 
+          type={alertType}
+          onClose={() => setShowAlert(false)} 
+        />
+      )}
+      {showConfirm && (
+        <ConfirmDialog 
+          message={confirmMessage}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
+      )}
     </div>
   );
 };

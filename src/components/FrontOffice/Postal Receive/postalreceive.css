@@ -64,3 +64,44 @@
   background-size: 16px 16px;
   cursor: pointer;
 }
+
+
+
+
+postalrecivetable
+
+
+
+.postalrecivetable td:nth-child(2),
+.postalrecivetable th:nth-child(2) {
+  width: 200px;
+}
+
+.postalrecivetable td:nth-child(1),
+.postalrecivetable th:nth-child(1) {
+  width: 50px;
+}
+
+.postalrecivetable td {
+  padding: 3px 7px !important;
+  line-height: 1 !important;
+}
+
+.postalrecivetable {
+  border-collapse: collapse;
+}
+
+.postalrecivetable th,
+.postalrecivetable td {
+  border: 1px solid #ccc;   /* Grid lines */
+  padding: 6px 10px;
+}
+
+.postalrecivetable tbody tr:hover {
+  background: #f9f9f9;      /* Optional hover */
+}
+
+
+.postalrecivetable td{
+  padding: 3px 7px; /* reduce vertical space */
+}
