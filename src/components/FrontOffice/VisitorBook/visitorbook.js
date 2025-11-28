@@ -190,18 +190,70 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
 
   return (
     <>
-      <div className="createbutton">
+      
+      {/* <div className="createbutton">
         <div className="leftvistor">Front Office → Visitor Book</div>
         <div className="rightvisitor" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <label style={{marginLeft :"7px"}}>Search</label> 
           <VisitorToolbar visitors={currentVisitors} columns={columns} />
           <button type="button" className="create" onClick={() => navigate("/createvisitor")}>
             Create New +
           </button>
         </div>
-      </div>
-      <div><label style={{marginLeft :"7px"}}>Search</label></div>
+      </div> */}
+
+        <div 
+    className="topRow" 
+    style={{
+      fontSize: "11px",
+       color: "blue", 
+      marginBottom: "8px",
+      marginLeft : "7px"
+    }}
+  >
+    front office → visitor book
+  </div>
+      <div className="createbutton" style={{ width: "100%" }}>
+
+  {/* LINE 1 */}
+ 
+   
+  {/* LINE 2 */}
+  <div
+    className="bottomRow"
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "100%",
+    }}
+  >
+    {/* LEFT SIDE OF LINE 2: Search */}
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
       
-      <input 
+
+      <input type="text" style={{ padding: "5px", borderRadius: "4px", border: "1px solid #ccc", width: "180px",   marginLeft : "7px", height :"26px"  }}
+        className="search" placeholder="Search..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1);}}/>
+    </div>
+ 
+    {/* RIGHT SIDE OF LINE 2: Toolbar + Create */}
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <VisitorToolbar visitors={currentVisitors} columns={columns} />
+
+      <button
+        type="button"
+        className="createvisitor"
+        onClick={() => navigate("/createvisitor")}
+      >
+        CREATE
+      </button>
+    </div>
+  </div>
+</div>
+
+      
+      
+      {/* <input 
         type="text" 
         style={{padding: "0px" , borderRadius : "4px", border : "1px solid #ccc", marginLeft:"7px", width : "180px"}} 
         className="search" 
@@ -210,7 +262,7 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
           setSearchQuery(e.target.value);
           setCurrentPage(1); // Reset to first page when searching
         }}
-      />
+      /> */}
 
       <main>
         <div id="printArea" className="table-container">
