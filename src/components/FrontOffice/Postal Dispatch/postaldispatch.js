@@ -555,7 +555,8 @@ const PostalDispatch = () => {
                 { key: "address", label: "ADDRESS" },
                 { key: "from_title", label: "FROM TITLE" },
                 { key: "date", label: "DATE" }
-              ]} 
+              ]}
+              onAlert={showCustomAlert}
             />
           </div>
         </div>

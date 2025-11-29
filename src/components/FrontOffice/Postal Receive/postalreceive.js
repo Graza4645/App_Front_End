@@ -552,7 +552,8 @@ const PostalReceive = () => {
                 { key: "address", label: "ADDRESS" },
                 { key: "to_title", label: "TO TITLE" },
                 { key: "date", label: "DATE" }
-              ]} 
+              ]}
+              onAlert={showCustomAlert}
             />
           </div>
         </div>

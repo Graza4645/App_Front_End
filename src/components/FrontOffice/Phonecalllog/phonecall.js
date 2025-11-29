@@ -772,7 +772,8 @@ const handleSubmit = async (e) => {
                 { key: "date", label: "DATE" },
                 { key: "nextFollowUpDate", label: "NEXT FOLLOW UP DATE" },
                 { key: "callType", label: "CALL TYPE" }
-              ]} 
+              ]}
+              onAlert={showCustomAlert}
             />
           </div>
         </div>

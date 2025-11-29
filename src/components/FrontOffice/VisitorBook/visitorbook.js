@@ -4,6 +4,47 @@ import { useEffect, useState } from "react";
 import VisitorToolbar from "../../Global/VisitorToolbar";
 import { API_BASE_URL } from "../../../config";
 
+const CustomAlert = ({ message, onClose, type = 'success' }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        minWidth: '300px'
+      }}>
+        <p style={{ margin: '0 0 15px 0', color: type === 'error' ? 'red' : 'green' }}>{message}</p>
+        <button 
+          onClick={onClose}
+          style={{
+            backgroundColor: 'black',
+            color: 'white',
+            border: 'none',
+            padding: '0px 27px',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+};
+
 export default function VisitorBook() {
   const columns = [
     { key: "purpose", label: "PURPOSE" },
@@ -26,6 +67,15 @@ export default function VisitorBook() {
   const [confirmMessage, setConfirmMessage] = useState('');
   const [itemToDelete, setItemToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
+
+  const showCustomAlert = (message, type = 'success') => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlert(true);
+  };
 
 
   const visitorsPerPage = 20;
@@ -238,7 +288,7 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
  
     {/* RIGHT SIDE OF LINE 2: Toolbar + Create */}
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-      <VisitorToolbar visitors={currentVisitors} columns={columns} />
+      <VisitorToolbar visitors={currentVisitors} columns={columns} onAlert={showCustomAlert} />
 
       <button
         type="button"
@@ -355,6 +405,13 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
           message={confirmMessage}
           onConfirm={confirmDelete}
           onCancel={cancelDelete}
+        />
+      )}
+      {showAlert && (
+        <CustomAlert 
+          message={alertMessage} 
+          type={alertType}
+          onClose={() => setShowAlert(false)} 
         />
       )}
     </>

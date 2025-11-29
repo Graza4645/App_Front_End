@@ -647,7 +647,8 @@ const Complain = () => {
                 { key: "phone", label: "PHONE" },
                 { key: "assigned", label: "ASSIGNED" },
                 { key: "date", label: "DATE" }
-              ]} 
+              ]}
+              onAlert={showCustomAlert}
             />
           </div>
         </div>
