@@ -570,7 +570,8 @@ const Hostel = () => {
                 { key: "address", label: "ADDRESS" },
                 { key: "intake", label: "INTAKE" },
                 { key: "description", label: "DESCRIPTION" }
-              ]} 
+              ]}
+              onAlert={showCustomAlert}
             />
           </div>
         </div>

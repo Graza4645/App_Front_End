@@ -499,6 +499,7 @@ const AdmissionEnquiry = () => {
                     { key: "next_follow_up_date", label: "NEXT FOLLOW UP DATE" },
                     { key: "Active", label: "STATUS" }
                   ]}
+                  onAlert={showCustomAlert}
                 />
                 <button
                   type="button"

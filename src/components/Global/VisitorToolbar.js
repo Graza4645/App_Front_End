@@ -3,11 +3,19 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import './VisitorToolbar.css';
 
-export default function VisitorToolbar({ visitors, columns, fileName = "visitor_book_data" }) {
+export default function VisitorToolbar({ visitors, columns, fileName = "visitor_book_data", onAlert }) {
   const headers = columns.map(col => col.label); // display names
 
+  const showAlert = (message, type = 'success') => {
+    if (onAlert && typeof onAlert === 'function') {
+      onAlert(message, type);
+    } else {
+      alert(message);
+    }
+  };
+
   const handleCopy = () => {
-    if (!visitors.length) return alert("No data to copy");
+    if (!visitors.length) return showAlert("No data to copy", 'error');
 
     const tsvContent = [
       headers.join("\t"),
@@ -18,15 +26,15 @@ export default function VisitorToolbar({ visitors, columns, fileName = "visitor_
 
     navigator.clipboard
       .writeText(tsvContent)
-      .then(() => alert("Data copied to clipboard!"))
+      .then(() => showAlert("Data copied to clipboard!"))
       .catch(err => {
         console.error("Failed to copy:", err);
-        alert("Failed to copy data.");
+        showAlert("Failed to copy data.", 'error');
       });
   };
 
   const handleExport = (type) => {
-    if (!visitors.length) return alert("No data to export");
+    if (!visitors.length) return showAlert("No data to export", 'error');
 
     // Prepare filtered data
     const exportData = visitors.map(v => {

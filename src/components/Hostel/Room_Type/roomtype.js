@@ -458,7 +458,8 @@ const Roomtype = () => {
               fileName="Room_Type_Data"
               columns={[
                 { key: "room_type", label: "ROOM TYPE" },        
-              ]} 
+              ]}
+              onAlert={showCustomAlert}
             />
           </div>
         </div>
