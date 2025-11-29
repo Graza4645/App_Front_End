@@ -25,11 +25,15 @@ import PhoneCallLog from '../FrontOffice/Phonecalllog/phonecall.js';
 import PostalDispatch from '../FrontOffice/Postal Dispatch/postaldispatch.js';
 import PostalReceive from '../FrontOffice/Postal Receive/postalreceive.js';
 import Complain from '../FrontOffice/Complain/complain.js';
+// import roomtype from '../Hostel/Room_Type/roomtype.js';
 
 // =====================================================
 //  ICON IMPORTS (Lucide)
 // =====================================================
-import { Home, Users, BookOpen, DollarSign, BarChart2, FileMinus, ClipboardCheck, Calendar, Menu,} from "lucide-react";
+import { Home, Users, BookOpen, DollarSign, BarChart2, FileMinus, ClipboardCheck, Calendar, Menu, Building} from "lucide-react";
+import Roomtype from '../Hostel/Room_Type/roomtype.js';
+import HostelRoom from '../Hostel/Hostel_Room/hostelroom.js';
+import Hostel from '../Hostel/Hostel/hostel.js';
 
 // =====================================================
 //  ICON COMPONENTS (NEW COLORFUL SET)
@@ -43,6 +47,7 @@ export const IconExpenses = ({ size = 20 }) => <FileMinus size={size} color="#60
 export const IconExam = ({ size = 20 }) => <ClipboardCheck size={size} color="#607D8B" />;
 export const IconAttendance = ({ size = 20 }) => <Calendar size={size} color="#607D8B" />;
 export const IconMenu2 = ({ size = 20 }) => <Menu size={size} color="#607D8B" />;
+export const IconHostel = ({ size = 20 }) => <Building size={size} color="#607D8B" />;
 
 // =====================================================
 //  MENU DATA WITH NEW ICONS
@@ -64,7 +69,7 @@ const mainLinksMockdata = [
       { label: 'Postal Dispatch', route : '/postaldispatch' },
       { label: 'Postal Receive', route : '/postalreceive' },
       { label: 'Complain', route : '/complain'},
-      { label: 'Setup Front Office' },
+      { label: 'Setup Front Office', route : '/setup/front/office'},
     ],
   },
   {
@@ -97,7 +102,18 @@ const mainLinksMockdata = [
     label: 'Attendance',
     subLinks: [{ label: 'Attendance In Progress..' }],
   },
-];
+   {
+    icon: IconHostel,
+    label: 'Hostle',
+    subLinks: [
+          { label: 'Hostel Rooms', route: '/hostel/rooms' },
+          { label: 'Room Type', route: '/hostel/room-types' },
+          { label: 'Hostel', route: '/hostel' },
+          { label: 'Fee Master', route: '/fees/master' },
+          { label: 'Student Hostel Fee', route: '/fees/student-hostel' }
+      ],
+    }
+  ];
 
 // =====================================================
 //  COMPONENT: DoubleNavbar
@@ -258,6 +274,14 @@ export function DoubleNavbar() {
             <Route path="/postaldispatch" element={<PostalDispatch/>}/>
             <Route path="/postalreceive" element={<PostalReceive/>}/>
             <Route path="/complain" element={<Complain/>}/>
+            <Route path="/setup/front/office" element={<Dashboard/>}/>
+
+             
+             <Route path="/hostel/rooms" element={<HostelRoom/>}/>
+            <Route path="/hostel/room-types" element={<Roomtype/>}/>
+            <Route path="/hostel" element={<Hostel/>}/>
+            <Route path="/fees/master" element={<Dashboard/>}/>
+            <Route path="/fees/student-hostel" element={<Dashboard/>}/>
           </Routes>
         </div>
       </div>

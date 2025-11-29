@@ -1,9 +1,12 @@
+
 import React, { useState, useEffect } from "react";
-import "./complain.css";
-import DatePicker from "react-datepicker";
+import "./hostel.css";
+
 import "react-datepicker/dist/react-datepicker.css";
 import VisitorToolbar from "../../Global/VisitorToolbar";
 import { API_BASE_URL } from "../../../config.js";
+
+
 
 const CustomAlert = ({ message, onClose, type = 'success' }) => {
   return (
@@ -102,10 +105,11 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
   );
 };
 
-const Complain = () => {
+const Hostel = () => {
   let num = 1;
 
   const [logs, setLogs] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({});
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
@@ -118,6 +122,26 @@ const Complain = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
+
+  
+  useEffect(() => {
+    roomtypedropdown();
+  }, []);
+
+  const roomtypedropdown = () => {
+    const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
+    fetch(`${apiUrl}/room_type`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched room types:", data);
+        setRoomTypes(Array.isArray(data) ? data : data.data || []);  
+      })
+      .catch((err) => {
+        console.error("Error fetching room types:", err);
+        setRoomTypes([]);
+      });
+  };
+
 
   const showCustomAlert = (message, type = 'success') => {
     setAlertMessage(message);
@@ -136,41 +160,41 @@ const Complain = () => {
 
   const fetchLogs = () => {
     const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
-    fetch(`${apiUrl}/complaint`)
+    fetch(`${apiUrl}/hostel`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Fetched data from /complaint:", data);
-        setLogs(Array.isArray(data) ? data : data.data || []);
+        console.log("Fetched data from /hostel:", data);
+        setLogs(Array.isArray(data) ? data : data.data || []);  
       })
       .catch((err) => {
-        console.error("Error fetching complaint logs:", err);
+        console.error("Error fetching hostel logs:", err);
         setLogs([]);
       });
   };
 
   const handleEdit = (item) => {
     setFormData({
-      complainttype: item.complaint_type,
-      complainsource: item.source,
-      complainby: item.complain_by,
-      complainPhone: item.phone,
-      complaindate: item.date,
-      complaindescription: item.description,
-      complainactiontaken: item.action_taken,
-      complainassigned: item.assigned,
-      complainnote: item.note,
-      fileUpload: item.upload_documents
+      hostalname: item.hostel_name,
+      Hosteltype: item.room_type?.id,
+      address: item.address,
+      intake: item.intake,
+      hostaldescription: item.description
     });
     setIsEditing(true);
     setEditingId(item.id);
   };
 
-  // Filter based on search input
+  // Filter based on search input (Reference No)
   const searchTerm = (formData.callSearch || "").toLowerCase();
 
-  const filteredLogs = logs.filter((log) =>
-    log.complain_by?.toLowerCase().includes(searchTerm)
-  );
+  const filteredLogs = (logs || []).filter((log) => {
+    // If no search term, show all records
+    if (!searchTerm || searchTerm.trim() === "") {
+      return true;
+    }
+    // Otherwise filter by hostel_name
+    return log.hostel_name?.toLowerCase().includes(searchTerm);
+  });
 
   // Pagination logic after filtering
   const recordsPerPage = 10;
@@ -179,92 +203,47 @@ const Complain = () => {
   const currentRecords = filteredLogs.slice(indexOfFirstRecord, indexOfLastRecord);
   const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
 
+
+  console.log("filteredLogs:", filteredLogs);
+  console.log("currentRecords:", currentRecords);
+  console.log("searchTerm:", searchTerm);
+  console.log("searchTerm length:", searchTerm.length);
+
+
+
   const formElements = [
     {
-      id: "complainttype",
-      label: "Complaint Type",
-      type: "dropdown",
-      options: ["Service Issue", "Product Issue", "Billing Issue", "Technical Issue"],
-      require: true,
-    },
-    {
-      id: "complainsource",
-      label: "Source",
-      type: "dropdown",
-      options: ["Phone", "Email", "Walk-in", "Online"],
-      require: true,
-    },
-    {
-      id: "complainby",
-      label: "Complain By",
+      id: "hostalname",
+      label: "Hostal Name",
       type: "text",
       require: true,
     },
+     {
+      id: "Hosteltype",
+      label: "Room / Hostel Type",
+      type: "dropdown",
+      options: roomTypes,
+      require: true,
+    },
     {
-      id: "complainPhone",
-      label: "Phone",
+      id: "address",
+      label: "Address",
       type: "text",
-      require: true,
+      require: false,
     },
     {
-      id: "complaindate",
-      label: "Date",
-      type: "date",
-      position: "left",
-      require: true,
+      id: "intake",
+      label: "Intake",
+      type: "text",
+      require: false,
     },
-    {
-      id: "complaindescription",
+       {
+      id: "hostaldescription",
       label: "Description",
       type: "textarea",
-      require: true,
-    },
-    {
-      id: "complainactiontaken",
-      label: "Action Taken",
-      type: "textarea",
-      require: true,
-    },
-    {
-      id: "complainassigned",
-      label: "Assigned",
-      type: "text",
-      require: true,
-    },
-    {
-      id: "complainnote",
-      label: "Note",
-      type: "textarea",
-      require: true,
-    },
-    {
-      id: "fileUpload",
-      label: "Upload Documents",
-      type: "file",
-      position: "right",
-      require: true,
-    },
+      require: false,
+    }
   ];
-
-  const [nameError, setNameError] = useState("");
-  const validateName = (value) => {
-    if (!/^[a-zA-Z\s]*$/.test(value)) {
-      setNameError("Name should contain only alphabets and spaces");
-    } else {
-      setNameError("");
-    }
-  };
-
-  const [phoneError, setPhoneError] = useState("");
-  const validatePhone = (value) => {
-    if (!/^[6-9]/.test(value)) {
-      setPhoneError("Indian mobile number should start with 6, 7, 8, or 9");
-    } else if (value.length !== 10) {
-      setPhoneError("Mobile number should be exactly 10 digits");
-    } else {
-      setPhoneError("");
-    }
-  };
 
   const [remarksError, setRemarksError] = useState({});
   const validateTextarea = (id, value) => {
@@ -280,7 +259,7 @@ const Complain = () => {
 
   const handleDelete = (item) => {
     setItemToDelete(item);
-    setConfirmMessage(`Are you sure you want to delete ${item.complain_by}?`);
+    setConfirmMessage(`Are you sure you want to delete ${item.hostel_name}?`);
     setShowConfirm(true);
   };
 
@@ -290,13 +269,13 @@ const Complain = () => {
     try {
       const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
       const response = await fetch(
-        `${apiUrl}/complaint/${itemToDelete.id}`,
+        `${apiUrl}/hostel/${itemToDelete.id}`,
         {
           method: "DELETE",
         }
       );
 
-      if (!response.ok) throw new Error("Failed to delete complaint");
+      if (!response.ok) throw new Error("Failed to delete dispatch");
 
       fetchLogs();
       showCustomAlert("Deleted successfully!");
@@ -332,22 +311,22 @@ const Complain = () => {
     e.preventDefault();
 
     const payload = {
-      complaint_type: formData.complainttype,
-      source: formData.complainsource,
-      complain_by: formData.complainby,
-      phone: formData.complainPhone,
-      date: formData.complaindate,
-      description: formData.complaindescription,
-      action_taken: formData.complainactiontaken,
-      assigned: formData.complainassigned,
-      note: formData.complainnote,
-      upload_documents: formData.fileUpload || "",
+      hostel_name: formData.hostalname,
+      room_type_id: parseInt(formData.Hosteltype),
+      address: formData.address,
+      intake: parseInt(formData.intake) || 0,
+      description: formData.hostaldescription,
     };
+
+    console.log("Payload being sent:", payload);
 
     try {
       const apiUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
-      const url = isEditing ? `${apiUrl}/complaint/${editingId}` : `${apiUrl}/complaint`;
+      const url = isEditing ? `${apiUrl}/hostel/${editingId}` : `${apiUrl}/hostel`;
       const method = isEditing ? "PATCH" : "POST";
+      
+      console.log("API URL:", url);
+      console.log("Method:", method);
       
       const response = await fetch(url, {
         method: method,
@@ -357,62 +336,36 @@ const Complain = () => {
         body: JSON.stringify(payload),
       });
 
+      console.log("Response status:", response.status);
+      const responseData = await response.text();
+      console.log("Response data:", responseData);
+
       if (response.ok) {
-        showCustomAlert(isEditing ? "Updated successfully!" : "Complaint saved successfully!");
+        showCustomAlert(isEditing ? "Updated successfully!" : "Hostel saved successfully!");
         setFormData({});
         setRemarksError({});
         setIsEditing(false);
         setEditingId(null);
         fetchLogs();
       } else {
-        showCustomAlert(isEditing ? "Failed to update" : "Failed to save complaint", 'error');
+        showCustomAlert(`${isEditing ? "Failed to update" : "Failed to save hostel"}: ${responseData}`, 'error');
       }
     } catch (error) {
-      console.error("Error saving complaint:", error);
-      showCustomAlert("An error occurred while saving complaint", 'error');
+      console.error("Error saving hostel:", error);
+      showCustomAlert("An error occurred while saving hostel", 'error');
     }
   };
 
   return (
     <div style={{ display: "flex" }}>
       {/* Left Section - Form */}
-      <div style={{ flex: 1, padding: "7px", borderRight: "1px solid #ccc", margin: "8px", boxShadow: "0 0 5px #ccc", borderRadius: "4px", maxHeight: "600px", overflowY: "auto"
-      }}>
+      <div className="leftCreatepostdispatch">
         <h4 style={{ padding: "0px", margin: "0px 0px 13px" }}>
-          {isEditing ? 'Edit Complaint' : 'Add Complaint'}
+          {isEditing ? 'Edit Hostel' : 'Add Hostel'}
         </h4>
         <form>
+          <div style={{}}>
           {formElements.map((item) => {
-            if (item.type === "dropdown") {
-              return (
-                <div key={item.id} className="call-group-create">
-                  <label htmlFor={item.id}>
-                    {item.label}
-                    {item.require && <span className="required">*</span>}
-                  </label>
-                  <select
-                    id={item.id}
-                    name={item.id}
-                    value={formData[item.id] || ""}
-                    className="call-group-create-input"
-                    onChange={(e) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        [item.id]: e.target.value,
-                      }));
-                    }}
-                  >
-                    <option value="">Select {item.label}</option>
-                    {item.options.map((option, idx) => (
-                      <option key={idx} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              );
-            }
-
             if (item.type === "textarea") {
               return (
                 <div key={item.id} className="call-group-create">
@@ -449,52 +402,38 @@ const Complain = () => {
                   </div>
                 </div>
               );
-            }
-
-            if (item.type === "date") {
-              const today = new Date();
-              const oneYearBack = new Date(today);
-              oneYearBack.setFullYear(today.getFullYear() - 1);
-
-              const oneYearAhead = new Date(today);
-              oneYearAhead.setFullYear(today.getFullYear() + 1);
-
-              const formatDate = (date) => {
-                const day = String(date.getDate()).padStart(2, "0");
-                const month = date.toLocaleString("en-US", { month: "short" });
-                const year = date.getFullYear();
-                return `${day}-${month}-${year}`;
-              };
-
+            } if (item.type === "dropdown") {
               return (
                 <div key={item.id} className="call-group-create">
                   <label htmlFor={item.id}>
                     {item.label}
                     {item.require && <span className="required">*</span>}
                   </label>
-                  <div className="call-group-create-date">
-                    <DatePicker
-                      id={item.id}
-                      selected={
-                        formData[item.id] ? new Date(formData[item.id]) : null
-                      }
-                      onChange={(date) => {
-                        const formatted = formatDate(date);
-                        setFormData((prev) => ({
-                          ...prev,
-                          [item.id]: formatted,
-                        }));
-                      }}
-                      minDate={oneYearBack}
-                      maxDate={oneYearAhead}
-                      placeholderText="Select Date"
-                      dateFormat="dd-MMM-yyyy"
-                    />
-                  </div>
+                  <select
+                    id={item.id}
+                    name={item.id}
+                    value={formData[item.id] || ""}
+                    className="call-group-create-input"
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        [item.id]: e.target.value,
+                      }));
+                    }}
+                  >
+                   <option value="">Select</option>
+                    {item.options?.map((option) => (
+                    <option key={option.id} value={option.id}>
+                        {option.room_type}
+                    </option>
+                    ))}
+                  </select>
                 </div>
               );
             }
 
+
+    
             if (item.type === "text") {
               return (
                 <div key={item.id} className="call-group-create">
@@ -508,30 +447,14 @@ const Complain = () => {
                     name={item.id}
                     className="call-group-create-input"
                     value={formData[item.id] || ""}
-                    maxLength={item.id === "complainPhone" ? 10 : undefined}
                     onChange={(e) => {
-                      let val = e.target.value;
-
-                      if (item.id === "complainby") {
-                        validateName(val);
-                      }
-
-                      if (item.id === "complainPhone") {
-                        validatePhone(val);
-                      }
-
+                      const val = e.target.value;
                       setFormData((prev) => ({
                         ...prev,
                         [item.id]: val,
                       }));
                     }}
                   />
-                  {item.id === "complainby" && nameError && (
-                    <div className="error-message">{nameError}</div>
-                  )}
-                  {item.id === "complainPhone" && phoneError && (
-                    <div className="error-message">{phoneError}</div>
-                  )}
                 </div>
               );
             }
@@ -547,7 +470,7 @@ const Complain = () => {
                     type="file"
                     id={item.id}
                     name={item.id}
-                    className="call-group-create-inpu"
+                    className="call-group-create-inputs"
                     onChange={(e) => {
                       const file = e.target.files[0];
                       setFormData((prev) => ({
@@ -562,6 +485,7 @@ const Complain = () => {
 
             return null;
           })}
+          </div>
 
           <div style={{ display: "flex", justifyContent: "center", marginTop: "12px" }}>
             <button
@@ -571,7 +495,7 @@ const Complain = () => {
                 width: isEditing ? "44%" : "44%",
                 height: "25px",
                 padding: "0px",
-                backgroundColor: isFormValid() ? "#007bff" : "#ccc",
+                backgroundColor: isFormValid() ? "#474849ff" : "#ccc",
                 color: "white",
                 border: "none",
                 cursor: isFormValid() ? "pointer" : "not-allowed",
@@ -587,8 +511,6 @@ const Complain = () => {
                   setIsEditing(false);
                   setEditingId(null);
                   setRemarksError({});
-                  setNameError("");
-                  setPhoneError("");
                 }}
                 style={{
                   fontSize: "14px",
@@ -610,9 +532,10 @@ const Complain = () => {
       </div>
 
       {/* Right Section - Table */}
-      <div style={{ flex: 3, padding: "7px", borderRight: "1px solid #ccc", margin: "8px", boxShadow: "0 0 5px #ccc", borderRadius: "4px" }}>
+      <div style={{ flex: "3 1 0%", padding: "7px", borderRight: "1px solid rgb(204, 204, 204)", margin: "8px", boxShadow: "0 0 5px #ccc", borderRadius: "4px" }}>
+       
         <h4 style={{ padding: "0px", margin: "0px 0px 13px" }}>
-          Complaint List
+          Hostel List
         </h4>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
@@ -640,28 +563,27 @@ const Complain = () => {
           <div>
             <VisitorToolbar 
               visitors={currentRecords} 
-              fileName="Complaint_Data"
+              fileName="Hostel_Data"
               columns={[
-                { key: "complaint_type", label: "COMPLAINT TYPE" },
-                { key: "complain_by", label: "COMPLAIN BY" },
-                { key: "phone", label: "PHONE" },
-                { key: "assigned", label: "ASSIGNED" },
-                { key: "date", label: "DATE" }
+                { key: "hostel_name", label: "HOSTEL NAME" },
+                { key: "room_type", label: "ROOM TYPE" },
+                { key: "address", label: "ADDRESS" },
+                { key: "intake", label: "INTAKE" },
+                { key: "description", label: "DESCRIPTION" }
               ]} 
             />
           </div>
         </div>
 
         <div style={{ maxHeight: "450px", overflowY: "auto" }}>
-          <table className="complaintable">
+          <table className="postDispatch">
             <thead>
               <tr>
                 <th>Sl No</th>
-                <th>Complain</th>
-                <th>Complaint Type</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Date</th>
+                <th>HOSTEL NAME</th>
+                <th>ROOM TYPE</th>
+                <th>ADDRESS</th>
+                <th>INTAKE</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -669,11 +591,10 @@ const Complain = () => {
               {currentRecords.map((log, index) => (
                 <tr key={index}>
                   <td>{num++}</td>
-                  <td>{log.assigned}</td>
-                  <td>{log.complaint_type}</td>
-                  <td>{log.complain_by}</td>
-                  <td>{log.phone || "-"}</td>
-                  <td>{log.date || "-"}</td>
+                  <td>{log.hostel_name}</td>
+                  <td>{log.room_type?.room_type || 'N/A'}</td>
+                  <td>{log.address}</td>
+                  <td>{log.intake}</td>
                   <td>
                     <div className="action-menu">
                       <i className="fas fa-ellipsis-v"></i>
@@ -688,7 +609,7 @@ const Complain = () => {
               ))}
               {logs.length === 0 && (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
+                  <td colSpan="6" style={{ textAlign: "center" }}>
                     No records found
                   </td>
                 </tr>
@@ -743,19 +664,14 @@ const Complain = () => {
               paddingBottom: '10px',
               marginBottom: '15px'
             }}>
-              <h3 style={{ margin: 0 }}>Complaint Details</h3>
+              <h3 style={{ margin: 0 }}>Hostel Details</h3>
             </div>
             <div>
-              <p><strong>Complaint Type:</strong> {selectedEnquiry.complaint_type || "N/A"}</p>
-              <p><strong>Source:</strong> {selectedEnquiry.source || "N/A"}</p>
-              <p><strong>Complain By:</strong> {selectedEnquiry.complain_by || "N/A"}</p>
-              <p><strong>Phone:</strong> {selectedEnquiry.phone || "N/A"}</p>
-              <p><strong>Date:</strong> {selectedEnquiry.date || "N/A"}</p>
+              <p><strong>Hostel Name:</strong> {selectedEnquiry.hostel_name || "N/A"}</p>
+              <p><strong>Room Type:</strong> {selectedEnquiry.room_type?.room_type || "N/A"}</p>
+              <p><strong>Address:</strong> {selectedEnquiry.address || "N/A"}</p>
+              <p><strong>Intake:</strong> {selectedEnquiry.intake || "N/A"}</p>
               <p><strong>Description:</strong> {selectedEnquiry.description || "N/A"}</p>
-              <p><strong>Action Taken:</strong> {selectedEnquiry.action_taken || "N/A"}</p>
-              <p><strong>Assigned:</strong> {selectedEnquiry.assigned || "N/A"}</p>
-              <p><strong>Note:</strong> {selectedEnquiry.note || "N/A"}</p>
-              <p><strong>Upload Documents:</strong> {selectedEnquiry.upload_documents || "N/A"}</p>
             </div>
             <button
               onClick={() => setShowModal(false)}
@@ -795,4 +711,6 @@ const Complain = () => {
   );
 };
 
-export default Complain;
+
+
+export default Hostel;
