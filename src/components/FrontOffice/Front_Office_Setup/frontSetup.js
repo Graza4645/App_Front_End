@@ -529,7 +529,7 @@ const FrontOfficeSetUp = () => {
           <div>
             <VisitorToolbar 
               visitors={currentRecords} 
-              fileName="Room_Type_Data"
+              fileName={`${activeTab.replace(' ', '_')}_Data`}
               columns={[
                 { key: {
                   'PURPOSE': 'purpose',
