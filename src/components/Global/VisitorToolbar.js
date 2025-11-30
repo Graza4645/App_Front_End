@@ -36,23 +36,25 @@ export default function VisitorToolbar({ visitors, columns, fileName = "visitor_
   const handleExport = (type) => {
     if (!visitors.length) return showAlert("No data to export", 'error');
 
-    // Prepare filtered data
-    const exportData = visitors.map(v => {
-      const obj = {};
-      columns.forEach(col => obj[col.label] = v[col.key] ?? "N/A");
-      return obj;
-    });
-
     if (type === "excel" || type === "csv") {
-      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      // Prepare data with headers
+      const exportData = [
+        headers, // Header row
+        ...visitors.map(v => 
+          columns.map(col => v[col.key] ?? "N/A")
+        )
+      ];
+      
+      const worksheet = XLSX.utils.aoa_to_sheet(exportData);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Visitors");
+      XLSX.utils.book_append_sheet(workbook, worksheet, fileName.toLowerCase());
       XLSX.writeFile(workbook, `${fileName}.${type === "csv" ? "csv" : "xlsx"}`);
     }
 
     if (type === "pdf") {
       const doc = new jsPDF();
-      doc.text("Visitor Data", 14, 15);
+      const pdfTitle = fileName.toLowerCase().replace('_data', '').replace(/_/g, ' ');
+      doc.text(pdfTitle, 14, 15);
       autoTable(doc, {
         head: [headers],
         body: visitors.map(v => columns.map(col => v[col.key] ?? "N/A")),
