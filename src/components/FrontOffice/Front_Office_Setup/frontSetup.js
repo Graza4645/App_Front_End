@@ -529,7 +529,7 @@ const FrontOfficeSetUp = () => {
           <div>
             <VisitorToolbar 
               visitors={currentRecords} 
-              fileName={`${activeTab.replace(' ', '_')}_Data`}
+              fileName={`${activeTab.split(' ').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join('_')}_Data`}
               columns={[
                 { key: {
                   'PURPOSE': 'purpose',
