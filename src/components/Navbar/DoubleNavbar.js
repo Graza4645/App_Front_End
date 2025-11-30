@@ -34,6 +34,7 @@ import { Home, Users, BookOpen, DollarSign, BarChart2, FileMinus, ClipboardCheck
 import Roomtype from '../Hostel/Room_Type/roomtype.js';
 import HostelRoom from '../Hostel/Hostel_Room/hostelroom.js';
 import Hostel from '../Hostel/Hostel/hostel.js';
+import FrontOfficeSetUp from '../FrontOffice/Front_Office_Setup/frontSetup.js';
 
 // =====================================================
 //  ICON COMPONENTS (NEW COLORFUL SET)
@@ -274,7 +275,7 @@ export function DoubleNavbar() {
             <Route path="/postaldispatch" element={<PostalDispatch/>}/>
             <Route path="/postalreceive" element={<PostalReceive/>}/>
             <Route path="/complain" element={<Complain/>}/>
-            <Route path="/setup/front/office" element={<Dashboard/>}/>
+            <Route path="/setup/front/office" element={<FrontOfficeSetUp/>}/>
 
              
              <Route path="/hostel/rooms" element={<HostelRoom/>}/>
